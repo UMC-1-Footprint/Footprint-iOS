@@ -1,14 +1,9 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-//let project = Project.app(name: "FootprintIOS",
-//                          platform: .iOS,
-//                          additionalTargets: ["FootprintIOSKit", "FootprintIOSUI"])
-//
-
 protocol ProjectFactory {
     var projectName: String { get }
-//    var dependencies: [TargetDependency] { get }
+    var dependencies: [TargetDependency] { get }
     
     func generateTarget() -> [Target]
 //    func generateConfigurations() -> Settings
@@ -17,9 +12,13 @@ protocol ProjectFactory {
 class BaseProjectFactory: ProjectFactory {
     let projectName: String = "Footprint-iOS"
     
-//    var dependencies: [TargetDependency] = [
-//        .external(name: "Moya")
-//    ]
+    var dependencies: [TargetDependency] = [
+        .external(name: "Moya"),
+        .external(name: "SnapKit"),
+        .external(name: "RxSwift"),
+        .external(name: "Then"),
+        .external(name: "ReactorKit"),
+    ]
     
     func generateTarget() -> [Target] {
         [
@@ -36,10 +35,7 @@ class BaseProjectFactory: ProjectFactory {
     //                private: "Sources/private/**",
     //                project: ["Sources/project/A/**", "Sources/project/B/**"]
     //            ),
-                dependencies: [
-                    /* Target dependencies can be defined here */
-                    /* .framework(path: "framework") */
-                ]
+                dependencies: dependencies
             ),
             Target(
                 name: "\(projectName)Tests",
@@ -61,7 +57,11 @@ class BaseProjectFactory: ProjectFactory {
 //
 }
 
-
+// MARK: - project
 let factory = BaseProjectFactory()
 
-let project: Project = .init(name: factory.projectName, organizationName: factory.projectName, targets: factory.generateTarget())
+let project: Project = .init(
+    name: factory.projectName,
+    organizationName: factory.projectName,
+    targets: factory.generateTarget()
+)
