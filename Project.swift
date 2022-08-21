@@ -20,6 +20,22 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "ReactorKit"),
     ]
     
+    let infoPlist: [String: InfoPlist.Value] = [
+        "CFBundleVersion": "1",
+        "UILaunchStoryboardName": "LaunchScreen",
+        "UIApplicationSceneManifest": [
+            "UIApplicationSupportsMultipleScenes": false,
+            "UISceneConfigurations": [
+                "UIWindowSceneSessionRoleApplication": [
+                    [
+                        "UISceneConfigurationName": "Default Configuration",
+                        "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+                    ],
+                ]
+            ]
+        ],
+    ]
+    
     func generateTarget() -> [Target] {
         [
             Target(
@@ -27,14 +43,9 @@ class BaseProjectFactory: ProjectFactory {
                 platform: .iOS,
                 product: .app,
                 bundleId: "com.\(projectName)",
-//                infoPlist: "Info.plist",
+                infoPlist: .extendingDefault(with: infoPlist),
                 sources: ["Targets/FootprintIOS/Sources/**"],
                 resources: ["Targets/FootprintIOS/Resources/**"],
-    //            headers: .headers(
-    //                public: ["Sources/public/A/**", "Sources/public/B/**"],
-    //                private: "Sources/private/**",
-    //                project: ["Sources/project/A/**", "Sources/project/B/**"]
-    //            ),
                 dependencies: dependencies
             ),
             Target(
@@ -42,7 +53,7 @@ class BaseProjectFactory: ProjectFactory {
                 platform: .iOS,
                 product: .unitTests,
                 bundleId: "com.\(projectName)Tests",
-//                infoPlist: "Info.plist",
+                infoPlist: .default,
                 sources: ["Targets/FootprintIOS/Tests/**"],
                 dependencies: [
                     .target(name: projectName)

@@ -1,6 +1,4 @@
 import UIKit
-import FootprintIOSKit
-import FootprintIOSUI
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -13,11 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         let viewController = UIViewController()
-        viewController.view.backgroundColor = .white
+        viewController.view.backgroundColor = .red
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
-        FootprintIOSKit.hello()
-        FootprintIOSUI.hello()
 
         return true
     }
