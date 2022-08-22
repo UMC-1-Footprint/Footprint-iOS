@@ -18,6 +18,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxSwift"),
         .external(name: "Then"),
         .external(name: "ReactorKit"),
+        .external(name: "RxCocoa")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
