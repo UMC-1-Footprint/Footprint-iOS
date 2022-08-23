@@ -1,6 +1,6 @@
 //
 //  TabBarController.swift
-//  Footprint-iOSTests
+//  Footprint-iOS
 //
 //  Created by 송영모 on 2022/08/22.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
@@ -11,29 +11,26 @@ import UIKit
 class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        tabBar.backgroundColor = .white
-        tabBar.isTranslucent = false
-        tabBar.layer.borderWidth = 1.0
-        tabBar.layer.borderColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.1)
-//
-//        let myPlannerReactor = MyPlannerReactor()
-//        let myPlannerNavigationViewController = UINavigationController(rootViewController: MyPlannerViewController(reactor: myPlannerReactor))
-//        let myPlannerTabBarItem = UITabBarItem(title: nil, image: JYPIOSAsset.myJourneyInactive.image.withRenderingMode(.alwaysOriginal), selectedImage: JYPIOSAsset.myJourneyActive.image.withRenderingMode(.alwaysOriginal))
-//        myPlannerTabBarItem.imageInsets = .init(top: 9, left: 0, bottom: -9, right: 0)
-//
-//        let anotherJourneyViewController = UINavigationController(rootViewController: AnotherJourneyViewController())
-//        let anotherJourneyTabBarItem = UITabBarItem(title: nil, image: JYPIOSAsset.anotherJourneyInactive.image.withRenderingMode(.alwaysOriginal), selectedImage: JYPIOSAsset.anotherJourneyActive.image.withRenderingMode(.alwaysOriginal))
-//        anotherJourneyTabBarItem.imageInsets = .init(top: 9, left: 0, bottom: -9, right: 0)
-//
-//        let myPageNavigationViewController = UINavigationController(rootViewController: MyPageViewController())
-//        let myPageTabBarItem = UITabBarItem(title: nil, image: JYPIOSAsset.myPageInactive.image.withRenderingMode(.alwaysOriginal), selectedImage: JYPIOSAsset.myPageActive.image.withRenderingMode(.alwaysOriginal))
-//        myPageTabBarItem.imageInsets = .init(top: 9, left: 0, bottom: -9, right: 0)
-//
-//        myPlannerNavigationViewController.tabBarItem = myPlannerTabBarItem
-//        anotherJourneyViewController.tabBarItem = anotherJourneyTabBarItem
-//        myPageNavigationViewController.tabBarItem = myPageTabBarItem
-//
-//        viewControllers = [myPlannerNavigationViewController, anotherJourneyViewController, myPageNavigationViewController]
+        
+        let footprintNavigationViewController = UINavigationController(rootViewController: FootprintViewController())
+        let footprintTabBarItem = UITabBarItem(title: "홈", image: nil, selectedImage: nil)
+        
+        let calendarNavigationViewController = UINavigationController(rootViewController: CalendarViewController())
+        let calendarTabBarItem = UITabBarItem(title: "캘린더", image: nil, selectedImage: nil)
+        
+        let recommendNavigationViewController = UINavigationController(rootViewController: RecommendViewController())
+        let recommendTabBarItem = UITabBarItem(title: "코스추천", image: nil, selectedImage: nil)
+        
+        let myPageNavigationViewController = UINavigationController(rootViewController: MyPageViewController())
+        let myPageTabBarItem = UITabBarItem(title: "마이 페이지", image: nil, selectedImage: nil)
+        
+        footprintNavigationViewController.tabBarItem = footprintTabBarItem
+        calendarNavigationViewController.tabBarItem = calendarTabBarItem
+        recommendNavigationViewController.tabBarItem = recommendTabBarItem
+        myPageNavigationViewController.tabBarItem = myPageTabBarItem
+        
+        viewControllers = [footprintNavigationViewController, calendarNavigationViewController, recommendNavigationViewController, myPageNavigationViewController]
+        
         selectedIndex = 0
     }
 }
