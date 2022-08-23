@@ -14,10 +14,6 @@ class BaseCollectionReusableView: UICollectionReusableView, BaseViewProtocol {
     
     // MARK: - Initializer
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -25,6 +21,11 @@ class BaseCollectionReusableView: UICollectionReusableView, BaseViewProtocol {
         setupHierarchy()
         setupLayout()
         setupBind()
+    }
+    
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func prepareForReuse() {
