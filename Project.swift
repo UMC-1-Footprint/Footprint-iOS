@@ -45,8 +45,8 @@ class BaseProjectFactory: ProjectFactory {
                 product: .app,
                 bundleId: "com.\(projectName)",
                 infoPlist: .extendingDefault(with: infoPlist),
-                sources: ["Targets/FootprintIOS/Sources/**"],
-                resources: ["Targets/FootprintIOS/Resources/**"],
+                sources: ["FootprintIOS/FootprintIOS/Sources/**"],
+                resources: ["FootprintIOS/FootprintIOS/Resources/**"],
                 dependencies: dependencies
             ),
             Target(
@@ -55,7 +55,7 @@ class BaseProjectFactory: ProjectFactory {
                 product: .unitTests,
                 bundleId: "com.\(projectName)Tests",
                 infoPlist: .default,
-                sources: ["Targets/FootprintIOS/Tests/**"],
+                sources: ["FootprintIOS/FootprintIOS/Tests/**"],
                 dependencies: [
                     .target(name: projectName)
                 ]
