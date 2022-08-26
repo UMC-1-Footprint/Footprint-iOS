@@ -30,6 +30,7 @@ protocol BaseNavigationBarViewControllerProtocol: AnyObject {
     func setNavigationBarSubTitleText(_ text: String?)
     func setNavigationBarSubTitleFont(_ font: UIFont?)
     func setNavigationBarSubTitleTextColor(_ color: UIColor?)
+    func setNavigationBarBackButtonImage(_ image: UIImage?)
 }
 
 class NavigationBarViewController: BaseViewController, BaseNavigationBarViewControllerProtocol {
@@ -87,7 +88,7 @@ class NavigationBarViewController: BaseViewController, BaseNavigationBarViewCont
         }
         
         navigationBar.title.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(55)
+            $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
         }
         
@@ -138,6 +139,10 @@ class NavigationBarViewController: BaseViewController, BaseNavigationBarViewCont
     
     func setNavigationBarBackButtonTitleColor(_ color: UIColor?) {
         navigationBar.backButton.setTitleColor(color, for: .normal)
+    }
+    
+    func setNavigationBarBackButtonImage(_ image: UIImage?) {
+        navigationBar.backButton.setImage(image, for: .normal)
     }
     
     func setNavigationBarTitleText(_ text: String?) {
