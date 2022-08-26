@@ -1,5 +1,5 @@
 //
-//  UIColor+Ext.swift
+//  UIImage+Ext.swift
 //  Footprint-iOS
 //
 //  Created by Sojin Lee on 2022/08/26.
@@ -8,6 +8,8 @@
 
 import UIKit
 
-extension UIColor {
-    static var blueM: UIColor? { return UIColor(named: "BlueM") }
+extension UIImage {
+    static var backButtonIcon: UIImage? {
+       return UIImage(named: "backButtonIcon.png")
+    }
 }
