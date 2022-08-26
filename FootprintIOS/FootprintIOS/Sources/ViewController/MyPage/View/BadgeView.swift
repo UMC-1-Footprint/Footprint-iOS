@@ -38,13 +38,23 @@ class BadgeView: BaseView {
         $0.textColor = .white
     }
     
+    let badgeImage = UIImageView().then {
+        $0.image = FootprintIOSAsset.Images.startBadge.image
+    }
+    
+    let badgeName = UILabel().then {
+        $0.text = "발자국 스타터"
+        $0.font = .boldSystemFont(ofSize: 16)
+        $0.textColor = FootprintIOSAsset.Colors.blackL.color
+    }
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
         representBadgeStackView.addArrangedSubview(representBadgeImage)
         representBadgeStackView.addArrangedSubview(representBadgeTitle)
         backgroundView.addSubviews([backgroundImage, representBadgeStackView])
-        addSubview(backgroundView)
+        addSubviews([backgroundView, badgeImage, badgeName])
     }
     
     override func setupLayout() {
@@ -74,7 +84,16 @@ class BadgeView: BaseView {
             $0.height.equalTo(19)
         }
         
+        badgeImage.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(representBadgeStackView.snp.bottom).offset(23)
+            $0.width.height.equalTo(150)
+        }
         
+        badgeName.snp.makeConstraints {
+            $0.top.equalTo(badgeImage.snp.bottom).offset(13)
+            $0.centerX.equalToSuperview()
+        }
     }
     
 }
