@@ -21,7 +21,7 @@ class TabBarViewController: UITabBarController {
         let recommendNavigationViewController = UINavigationController(rootViewController: RecommendViewController())
         let recommendTabBarItem = UITabBarItem(title: "코스추천", image: nil, selectedImage: nil)
         
-        let myPageNavigationViewController = UINavigationController(rootViewController: MyPageViewController())
+        let myPageNavigationViewController = UINavigationController(rootViewController: BadgeViewController())
         let myPageTabBarItem = UITabBarItem(title: "마이 페이지", image: nil, selectedImage: nil)
         
         footprintNavigationViewController.tabBarItem = footprintTabBarItem
