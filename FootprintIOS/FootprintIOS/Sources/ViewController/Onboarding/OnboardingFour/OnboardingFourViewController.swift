@@ -1,20 +1,20 @@
 //
-//  OnboardingOneViewController.swift
+//  OnboardingFourViewController.swift
 //  Footprint-iOS
 //
-//  Created by 송영모 on 2022/08/26.
+//  Created by 송영모 on 2022/08/27.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
 import UIKit
 import ReactorKit
 
-class OnboardingOneViewController: NavigationBarViewController, View {
+class OnboardingFourViewController: NavigationBarViewController, View {
     typealias Reactor = OnboardingReactor
     
     // MARK: - UI Components
     
-    let onboardingView: OnboardingView = .init(type: .one)
+    let onboardingView: OnboardingView = .init(type: .four)
     
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
@@ -58,9 +58,7 @@ class OnboardingOneViewController: NavigationBarViewController, View {
             .distinctUntilChanged()
             .filter { $0 }
             .bind { [weak self] _ in
-                let onboardingTwoViewController = OnboardingTwoViewController(reactor: .init())
-                
-                self?.navigationController?.pushViewController(onboardingTwoViewController, animated: true)
+                //TODO: 로그인 페이지 이동
             }
             .disposed(by: disposeBag)
     }

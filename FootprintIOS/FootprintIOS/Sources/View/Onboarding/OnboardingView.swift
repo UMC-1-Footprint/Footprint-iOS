@@ -52,6 +52,20 @@ enum OnboardingViewType {
             return "그동안의 산책과 생각들을 추억할 수 있어요"
         }
     }
+    
+    var button: UIButton {
+        switch self {
+        case .one:
+            return FootprintButton(type: .next)
+        case .two:
+            return FootprintButton(type: .next)
+        case .three:
+            return FootprintButton(type: .next)
+        case .four:
+            return FootprintButton(type: .start)
+        }
+    }
+
 }
 
 class OnboardingView: BaseView {
@@ -59,8 +73,10 @@ class OnboardingView: BaseView {
     // MARK: - UI Components
     
     let pageStackView: UIStackView = .init()
+    let skipButton: UIButton = .init()
     let titleLabel: UILabel = .init()
     let subLabel: UILabel = .init()
+    lazy var bottomButton: UIButton = type.button
     
     // MARK: - Properties
     
@@ -90,6 +106,66 @@ class OnboardingView: BaseView {
             } else {
                 circle.backgroundColor = FootprintIOSAsset.Colors.white3.color
             }
+            
+            circle.snp.makeConstraints {
+                $0.width.height.equalTo(6)
+            }
+            
+            circle.cornerRound(radius: 3)
+            
+            pageStackView.addArrangedSubview(circle)
+        }
+        
+        pageStackView.distribution = .equalSpacing
+        
+        skipButton.setTitle("skip >", for: .normal)
+        skipButton.setTitleColor(.black, for: .normal)
+        skipButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .regular)
+        
+        titleLabel.text = type.title
+        titleLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        
+        subLabel.text = type.subTitle
+        subLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        subLabel.numberOfLines = 2
+        subLabel.textColor = FootprintIOSAsset.Colors.blackL.color
+    }
+    
+    override func setupHierarchy() {
+        super.setupHierarchy()
+        
+        addSubviews([pageStackView, skipButton, titleLabel, subLabel, bottomButton])
+    }
+    
+    override func setupLayout() {
+        super.setupLayout()
+        
+        pageStackView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(40)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(48)
+            $0.height.equalTo(6)
+        }
+        
+        skipButton.snp.makeConstraints {
+            $0.centerY.equalTo(pageStackView)
+            $0.trailing.equalToSuperview().inset(24)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(pageStackView.snp.bottom).offset(60)
+            $0.centerX.equalToSuperview()
+        }
+        
+        subLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(15)
+            $0.centerX.equalToSuperview()
+        }
+        
+        bottomButton.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.bottom.equalToSuperview().inset(36)
+            $0.height.equalTo(56)
         }
     }
 }
