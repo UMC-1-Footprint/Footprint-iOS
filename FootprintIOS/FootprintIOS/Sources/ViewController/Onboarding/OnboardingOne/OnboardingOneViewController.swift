@@ -51,7 +51,7 @@ class OnboardingOneViewController: NavigationBarViewController, View {
             .map { .tapBottomButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         // State
         reactor.state
             .map(\.isPresent)
