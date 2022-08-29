@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-class BadgeListViewCell: BaseCollectionViewCell {
+class BadgeListCollectionViewCell: BaseCollectionViewCell {
    static let identifier = "BadgeListViewCell"
 
     var badgeImage = UIImageView()
@@ -20,10 +20,14 @@ class BadgeListViewCell: BaseCollectionViewCell {
     }
     
     override func setupHierarchy() {
+        super.setupHierarchy()
+        
         addSubviews([badgeImage, badgeTitle])
     }
     
     override func setupLayout() {
+        super.setupLayout()
+        
         badgeImage.snp.makeConstraints {
             $0.width.height.equalTo(100)
             $0.top.equalToSuperview()

@@ -14,6 +14,8 @@ import RxSwift
 class MyPageViewController: NavigationBarViewController {
     
     override func setupNavigationBar() {
+        super.setupNavigationBar()
+        
         setNavigationBarTitleText("마이페이지")
     }
     
@@ -37,6 +39,8 @@ class MyPageViewController: NavigationBarViewController {
     }
     
     override func setupBind() {
+        super.setupBind()
+        
         pageButton.rx
             .tap
             .bind { [weak self] _ in

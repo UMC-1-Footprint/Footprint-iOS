@@ -36,10 +36,17 @@ class BadgeViewController: NavigationBarViewController {
             $0.edges.equalToSuperview()
         }
     }
+    
+    override func setupDelegate() {
+        super.setupDelegate()
+        
+        badgeView.badgeListCollectionView.delegate = self
+        badgeView.badgeListCollectionView.dataSource = self
+    }
 }
 
 // MARK: - extension
-extension BadgeView: UICollectionViewDelegateFlowLayout {
+extension BadgeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = UIScreen.main.bounds.width
         
@@ -50,13 +57,13 @@ extension BadgeView: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension BadgeView: UICollectionViewDataSource {
+extension BadgeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return BadgeModel.dummyData.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BadgeListViewCell.identifier, for: indexPath) as? BadgeListViewCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BadgeListCollectionViewCell.identifier, for: indexPath) as? BadgeListCollectionViewCell else { return UICollectionViewCell() }
         cell.setBadgeListCell(badge: BadgeModel.dummyData[indexPath.row])
         return cell
     }
