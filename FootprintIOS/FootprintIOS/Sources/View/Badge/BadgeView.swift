@@ -12,24 +12,25 @@ import Then
 
 class BadgeView: BaseView {
     
+    // MARK: - UI Components
     let backgroundView = UIView().then {
         $0.backgroundColor = FootprintIOSAsset.Colors.blueL.color.withAlphaComponent(0.3)
     }
     
     let backgroundImage = UIImageView().then {
-        $0.image = .badgeBackgroundImage
+        $0.image = FootprintIOSAsset.Images.badgeBackground.image
         $0.contentMode = .scaleAspectFill
     }
     
     let representBadgeStackView = UIStackView().then {
-        $0.backgroundColor = UIColor(patternImage: .representBadgeBackground!)
+        $0.backgroundColor = UIColor(patternImage: FootprintIOSAsset.Images.representBadgeBackground.image)
         $0.axis = .horizontal
         $0.spacing = 3
         $0.alignment = .center
     }
 
     let representBadgeImage = UIImageView().then {
-        $0.image = .representBadge
+        $0.image = FootprintIOSAsset.Images.representBadge.image
     }
 
     let representBadgeTitle = UILabel().then {
@@ -48,13 +49,24 @@ class BadgeView: BaseView {
         $0.textColor = FootprintIOSAsset.Colors.blackL.color
     }
     
+    let collectionViewFlowLayout = UICollectionViewFlowLayout().then {
+        $0.minimumLineSpacing = 4
+        $0.minimumInteritemSpacing = 14
+        $0.sectionInset = UIEdgeInsets(top: 15, left: 23, bottom: 15, right: 23)
+    }
+
+    lazy var badgeListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewFlowLayout).then {
+        $0.backgroundColor = FootprintIOSAsset.Colors.white2.color
+        $0.register(BadgeListViewCell.self, forCellWithReuseIdentifier: BadgeListViewCell.identifier)
+    }
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
         representBadgeStackView.addArrangedSubview(representBadgeImage)
         representBadgeStackView.addArrangedSubview(representBadgeTitle)
         backgroundView.addSubviews([backgroundImage, representBadgeStackView])
-        addSubviews([backgroundView, badgeImage, badgeName])
+        addSubviews([backgroundView, badgeImage, badgeName, badgeListCollectionView])
     }
     
     override func setupLayout() {
@@ -66,7 +78,8 @@ class BadgeView: BaseView {
         }
         
         backgroundView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.leading.trailing.equalToSuperview()
+            $0.height.equalTo(289)
         }
         
         representBadgeStackView.snp.makeConstraints {
@@ -80,8 +93,7 @@ class BadgeView: BaseView {
         representBadgeStackView.layoutMargins = UIEdgeInsets(top: 0.0, left: 7.0, bottom: 0.0, right: 0.0)
 
         representBadgeImage.snp.makeConstraints {
-            $0.width.equalTo(19)
-            $0.height.equalTo(19)
+            $0.width.height.equalTo(19)
         }
         
         badgeImage.snp.makeConstraints {
@@ -94,6 +106,19 @@ class BadgeView: BaseView {
             $0.top.equalTo(badgeImage.snp.bottom).offset(13)
             $0.centerX.equalToSuperview()
         }
+        
+        badgeListCollectionView.snp.makeConstraints {
+            $0.top.equalTo(backgroundView.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
+        
     }
     
+    override func setupDelegate() {
+        badgeListCollectionView.delegate = self
+        badgeListCollectionView.dataSource = self
+    }
+
 }
+
+
