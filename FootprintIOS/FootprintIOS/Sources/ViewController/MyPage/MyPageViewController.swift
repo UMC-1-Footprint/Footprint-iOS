@@ -29,10 +29,15 @@ class MyPageViewController: NavigationBarViewController {
         $0.setTitleColor(.black, for: .normal)
     }
     
+    let agreementPageButton = UIButton().then {
+        $0.setTitle("약관동의 뷰컨으로 이동", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+    }
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([badgePageButton, loginPageButton])
+        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton])
     }
     
     override func setupLayout() {
@@ -44,6 +49,11 @@ class MyPageViewController: NavigationBarViewController {
         
         loginPageButton.snp.makeConstraints {
             $0.top.equalTo(badgePageButton.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
+        
+        agreementPageButton.snp.makeConstraints {
+            $0.top.equalTo(loginPageButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
     }
@@ -66,6 +76,15 @@ class MyPageViewController: NavigationBarViewController {
                 let loginViewController = LoginViewController()
                 
                 self?.navigationController?.pushViewController(loginViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        agreementPageButton.rx
+            .tap
+            .bind { [weak self] _ in
+                let agreementViewController = AgreementViewController()
+                
+                self?.navigationController?.pushViewController(agreementViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }
