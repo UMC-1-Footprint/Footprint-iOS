@@ -13,7 +13,6 @@ import SnapKit
 enum LoginButtonType {
     case google
     case kakao
-    case confirm
     
     var title: String {
         switch self {
@@ -21,8 +20,6 @@ enum LoginButtonType {
             return "  카카오계정으로 로그인"
         case .google:
             return " 구글계정으로 로그인"
-        case .confirm:
-            return "확인"
         }
     }
     
@@ -32,8 +29,6 @@ enum LoginButtonType {
             return FootprintIOSAsset.Images.kakaoIcon.image
         case .google:
             return FootprintIOSAsset.Images.googleIcon.image
-        case .confirm:
-            return nil
         }
     }
     
@@ -43,8 +38,6 @@ enum LoginButtonType {
             return FootprintIOSAsset.Colors.yellowM.color
         case .google:
             return .white
-        case .confirm:
-            return FootprintIOSAsset.Colors.blueM.color
         }
     }
     
@@ -52,7 +45,7 @@ enum LoginButtonType {
         switch self {
         case .kakao:
             return FootprintIOSAsset.Colors.yellowM.color
-        case .google, .confirm:
+        case .google:
             return FootprintIOSAsset.Colors.blueM.color
         }
     }
@@ -61,8 +54,6 @@ enum LoginButtonType {
         switch self {
         case .kakao, .google:
             return FootprintIOSAsset.Colors.blackD.color
-        case .confirm:
-            return FootprintIOSAsset.Colors.white3.color
         }
     }
 }

@@ -11,6 +11,7 @@ import UIKit
 enum FootprintButtonType {
     case next
     case start
+    case confirm
     
     var title: String {
         switch self {
@@ -18,6 +19,8 @@ enum FootprintButtonType {
             return "다음"
         case .start:
             return "시작하기"
+        case .confirm:
+            return "확인"
         }
     }
 }
