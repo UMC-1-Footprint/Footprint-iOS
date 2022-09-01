@@ -112,7 +112,7 @@ class GoalViewController: NavigationBarViewController, View {
             $0.font = .systemFont(ofSize: 16, weight: .semibold)
         }
         
-        for i in 1 ... 7 {
+        for day in ["월", "화", "수", "목", "금", "토", "일"] {
             let dayButton = UIButton().then {
                 $0.layer.cornerRadius = 20
                 $0.setTitleColor(FootprintIOSAsset.Colors.blackD.color, for: .normal)
@@ -123,24 +123,7 @@ class GoalViewController: NavigationBarViewController, View {
             dayButton.snp.makeConstraints {
                 $0.width.height.equalTo(40)
             }
-            switch i {
-            case 1:
-                dayButton.setTitle("월", for: .normal)
-            case 2:
-                dayButton.setTitle("화", for: .normal)
-            case 3:
-                dayButton.setTitle("수", for: .normal)
-            case 4:
-                dayButton.setTitle("목", for: .normal)
-            case 5:
-                dayButton.setTitle("금", for: .normal)
-            case 6:
-                dayButton.setTitle("토", for: .normal)
-            case 7:
-                dayButton.setTitle("일", for: .normal)
-            default:
-                return
-            }
+            dayButton.setTitle(day, for: .normal)
             dayButtons.append(dayButton)
             dayButtonStackView.addArrangedSubview(dayButton)
         }
