@@ -57,7 +57,7 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     private let nicknameLabel = UILabel().then {
-        $0.text = "닉네임"
+        $0.text = "닉네임*"
     }
     
     private let nicknameTextField = UITextField().then {
@@ -77,7 +77,7 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     private let genderLabel = UILabel().then {
-        $0.text = "성별"
+        $0.text = "성별*"
     }
     
     private let genderSegmentControl = UISegmentedControl(items: ["여", "남", "선택안함"]).then {
@@ -191,13 +191,14 @@ class InfoViewController: NavigationBarViewController, View {
         super.setupHierarchy()
         
         selectedPageCircle.addSubview(pageNumLabel)
-        view.addSubviews([infoScrollView, pageStackView, titleLabel, subtitleLabel])
+        view.addSubviews([infoScrollView, pageStackView, titleLabel, subtitleLabel,
+                          bottomButton])
         infoScrollView.addSubview(infoContentView)
         bodyInfoImageView.addSubview(bodyInfoLabel)
         infoContentView.addSubviews([nicknameLabel, nicknameTextField, nicknameTFlineView, genderLabel,
                                      genderSegmentControl, lineView, birthLabel, birthDatePicker,
                                      bodyLabel, bodyInfoButton, bodyInfoImageView, bodyInfoStackView,
-                                     heightTFlineView, weightTFlineView, bottomButton])
+                                     heightTFlineView, weightTFlineView])
     }
 
     
@@ -332,19 +333,34 @@ class InfoViewController: NavigationBarViewController, View {
         bodyInfoStackView.snp.makeConstraints {
             $0.top.equalTo(bodyLabel.snp.bottom).offset(20)
             $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(infoContentView.snp.bottom).inset(150)
         }
         
         bottomButton.snp.makeConstraints {
-            $0.top.equalTo(bodyInfoStackView.snp.bottom).offset(55)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(56)
-            $0.bottom.equalTo(infoContentView.snp.bottom)
+            $0.bottom.equalToSuperview().inset(70)
         }
     }
 
     
     func bind(reactor: InfoReactor) {
         // Action
+        bottomButton
+            .rx
+            .tap
+            .map { .tapBottomButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         // State
+        reactor.state
+            .map(\.isPresent)
+            .filter { $0 }
+            .bind { [weak self] _ in
+                let goalViewController = GoalViewController(reactor: .init())
+                self?.navigationController?.pushViewController(goalViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
