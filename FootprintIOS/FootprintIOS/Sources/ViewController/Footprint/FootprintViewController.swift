@@ -11,6 +11,7 @@ import UIKit
 class FootprintViewController: NavigationBarViewController {
     
     let onboardingButton: UIButton = .init()
+    let settingButton: UIButton = .init()
     
     override func setupNavigationBar() {
         super.setupNavigationBar()
@@ -23,12 +24,15 @@ class FootprintViewController: NavigationBarViewController {
         
         onboardingButton.setTitle("온보딩 버튼", for: .normal)
         onboardingButton.setTitleColor(.black, for: .normal)
+        
+        settingButton.setTitle("세팅 버튼", for: .normal)
+        settingButton.setTitleColor(.black, for: .normal)
     }
     
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([onboardingButton])
+        view.addSubviews([onboardingButton, settingButton])
     }
     
     override func setupLayout() {
@@ -36,6 +40,11 @@ class FootprintViewController: NavigationBarViewController {
         
         onboardingButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
+            $0.centerX.equalToSuperview()
+        }
+        
+        settingButton.snp.makeConstraints {
+            $0.top.equalTo(onboardingButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
     }
@@ -50,6 +59,17 @@ class FootprintViewController: NavigationBarViewController {
                 let onboardingViewController = OnboardingOneViewController(reactor: .init())
                 onboardingViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(onboardingViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        settingButton
+            .rx
+            .tap
+            .bind { [weak self] in
+                let settingViewController = SettingViewController()
+                
+                settingViewController.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(settingViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }
