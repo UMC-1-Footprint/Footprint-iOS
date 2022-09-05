@@ -82,7 +82,7 @@ class MyPageViewController: NavigationBarViewController {
         agreementPageButton.rx
             .tap
             .bind { [weak self] _ in
-                let agreementViewController = AgreementViewController()
+                let agreementViewController = AgreementViewController(reactor: .init())
                 
                 self?.navigationController?.pushViewController(agreementViewController, animated: true)
             }

@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import Then
+import ReactorKit
 
 enum agreementType {
     case first
@@ -44,7 +45,7 @@ enum agreementType {
 
 class agreementView: UIView {
     let type: agreementType
-    let checkboxButton: UIButton = .init()
+    var checkboxButton: UIButton = .init()
     lazy var moreButton: UIButton = .init()
     lazy var titleLabel = UILabel().then {
         $0.text = type.title
@@ -64,6 +65,7 @@ class agreementView: UIView {
     func setupProperty() {
         moreButton.setImage(FootprintIOSAsset.Images.moreIcon.image, for: .normal)
         checkboxButton.setImage(FootprintIOSAsset.Images.checkboxOff.image, for: .normal)
+        checkboxButton.setImage(FootprintIOSAsset.Images.checkboxOn.image, for: .selected)
         moreButton.isHidden = !type.button
     }
     
@@ -99,7 +101,19 @@ class agreementView: UIView {
     }
 }
 
-class AgreementViewController: NavigationBarViewController {
+class AgreementViewController: NavigationBarViewController, View {
+    
+    typealias Reactor = AgreementReactor
+    
+    init(reactor: Reactor) {
+        super.init(nibName: nil, bundle: nil)
+        
+        self.reactor = reactor
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     let noteImage = UIImageView().then {
         $0.image = FootprintIOSAsset.Images.notePencil.image
@@ -131,6 +145,57 @@ class AgreementViewController: NavigationBarViewController {
         setNavigationBarBackButtonImage(.backButtonIcon)
         setNavigationBarTitleFont(.boldSystemFont(ofSize: 16))
     }
+    
+    func bind(reactor: AgreementReactor) {
+        firstAgreement.checkboxButton
+            .rx
+            .tap
+            .map { .selectButton(.first) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        secondAgreement.checkboxButton
+            .rx
+            .tap
+            .map { .selectButton(.second) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        thirdAgreement.checkboxButton
+            .rx
+            .tap
+            .map { .selectButton(.third) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        fourthAgreement.checkboxButton
+            .rx
+            .tap
+            .map { .selectButton(.fourth) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isSelectedFirstButton)
+            .bind(to: firstAgreement.checkboxButton.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isSelectedSecondButton)
+            .bind(to: secondAgreement.checkboxButton.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isSelectedThirdButton)
+            .bind(to: thirdAgreement.checkboxButton.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isSelectedFourthButton)
+            .bind(to: fourthAgreement.checkboxButton.rx.isSelected)
+            .disposed(by: disposeBag)
+    }
+
     
     override func setupHierarchy() {
         super.setupHierarchy()
