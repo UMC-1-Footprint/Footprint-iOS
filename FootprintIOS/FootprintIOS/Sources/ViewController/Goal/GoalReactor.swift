@@ -1,24 +1,24 @@
 //
-//  InfoReactor.swift
-//  Footprint-iOS
+//  GoalReactor.swift
+//  Footprint-iOSTests
 //
-//  Created by 김영인 on 2022/08/27.
+//  Created by 김영인 on 2022/08/30.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
 import ReactorKit
 
-class InfoReactor: Reactor {
+class GoalReactor: Reactor {
     enum Action {
         case tapBottomButton
     }
 
     enum Mutation {
-        case updateIsPresent(Bool)
+        case updateIsComplete(Bool)
     }
 
     struct State {
-        var isPresent: Bool = false
+        var isComplete: Bool = false
     }
 
     var initialState: State
@@ -30,7 +30,7 @@ class InfoReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .tapBottomButton:
-            return .just(.updateIsPresent(true))
+            return .just(.updateIsComplete(true))
         }
     }
 
@@ -38,8 +38,8 @@ class InfoReactor: Reactor {
         var newState = state
 
         switch mutation {
-        case .updateIsPresent(let bool):
-            newState.isPresent = bool
+        case .updateIsComplete(let bool):
+            newState.isComplete = bool
         }
 
         return newState

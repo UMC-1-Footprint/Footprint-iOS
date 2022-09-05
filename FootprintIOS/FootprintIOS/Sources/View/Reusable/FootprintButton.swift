@@ -12,6 +12,7 @@ enum FootprintButtonType {
     case next
     case start
     case confirm
+    case complete
     
     var title: String {
         switch self {
@@ -21,6 +22,8 @@ enum FootprintButtonType {
             return "시작하기"
         case .confirm:
             return "확인"
+        case .complete:
+            return "완료"
         }
     }
 }
