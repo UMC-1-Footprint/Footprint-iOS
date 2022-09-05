@@ -65,7 +65,7 @@ class MyPageViewController: NavigationBarViewController {
             .tap
             .bind { [weak self] _ in
                 let badgeViewController = BadgeViewController()
-                
+                badgeViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(badgeViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -74,7 +74,7 @@ class MyPageViewController: NavigationBarViewController {
             .tap
             .bind { [weak self] _ in
                 let loginViewController = LoginViewController()
-                
+                loginViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(loginViewController, animated: true)
             }
             .disposed(by: disposeBag)
@@ -83,7 +83,7 @@ class MyPageViewController: NavigationBarViewController {
             .tap
             .bind { [weak self] _ in
                 let agreementViewController = AgreementViewController(reactor: .init())
-                
+                agreementViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(agreementViewController, animated: true)
             }
             .disposed(by: disposeBag)

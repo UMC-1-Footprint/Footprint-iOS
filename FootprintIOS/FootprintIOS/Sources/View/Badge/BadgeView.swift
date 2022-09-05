@@ -57,7 +57,7 @@ class BadgeView: BaseView {
 
     lazy var badgeListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewFlowLayout).then {
         $0.backgroundColor = FootprintIOSAsset.Colors.white2.color
-        $0.register(BadgeListCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: BadgeListCollectionViewCell.self))
+        $0.register(BadgeListCollectionViewCell.self, forCellWithReuseIdentifier: BadgeListCollectionViewCell.identifier)
     }
     
     override func setupHierarchy() {

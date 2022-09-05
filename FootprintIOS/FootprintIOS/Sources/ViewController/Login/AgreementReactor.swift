@@ -8,13 +8,6 @@
 
 import ReactorKit
 
-enum ButtonType {
-    case first
-    case second
-    case third
-    case fourth
-}
-
 class AgreementReactor: Reactor {
     enum Action {
         case selectButton(ButtonType)
@@ -22,6 +15,13 @@ class AgreementReactor: Reactor {
     
     enum Mutation {
         case updateButton(ButtonType)
+    }
+    
+    enum ButtonType {
+        case first
+        case second
+        case third
+        case fourth
     }
     
     struct State {
