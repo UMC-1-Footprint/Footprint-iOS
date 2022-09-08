@@ -44,13 +44,13 @@ class TwoButtonAlertView: BaseView {
         $0.backgroundColor = FootprintIOSAsset.Colors.white3.color
     }
     
-    private lazy var cancelButton = UIButton().then {
+    lazy var cancelButton = UIButton().then {
         $0.setTitle("취소", for: .normal)
         $0.setTitleColor(FootprintIOSAsset.Colors.blackM.color, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
     }
     
-    private lazy var rightButton = UIButton().then {
+    lazy var rightButton = UIButton().then {
         $0.setTitleColor(FootprintIOSAsset.Colors.blueM.color, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
     }
@@ -80,7 +80,6 @@ class TwoButtonAlertView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        self.isHidden = true
         titleLabel.text = type.title
         subTitleLabel.text = type.subTitle
         rightButton.setTitle(type.buttonTitle, for: .normal)
@@ -109,10 +108,8 @@ class TwoButtonAlertView: BaseView {
         titleStackView.snp.makeConstraints {
             if (type.subTitle == "") {
                 $0.top.equalTo(backgroundView).offset(72)
-            } else if (type == .deleteAll){
-                $0.top.equalTo(backgroundView).offset(52)
             } else {
-                $0.top.equalTo(backgroundView).offset(59)
+                $0.top.equalTo(backgroundView).offset(55)
             }
             $0.centerX.equalTo(backgroundView)
         }

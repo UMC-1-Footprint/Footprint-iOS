@@ -36,7 +36,7 @@ class BadgeAlertView: BaseView {
         $0.textAlignment = .center
     }
     
-    private lazy var confirmButton = UIButton().then {
+    lazy var confirmButton = UIButton().then {
         $0.setTitle("확인", for: .normal)
         $0.setTitleColor(FootprintIOSAsset.Colors.blueM.color, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
@@ -64,7 +64,6 @@ class BadgeAlertView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        self.isHidden = true
         titleLabel.text = type.title
     }
 

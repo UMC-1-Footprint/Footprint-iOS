@@ -35,13 +35,13 @@ class CustomAlertView: BaseView {
         $0.backgroundColor = FootprintIOSAsset.Colors.white3.color
     }
     
-    private lazy var cancelButton = UIButton().then {
+    lazy var cancelButton = UIButton().then {
         $0.setTitle("취소", for: .normal)
         $0.setTitleColor(FootprintIOSAsset.Colors.blackM.color, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
     }
     
-    private lazy var rightButton = UIButton().then {
+    lazy var rightButton = UIButton().then {
         $0.setTitleColor(FootprintIOSAsset.Colors.blueM.color, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
     }
@@ -71,7 +71,6 @@ class CustomAlertView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        self.isHidden = true
         titleLabel.text = type.title
         rightButton.setTitle(type.buttonTitle, for: .normal)
     }

@@ -68,10 +68,7 @@ class CalendarViewController: NavigationBarViewController {
         
         alertButton.rx.tap
             .bind { [weak self] in
-                let alertVC = AlertViewController(type: .custom)
-                alertVC.modalTransitionStyle = .crossDissolve
-                alertVC.modalPresentationStyle = .fullScreen
-                self?.present(alertVC, animated: true)
+                self?.makeAlert(type: .delete)
             }
             .disposed(by: disposeBag)
     }

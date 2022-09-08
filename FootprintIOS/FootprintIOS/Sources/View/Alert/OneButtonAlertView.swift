@@ -26,7 +26,7 @@ class OneButtonAlertView: BaseView {
         $0.textColor = FootprintIOSAsset.Colors.blackD.color
     }
     
-    private lazy var confirmButton = UIButton().then {
+    lazy var confirmButton = UIButton().then {
         $0.setTitle("확인", for: .normal)
         $0.setTitleColor(FootprintIOSAsset.Colors.blueM.color, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
@@ -54,7 +54,6 @@ class OneButtonAlertView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        self.isHidden = true
         titleLabel.text = type.title
     }
 

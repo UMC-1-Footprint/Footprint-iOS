@@ -15,13 +15,13 @@ enum AlertType {
     case noGoal
     case changeGoal
     case delete
-    case save
-    case cancel
+    case save(Int)
+    case cancel(Int)
     case setBadge
     case logout
     case withdrawal
-    case deleteAll
-    case badge
+    case deleteAll(Int)
+    case badge(String)
     case custom
     
     var title: String {
@@ -32,20 +32,20 @@ enum AlertType {
             return "다음달 목표를 변경했어요"
         case .delete:
             return "해당 발자국을 삭제할까요?"
-        case .save:
-            return "번째 산책'을 저장할까요?"
-        case .cancel:
-            return "번째 산책'작성을 취소할까요?"
+        case let .save(i):
+            return "\(i)번째 산책'을 저장할까요?"
+        case let .cancel(i):
+            return "\(i)번째 산책'작성을 취소할까요?"
         case .setBadge:
             return "대표뱃지로 설정할까요?"
         case .logout:
             return "발자국에서 로그아웃하시겠어요?"
         case .withdrawal:
             return "정말 발자국을 탈퇴하시겠어요?"
-        case .deleteAll:
-            return "번째 산책'을 삭제하시겠어요?"
-        case .badge:
-            return "'Start'\n뱃지를 획득했어요!"
+        case let .deleteAll(i):
+            return "\(i)번째 산책'을 삭제하시겠어요?"
+        case let .badge(badgeName):
+            return "\(badgeName)\n뱃지를 획득했어요!"
         case .custom:
             return "목표산책시간 직접설정"
         }
@@ -100,10 +100,12 @@ class AlertViewController: NavigationBarViewController, View {
     
     // MARK: - Initializer
     
-    init(type: AlertType) {
+    init(type: AlertType, reator: Reactor) {
         self.type = type
         
         super.init(nibName: nil, bundle: nil)
+        
+        self.reactor = reator
     }
     
     @available(*, unavailable)
@@ -117,30 +119,41 @@ class AlertViewController: NavigationBarViewController, View {
         super.setupProperty()
         
         view.backgroundColor = .white.withAlphaComponent(0.4)
-        
-        switch type {
-        case .noGoal, .changeGoal:
-            oneButtonAlertView.isHidden = false
-        case .delete, .save, .cancel, .setBadge, .logout, .withdrawal, .deleteAll:
-            twoButtonAlertView.isHidden = false
-        case .badge:
-            badgeAlertView.isHidden = false
-        case .custom:
-            customAlertView.isHidden = false
-        }
     }
     
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([oneButtonAlertView, twoButtonAlertView, badgeAlertView, customAlertView])
+        switch type {
+        case .noGoal, .changeGoal:
+            view.addSubview(oneButtonAlertView)
+        case .delete, .save, .cancel, .setBadge, .logout, .withdrawal, .deleteAll:
+            view.addSubview(twoButtonAlertView)
+        case .badge:
+            view.addSubview(badgeAlertView)
+        case .custom:
+            view.addSubview(customAlertView)
+        }
     }
     
     override func setupLayout() {
         super.setupLayout()
         
-        [oneButtonAlertView, twoButtonAlertView, badgeAlertView, customAlertView].forEach {
-            $0.snp.makeConstraints {
+        switch type {
+        case .noGoal, .changeGoal:
+            oneButtonAlertView.snp.makeConstraints {
+                $0.top.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+            }
+        case .delete, .save, .cancel, .setBadge, .logout, .withdrawal, .deleteAll:
+            twoButtonAlertView.snp.makeConstraints {
+                $0.top.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+            }
+        case .badge:
+            badgeAlertView.snp.makeConstraints {
+                $0.top.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+            }
+        case .custom:
+            customAlertView.snp.makeConstraints {
                 $0.top.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
             }
         }
@@ -148,6 +161,56 @@ class AlertViewController: NavigationBarViewController, View {
     
     func bind(reactor: AlertReactor) {
         // Action
+        oneButtonAlertView.confirmButton
+            .rx
+            .tap
+            .map{ .tapCancelButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        twoButtonAlertView.cancelButton
+            .rx
+            .tap
+            .map{ .tapCancelButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        twoButtonAlertView.rightButton
+            .rx
+            .tap
+            .map{ .tapAlertButton(.delete) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        badgeAlertView.confirmButton
+            .rx
+            .tap
+            .map{ .tapCancelButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        customAlertView.cancelButton
+            .rx
+            .tap
+            .map{ .tapCancelButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         // State
+        reactor.state
+            .map(\.isDismiss)
+            .bind { [weak self] _ in
+                self?.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
+    }
+}
+
+extension UIViewController {
+    func makeAlert(type: AlertType) {
+        let alertVC = AlertViewController(type: type, reator: .init())
+        alertVC.modalTransitionStyle = .crossDissolve
+        alertVC.modalPresentationStyle = .fullScreen
+        self.present(alertVC, animated: true)
     }
 }
