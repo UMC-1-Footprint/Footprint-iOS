@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import RxGesture
 
 class SettingViewController: NavigationBarViewController {
     
@@ -147,5 +150,19 @@ class SettingViewController: NavigationBarViewController {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview().inset(20)
         }
+    }
+    
+    override func setupBind() {
+        super.setupBind()
+        
+        noticeMenu.rx.tapGesture()
+            .withUnretained(self)
+            .bind { this, tap in
+                if tap.state == .ended {
+                    let noticeViewController = NoticeViewController(reactor: NoticeReactor())
+                    this.navigationController?.pushViewController(noticeViewController, animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
     }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import RxSwift
 
-class BaseTVC: UITableViewCell, BaseViewProtocol {
+class BaseTableViewCell: UITableViewCell, BaseViewProtocol {
     var disposeBag = DisposeBag()
     
     // MARK: - Initializer
