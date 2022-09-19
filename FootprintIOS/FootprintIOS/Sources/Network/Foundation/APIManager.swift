@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol Requestable: AnyObject {
     func request<T: Decodable>(_ request: NetworkRequest) async throws -> T?

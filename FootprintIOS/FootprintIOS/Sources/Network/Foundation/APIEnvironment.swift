@@ -11,6 +11,7 @@ import Foundation
 enum APIEnvironment: String {
     case dev
     case production
+    case test
 }
 
 extension APIEnvironment {
@@ -20,6 +21,8 @@ extension APIEnvironment {
             return "https://dev.mysteps.shop"
         case .production:
             return "https://prod.mysteps.shop"
+        case .test:
+            return "https://jsonplaceholder.typicode.com/users"
         }
     }
 }

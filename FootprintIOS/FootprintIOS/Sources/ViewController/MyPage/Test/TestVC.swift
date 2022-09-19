@@ -1,0 +1,63 @@
+//
+//  TestVC.swift
+//  Footprint-iOS
+//
+//  Created by Sojin Lee on 2022/09/16.
+//  Copyright © 2022 Footprint-iOS. All rights reserved.
+//
+
+import UIKit
+import SnapKit
+import Then
+
+class TestVC: NavigationBarViewController {
+    
+    let label = UILabel().then {
+        $0.text = "안녕하세요"
+    }
+    
+    let apiManager = TestManager(apiService: TestAPIManager(), environment: .test)
+    
+    func getTestAPI() {
+//        print("hello")
+//        apiManager.getTestAPI().bind { data in
+//            print("[D] \(data)")
+//        }
+        Task {
+            do {
+                let result = try await apiManager.getTestAPI()
+                print(result)
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        getTestAPI()
+    }
+    
+    override func setupNavigationBar() {
+        super.setupNavigationBar()
+        
+        setNavigationBarTitleText("api 연습 페이지")
+        setNavigationBarBackgroundColor(.white)
+        setNavigationBarBackButtonImage(.backButtonIcon)
+        setNavigationBarTitleFont(.boldSystemFont(ofSize: 16))
+    }
+    
+    override func setupHierarchy() {
+        super.setupHierarchy()
+        
+        contentView.addSubview(label)
+    }
+    
+    override func setupLayout() {
+        super.setupLayout()
+        
+        label.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+}

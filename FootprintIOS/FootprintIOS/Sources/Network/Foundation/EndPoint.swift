@@ -13,13 +13,13 @@ protocol EndPoint {
     var body: Data? { get }
     
     func getURL(environment: APIEnvironment) -> String
-    func createRequest(contentType: ContentType, headerField: HTTPHeaderField, environment: APIEnvironment) -> NetworkRequest
+    func createRequest(environment: APIEnvironment) -> NetworkRequest
 }
 
 extension EndPoint {
-    func createRequest(contentType: ContentType, headerField: HTTPHeaderField, environment: APIEnvironment) -> NetworkRequest {
+    func createRequest(environment: APIEnvironment) -> NetworkRequest {
         var headers: [String: String] = [:]
-        headers[headerField.code] = contentType.code
+        headers["Content-Type"] = "application/json"
         return NetworkRequest(url: getURL(environment: environment),
                               httpMethod: method,
                               body: body,
