@@ -23,14 +23,21 @@ class TestVC: NavigationBarViewController {
 //        apiManager.getTestAPI().bind { data in
 //            print("[D] \(data)")
 //        }
-        Task {
-            do {
-                let result = try await apiManager.getTestAPI()
-                print(result)
-            } catch {
-                print(error)
+        
+//        Task {
+//            do {
+//                let result = try await apiManager.getTestAPI()
+//                print(result)
+//            } catch {
+//                print(error)
+//            }
+//        }
+        apiManager.getTestAPI()
+            .bind { testModel in
+                print("여기에요 여기!")
+                print(testModel)
             }
-        }
+            .disposed(by: disposeBag)
     }
     
     override func viewDidLoad() {

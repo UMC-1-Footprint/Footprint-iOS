@@ -18,11 +18,11 @@ struct TestManager {
         self.environment = environment
     }
     
-    func getTestAPI() async throws -> [TestModel]? {
+    func getTestAPI() -> Observable<[TestModel]?> {
         let request = TestEndPoint
             .testAPI
             .createRequest(environment: .test)
-        return try await self.apiService.request(request)
+        return self.apiService.request(request)
     }
     
 //    func getTestAPI() -> Observable<[TestModel]?> {
