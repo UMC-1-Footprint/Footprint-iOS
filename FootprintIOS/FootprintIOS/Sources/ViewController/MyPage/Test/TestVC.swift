@@ -19,19 +19,6 @@ class TestVC: NavigationBarViewController {
     let apiManager = TestManager(apiService: TestAPIManager(), environment: .test)
     
     func getTestAPI() {
-//        print("hello")
-//        apiManager.getTestAPI().bind { data in
-//            print("[D] \(data)")
-//        }
-        
-//        Task {
-//            do {
-//                let result = try await apiManager.getTestAPI()
-//                print(result)
-//            } catch {
-//                print(error)
-//            }
-//        }
         apiManager.getTestAPI()
             .bind { testModel in
                 print("여기에요 여기!")
