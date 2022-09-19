@@ -12,13 +12,23 @@ import SnapKit
 
 class CalendarViewController: NavigationBarViewController {
     
-    private lazy var infoButton: UIButton = {
-        let btn = UIButton()
-        btn.setTitle("정보 입력 뷰컨 이동", for: .normal)
-        btn.setTitleColor(.black, for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
-        return btn
-    }()
+    private lazy var infoButton = UIButton().then {
+        $0.setTitle("정보 입력 뷰컨 이동", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+    }
+    
+    private lazy var alertButton = UIButton().then {
+        $0.setTitle("알림창 띄우기", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+    }
+    
+    private lazy var stackView = UIStackView().then {
+        $0.addArrangedSubview(infoButton)
+        $0.addArrangedSubview(alertButton)
+        $0.axis = .vertical
+    }
     
     override func setupNavigationBar() {
         super.setupNavigationBar()
@@ -26,16 +36,21 @@ class CalendarViewController: NavigationBarViewController {
         setNavigationBarTitleText("캘린더")
     }
     
+    override func setupProperty() {
+        super.setupProperty()
+        
+    }
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubview(infoButton)
+        view.addSubviews([stackView])
     }
     
     override func setupLayout() {
         super.setupLayout()
         
-        infoButton.snp.makeConstraints {
+        stackView.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
     }
@@ -48,6 +63,12 @@ class CalendarViewController: NavigationBarViewController {
                 let infoVC = InfoViewController(reactor: .init())
                 infoVC.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(infoVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        alertButton.rx.tap
+            .bind { [weak self] in
+                self?.makeAlert(type: .delete)
             }
             .disposed(by: disposeBag)
     }
