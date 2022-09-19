@@ -9,28 +9,34 @@
 import Foundation
 import RxSwift
 
-protocol Requestable: AnyObject {
-    func request<T: Decodable>(_ request: NetworkRequest) async throws -> T?
-}
-
-final class APIManager: Requestable {
-    func request<T: Decodable>(_ request: NetworkRequest) async throws -> T? {
-        guard let encodedURL = request.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: encodedURL) else {
-            throw APIError.urlEncodingError
-        }
-
-        let (data, response) = try await URLSession.shared.data(for: request.createNetworkRequest(with: url))
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200..<500) ~= httpResponse.statusCode else {
-            throw APIError.serverError(error: "server Error")
-        }
-
-        let decodedData = try JSONDecoder().decode(BaseModel<T>.self, from: data)
-        if decodedData.isSuccess {
-            return decodedData.result
-        } else {
-            throw APIError.clientError(error: decodedData.message)
+final class APIManager {
+    func request<T: Decodable>(_ request: NetworkRequest) -> Observable<T?> {
+        return Observable.create { observable in
+            guard let encodedURL = request.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+                  let url = URL(string: encodedURL) else {
+                return Disposables.create {
+                    observable.onError(APIError.urlEncodingError)
+                }
+            }
+            
+            let task = URLSession.shared.dataTask(with: request.createNetworkRequest(with: url)) { data, response, error in
+                if let error = error {
+                    observable.onError(error)
+                    return
+                }
+                guard let data = data,
+                      let responseData = try? JSONDecoder().decode(BaseModel<T>.self, from: data) else {
+                    observable.onCompleted()
+                    return
+                }
+                observable.onNext(responseData as? T)
+                observable.onCompleted()
+            }
+            task.resume()
+            
+            return Disposables.create {
+                task.cancel()
+            }
         }
     }
 }
