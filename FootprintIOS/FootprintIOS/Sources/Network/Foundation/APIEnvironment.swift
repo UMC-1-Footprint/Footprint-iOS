@@ -18,9 +18,9 @@ extension APIEnvironment {
     var baseURL: String {
         switch self {
         case .dev:
-            return "https://dev.mysteps.shop"
+            return ""
         case .production:
-            return "https://prod.mysteps.shop"
+            return ""
         case .test:
             return "https://jsonplaceholder.typicode.com/users"
         }
