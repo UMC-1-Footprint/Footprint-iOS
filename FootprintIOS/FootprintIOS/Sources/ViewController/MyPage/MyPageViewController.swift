@@ -34,10 +34,15 @@ class MyPageViewController: NavigationBarViewController {
         $0.setTitleColor(.black, for: .normal)
     }
     
+    let testPageButton = UIButton().then {
+        $0.setTitle("api 테스트 페이지로 이동", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+    }
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton])
+        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, testPageButton])
     }
     
     override func setupLayout() {
@@ -54,6 +59,11 @@ class MyPageViewController: NavigationBarViewController {
         
         agreementPageButton.snp.makeConstraints {
             $0.top.equalTo(loginPageButton.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
+        
+        testPageButton.snp.makeConstraints {
+            $0.top.equalTo(agreementPageButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
     }
@@ -85,6 +95,15 @@ class MyPageViewController: NavigationBarViewController {
                 let agreementViewController = AgreementViewController(reactor: .init())
                 agreementViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(agreementViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        testPageButton.rx
+            .tap
+            .bind { [weak self] _ in
+                let testVC = TestVC()
+                testVC.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(testVC, animated: true)
             }
             .disposed(by: disposeBag)
     }
