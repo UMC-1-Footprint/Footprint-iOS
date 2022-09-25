@@ -21,7 +21,9 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxCocoa"),
         .external(name: "RxDataSources"),
         .external(name: "RxGesture"),
-        
+        .external(name: "KakaoSDKCommon"),
+        .external(name: "KakaoSDKAuth"),
+        .external(name: "KakaoSDKUser"),
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
