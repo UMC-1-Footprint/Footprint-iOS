@@ -12,4 +12,10 @@ class Enviroment {
     static var version: String {
         FootprintIOSResources.bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     }
+    static var apiBaseURL: String {
+        FootprintIOSResources.bundle.object(forInfoDictionaryKey: "API_BASE_URL") as! String
+    }
+    static var kakaoAppKey: String {
+        FootprintIOSResources.bundle.object(forInfoDictionaryKey: "KAKAO_APP_KEY") as! String
+    }
 }

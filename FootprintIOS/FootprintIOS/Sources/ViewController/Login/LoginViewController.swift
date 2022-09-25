@@ -7,8 +7,11 @@
 //
 
 import UIKit
+
 import Then
 import SnapKit
+import RxSwift
+import KakaoSDKUser
 
 enum LoginButtonType {
     case google
@@ -117,6 +120,24 @@ class LoginViewController: NavigationBarViewController {
     let googleLoginButton = LoginButton(type: .google)
     let kakaoLoginButton = LoginButton(type: .kakao)
     
+    // MARK: - bind
+    override func setupBind() {
+        super.setupBind()
+        
+        kakaoLoginButton.rx
+            .tap
+            .bind { _ in
+                if (UserApi.isKakaoTalkLoginAvailable()) {
+                    self.kakaoLoginApp()
+                }
+                else {
+                    self.kakaoLoginWeb()
+                }
+            }
+            .disposed(by: disposeBag)
+            
+    }
+    
     // MARK: - set
     override func setupHierarchy() {
         super.setupHierarchy()
@@ -180,5 +201,48 @@ class LoginViewController: NavigationBarViewController {
         setNavigationBarBackgroundColor(.white)
         setNavigationBarBackButtonImage(.backButtonIcon)
         setNavigationBarTitleFont(.boldSystemFont(ofSize: 16))
+    }
+}
+
+// MARK: - extension
+extension LoginViewController {
+    func kakaoLoginApp() {
+        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+            if let error = error {
+                print(error)
+            }
+            else {
+                print("loginWithKakaoTalk() success.")
+
+                UserApi.shared.me {(user, error) in
+                    if let error = error {
+                        print(error)
+                    } else {
+                        // TODO: - 로그인 성공한 경우. 뷰컨 이동하기
+                        print(user)
+                    }
+                }
+            }
+        }
+    }
+    
+    func kakaoLoginWeb() {
+        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+                if let error = error {
+                    print(error)
+                }
+                else {
+                    print("loginWithKakaoAccount() success.")
+
+                    UserApi.shared.me {(user, error) in
+                        if let error = error {
+                            print(error)
+                        } else {
+                            // TODO: - 로그인 성공한 경우. 뷰컨 이동하기
+                            print(user)
+                        }
+                    }
+                }
+            }
     }
 }

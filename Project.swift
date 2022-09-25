@@ -40,6 +40,10 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
+        "API_BASE_URL": "$(ROOT_URL)",
+        "KAKAO_APP_KEY": "$(KAKAO_APP_KEY)",
+        "LSApplicationQueriesSchemes": ["kakaokompassauth", "kakaolink"],
+        "CFBundleURLTypes": ["CFBundleURLSchemes": ["kakao$(KAKAO_APP_KEY)"]],
     ]
     
     func generateTarget() -> [Target] {
