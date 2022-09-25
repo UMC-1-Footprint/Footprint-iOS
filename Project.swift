@@ -6,7 +6,7 @@ protocol ProjectFactory {
     var dependencies: [TargetDependency] { get }
     
     func generateTarget() -> [Target]
-//    func generateConfigurations() -> Settings
+    func generateConfigurations() -> Settings
 }
 
 class BaseProjectFactory: ProjectFactory {
@@ -65,11 +65,14 @@ class BaseProjectFactory: ProjectFactory {
             )
         ]
     }
-    
-//    func generateConfigurations() -> Settings {
-//        <#code#>
-//    }
-//
+
+    func generateConfigurations() -> Settings {
+        Settings.settings(configurations: [
+            .debug(name: "Develop", xcconfig: .relativeToRoot("FootprintIOS/FootprintIOS/Sources/Config/Develop.xcconfig")),
+            .release(name: "Production", xcconfig: .relativeToRoot("FootprintIOS/FootprintIOS/Sources/Config/Production.xcconfig")),
+        ])
+    }
+
 }
 
 // MARK: - project
@@ -78,5 +81,6 @@ let factory = BaseProjectFactory()
 let project: Project = .init(
     name: factory.projectName,
     organizationName: factory.projectName,
+    settings: factory.generateConfigurations(),
     targets: factory.generateTarget()
 )
