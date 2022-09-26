@@ -12,6 +12,7 @@ class FootprintViewController: NavigationBarViewController {
     
     let onboardingButton: UIButton = .init()
     let settingButton: UIButton = .init()
+    let mapButton: UIButton = .init()
     
     override func setupNavigationBar() {
         super.setupNavigationBar()
@@ -27,12 +28,15 @@ class FootprintViewController: NavigationBarViewController {
         
         settingButton.setTitle("세팅 버튼", for: .normal)
         settingButton.setTitleColor(.black, for: .normal)
+        
+        mapButton.setTitle("세팅 버튼", for: .normal)
+        mapButton.setTitleColor(.black, for: .normal)
     }
     
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([onboardingButton, settingButton])
+        view.addSubviews([onboardingButton, settingButton, mapButton])
     }
     
     override func setupLayout() {
@@ -45,6 +49,11 @@ class FootprintViewController: NavigationBarViewController {
         
         settingButton.snp.makeConstraints {
             $0.top.equalTo(onboardingButton.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
+        
+        mapButton.snp.makeConstraints {
+            $0.top.equalTo(settingButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
     }
@@ -70,6 +79,17 @@ class FootprintViewController: NavigationBarViewController {
                 
                 settingViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(settingViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        mapButton
+            .rx
+            .tap
+            .bind { [weak self] in
+                let mapViewController = MapViewController()
+                
+                mapViewController.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(mapViewController, animated: true)
             }
             .disposed(by: disposeBag)
     }

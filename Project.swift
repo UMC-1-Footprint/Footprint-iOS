@@ -21,7 +21,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxCocoa"),
         .external(name: "RxDataSources"),
         .external(name: "RxGesture"),
-        
+        .external(name: "NMapsMap")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -51,6 +51,7 @@ class BaseProjectFactory: ProjectFactory {
                 sources: ["FootprintIOS/FootprintIOS/Sources/**"],
                 resources: ["FootprintIOS/FootprintIOS/Resources/**"],
                 dependencies: dependencies
+                
             ),
             Target(
                 name: "\(projectName)Tests",
