@@ -83,7 +83,7 @@ class MyPageViewController: NavigationBarViewController {
         loginPageButton.rx
             .tap
             .bind { [weak self] _ in
-                let loginViewController = LoginViewController()
+                let loginViewController = LoginViewController(reactor: .init())
                 loginViewController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(loginViewController, animated: true)
             }

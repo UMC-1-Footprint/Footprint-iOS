@@ -12,6 +12,7 @@ import Then
 import SnapKit
 import RxSwift
 import KakaoSDKUser
+import ReactorKit
 
 enum LoginButtonType {
     case google
@@ -85,7 +86,19 @@ class LoginButton: UIButton {
     }
 }
 
-class LoginViewController: NavigationBarViewController {
+class LoginViewController: NavigationBarViewController, View {
+    typealias Reactor = LoginReactor
+    
+    init(reactor: Reactor) {
+        super.init(nibName: nil, bundle: nil)
+        
+        self.reactor = reactor
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - properties
     let loginBackgroundImage = UIImageView().then {
         $0.image = FootprintIOSAsset.Images.road.image
@@ -121,21 +134,32 @@ class LoginViewController: NavigationBarViewController {
     let kakaoLoginButton = LoginButton(type: .kakao)
     
     // MARK: - bind
-    override func setupBind() {
-        super.setupBind()
+    func bind(reactor: LoginReactor) {
+//        kakaoLoginButton.rx
+//            .tap
+//            .map { .}
+//            .disposed(by: disposeBag)
+//
+//        firstAgreement.checkboxButton
+//            .rx
+//            .tap
+//            .map { .selectButton(.first) }
+//            .bind(to: reactor.action)
+//            .disposed(by: disposeBag)
         
         kakaoLoginButton.rx
             .tap
-            .bind { _ in
-                if (UserApi.isKakaoTalkLoginAvailable()) {
-                    self.kakaoLoginApp()
-                }
-                else {
-                    self.kakaoLoginWeb()
-                }
+            .map { .kakaoLogin }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.kakaoLoginButtonDidTap)
+            .bind { status in
+                print("카카오 로그인 성공 여부 : ", status)
             }
             .disposed(by: disposeBag)
-            
+        
     }
     
     // MARK: - set
