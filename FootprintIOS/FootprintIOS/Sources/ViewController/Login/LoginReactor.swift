@@ -59,16 +59,22 @@ extension LoginReactor {
     func kakaoLoginApp() -> Observable<Mutation> {
         return Observable<Mutation>.create { observable in
             UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+                guard let token = oauthToken else { return observable.onNext(.doKakaoLogin(false)) }
                 if let error = error {
                     print(error)
                 }
                 else {
-                    guard let token = oauthToken else { return observable.onNext(.doKakaoLogin(false)) }
-                    let keyChain = KeyChain()
-                    keyChain.createKeyChain(key: token.accessToken, token: token.accessToken)
-                    keyChain.createKeyChain(key: token.refreshToken, token: token.refreshToken)
-                    observable.onNext(.doKakaoLogin(true))
-                    observable.onCompleted()
+                    UserApi.shared.me {(user, error) in
+                        if let error = error {
+                            print(error)
+                        } else {
+                            guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
+                            let keyChain = KeyChain()
+                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
+                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            observable.onNext(.doKakaoLogin(true))
+                        }
+                    }
                 }
             }
             return Disposables.create()
@@ -78,28 +84,21 @@ extension LoginReactor {
     func kakaoLoginWeb() -> Observable<Mutation> {
         return Observable<Mutation>.create { observable in
             UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
+                guard let token = oauthToken else { return observable.onNext(.doKakaoLogin(false)) }
                 if let error = error {
                     print(error)
                 } else {
-                    guard let token = oauthToken else { return observable.onNext(.doKakaoLogin(false)) }
-                    let keyChain = KeyChain()
-                    keyChain.createKeyChain(key: token.accessToken, token: token.accessToken)
-                    keyChain.createKeyChain(key: token.refreshToken, token: token.refreshToken)
-                    observable.onNext(.doKakaoLogin(true))
-                    observable.onCompleted()
-                    //TODO: - 여기까지 넣으면 제대로 처리가 안됨 .. .왤까요
-//                    UserApi.shared.me {(user, error) in
-//                        if let error = error {
-//                            print(error)
-//                        } else {
-//                            let keyChain = KeyChain()
-//                            guard let userEmail = user?.kakaoAccount?.email else { return }
-//                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-//                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
-//                            print("성공했다구 넘길꼬임 ")
-//                            observable.onNext(.doKakaoLogin(true))
-//                        }
-//                    }
+                    UserApi.shared.me {(user, error) in
+                        if let error = error {
+                            print(error)
+                        } else {
+                            guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
+                            let keyChain = KeyChain()
+                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
+                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            observable.onNext(.doKakaoLogin(true))
+                        }
+                    }
                 }
             }
             return Disposables.create()

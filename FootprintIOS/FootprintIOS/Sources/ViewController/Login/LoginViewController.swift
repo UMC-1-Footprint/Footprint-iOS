@@ -217,10 +217,3 @@ class LoginViewController: NavigationBarViewController, View {
         setNavigationBarTitleFont(.boldSystemFont(ofSize: 16))
     }
 }
-
-// MARK: - extension
-extension LoginViewController {
-    func saveKeyChain() {
-        
-    }
-}
