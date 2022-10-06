@@ -212,14 +212,16 @@ extension LoginViewController {
                 print(error)
             }
             else {
-                print("loginWithKakaoTalk() success.")
-
+                guard let token = oauthToken else { return }
+                
                 UserApi.shared.me {(user, error) in
                     if let error = error {
                         print(error)
                     } else {
-                        // TODO: - 로그인 성공한 경우. 뷰컨 이동하기
-                        print(user)
+                        let keyChain = KeyChain()
+                        guard let userEmail = user?.kakaoAccount?.email else { return }
+                        keyChain.createKeyChain(key: userEmail, token: token.accessToken)
+                        keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
                     }
                 }
             }
@@ -232,14 +234,16 @@ extension LoginViewController {
                     print(error)
                 }
                 else {
-                    print("loginWithKakaoAccount() success.")
+                    guard let token = oauthToken else { return }
 
                     UserApi.shared.me {(user, error) in
                         if let error = error {
                             print(error)
                         } else {
-                            // TODO: - 로그인 성공한 경우. 뷰컨 이동하기
-                            print(user)
+                            let keyChain = KeyChain()
+                            guard let userEmail = user?.kakaoAccount?.email else { return }
+                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
+                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
                         }
                     }
                 }
