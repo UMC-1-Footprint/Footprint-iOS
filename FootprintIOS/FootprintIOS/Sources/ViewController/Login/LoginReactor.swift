@@ -33,15 +33,12 @@ class LoginReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .kakaoLogin:
-            var loginStatus = false
             if (UserApi.isKakaoTalkLoginAvailable()) {
-                loginStatus = self.kakaoLoginApp()
+                return kakaoLoginApp()
             }
             else {
-                loginStatus = self.kakaoLoginWeb()
+                return kakaoLoginWeb()
             }
-            print("mutation 함수에서 동작 여부 :", loginStatus)
-            return .just(.doKakaoLogin(loginStatus))
         }
     }
     
@@ -50,7 +47,6 @@ class LoginReactor: Reactor {
         
         switch mutation {
         case .doKakaoLogin(let status):
-            print("mutation: ", status)
             newState.kakaoLoginButtonDidTap = status
         }
         
@@ -60,57 +56,53 @@ class LoginReactor: Reactor {
 
 // MARK: - extension
 extension LoginReactor {
-    func kakaoLoginApp() -> Bool {
-        var loginStatus = false
-        
-        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
-            if let error = error {
-                print(error)
-            }
-            else {
-                guard let token = oauthToken else { return }
-                print("카카오 로그인 되는중 드릉드릉 드르릉")
-                UserApi.shared.me {(user, error) in
-                    if let error = error {
-                        print(error)
-                    } else {
-                        let keyChain = KeyChain()
-                        guard let userEmail = user?.kakaoAccount?.email else { return }
-                        keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                        keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
-                        print("성공했다구 넘길꼬임 ")
-                        loginStatus = true
-                    }
+    func kakaoLoginApp() -> Observable<Mutation> {
+        return Observable<Mutation>.create { observable in
+            UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+                if let error = error {
+                    print(error)
+                }
+                else {
+                    guard let token = oauthToken else { return observable.onNext(.doKakaoLogin(false)) }
+                    let keyChain = KeyChain()
+                    keyChain.createKeyChain(key: token.accessToken, token: token.accessToken)
+                    keyChain.createKeyChain(key: token.refreshToken, token: token.refreshToken)
+                    observable.onNext(.doKakaoLogin(true))
+                    observable.onCompleted()
                 }
             }
+            return Disposables.create()
         }
-        return loginStatus
     }
     
-    func kakaoLoginWeb() -> Bool {
-        var loginStatus = false
-        
-        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-            if let error = error {
-                print(error)
-            }
-            else {
-                guard let token = oauthToken else { return }
-                print("카카오 로그인 되는중 드릉드릉 드르릉")
-                UserApi.shared.me {(user, error) in
-                    if let error = error {
-                        print(error)
-                    } else {
-                        let keyChain = KeyChain()
-                        guard let userEmail = user?.kakaoAccount?.email else { return }
-                        keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                        keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
-                        print("성공했다구 넘길꼬임 ")
-                        loginStatus = true
-                    }
+    func kakaoLoginWeb() -> Observable<Mutation> {
+        return Observable<Mutation>.create { observable in
+            UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
+                if let error = error {
+                    print(error)
+                } else {
+                    guard let token = oauthToken else { return observable.onNext(.doKakaoLogin(false)) }
+                    let keyChain = KeyChain()
+                    keyChain.createKeyChain(key: token.accessToken, token: token.accessToken)
+                    keyChain.createKeyChain(key: token.refreshToken, token: token.refreshToken)
+                    observable.onNext(.doKakaoLogin(true))
+                    observable.onCompleted()
+                    //TODO: - 여기까지 넣으면 제대로 처리가 안됨 .. .왤까요
+//                    UserApi.shared.me {(user, error) in
+//                        if let error = error {
+//                            print(error)
+//                        } else {
+//                            let keyChain = KeyChain()
+//                            guard let userEmail = user?.kakaoAccount?.email else { return }
+//                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
+//                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+//                            print("성공했다구 넘길꼬임 ")
+//                            observable.onNext(.doKakaoLogin(true))
+//                        }
+//                    }
                 }
             }
+            return Disposables.create()
         }
-        return loginStatus
     }
 }

@@ -135,18 +135,6 @@ class LoginViewController: NavigationBarViewController, View {
     
     // MARK: - bind
     func bind(reactor: LoginReactor) {
-//        kakaoLoginButton.rx
-//            .tap
-//            .map { .}
-//            .disposed(by: disposeBag)
-//
-//        firstAgreement.checkboxButton
-//            .rx
-//            .tap
-//            .map { .selectButton(.first) }
-//            .bind(to: reactor.action)
-//            .disposed(by: disposeBag)
-        
         kakaoLoginButton.rx
             .tap
             .map { .kakaoLogin }
@@ -156,7 +144,9 @@ class LoginViewController: NavigationBarViewController, View {
         reactor.state
             .map(\.kakaoLoginButtonDidTap)
             .bind { status in
-                print("카카오 로그인 성공 여부 : ", status)
+                if status {
+                    // TODO: - 화면 전환 코드 넣어두기
+                }
             }
             .disposed(by: disposeBag)
         
@@ -230,47 +220,7 @@ class LoginViewController: NavigationBarViewController, View {
 
 // MARK: - extension
 extension LoginViewController {
-    func kakaoLoginApp() {
-        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
-            if let error = error {
-                print(error)
-            }
-            else {
-                guard let token = oauthToken else { return }
-                
-                UserApi.shared.me {(user, error) in
-                    if let error = error {
-                        print(error)
-                    } else {
-                        let keyChain = KeyChain()
-                        guard let userEmail = user?.kakaoAccount?.email else { return }
-                        keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                        keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
-                    }
-                }
-            }
-        }
-    }
-    
-    func kakaoLoginWeb() {
-        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-                if let error = error {
-                    print(error)
-                }
-                else {
-                    guard let token = oauthToken else { return }
-
-                    UserApi.shared.me {(user, error) in
-                        if let error = error {
-                            print(error)
-                        } else {
-                            let keyChain = KeyChain()
-                            guard let userEmail = user?.kakaoAccount?.email else { return }
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
-                        }
-                    }
-                }
-            }
+    func saveKeyChain() {
+        
     }
 }
