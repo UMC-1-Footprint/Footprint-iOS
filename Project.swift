@@ -6,7 +6,7 @@ protocol ProjectFactory {
     var dependencies: [TargetDependency] { get }
     
     func generateTarget() -> [Target]
-//    func generateConfigurations() -> Settings
+    func generateConfigurations() -> Settings
 }
 
 class BaseProjectFactory: ProjectFactory {
@@ -21,7 +21,9 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxCocoa"),
         .external(name: "RxDataSources"),
         .external(name: "RxGesture"),
-        
+        .external(name: "KakaoSDKCommon"),
+        .external(name: "KakaoSDKAuth"),
+        .external(name: "KakaoSDKUser"),
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -38,6 +40,10 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
+        "API_BASE_URL": "$(ROOT_URL)",
+        "KAKAO_APP_KEY": "$(KAKAO_APP_KEY)",
+        "LSApplicationQueriesSchemes": ["kakaokompassauth", "kakaolink"],
+        "CFBundleURLTypes": ["CFBundleURLSchemes": ["kakao$(KAKAO_APP_KEY)"]],
     ]
     
     func generateTarget() -> [Target] {
@@ -65,11 +71,14 @@ class BaseProjectFactory: ProjectFactory {
             )
         ]
     }
-    
-//    func generateConfigurations() -> Settings {
-//        <#code#>
-//    }
-//
+
+    func generateConfigurations() -> Settings {
+        Settings.settings(configurations: [
+            .debug(name: "Develop", xcconfig: .relativeToRoot("FootprintIOS/FootprintIOS/Sources/Config/Develop.xcconfig")),
+            .release(name: "Production", xcconfig: .relativeToRoot("FootprintIOS/FootprintIOS/Sources/Config/Production.xcconfig")),
+        ])
+    }
+
 }
 
 // MARK: - project
@@ -78,5 +87,6 @@ let factory = BaseProjectFactory()
 let project: Project = .init(
     name: factory.projectName,
     organizationName: factory.projectName,
+    settings: factory.generateConfigurations(),
     targets: factory.generateTarget()
 )

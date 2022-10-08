@@ -7,8 +7,12 @@
 //
 
 import UIKit
+
 import Then
 import SnapKit
+import RxSwift
+import KakaoSDKUser
+import ReactorKit
 
 enum LoginButtonType {
     case google
@@ -82,7 +86,19 @@ class LoginButton: UIButton {
     }
 }
 
-class LoginViewController: NavigationBarViewController {
+class LoginViewController: NavigationBarViewController, View {
+    typealias Reactor = LoginReactor
+    
+    init(reactor: Reactor) {
+        super.init(nibName: nil, bundle: nil)
+        
+        self.reactor = reactor
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - properties
     let loginBackgroundImage = UIImageView().then {
         $0.image = FootprintIOSAsset.Images.road.image
@@ -116,6 +132,25 @@ class LoginViewController: NavigationBarViewController {
     
     let googleLoginButton = LoginButton(type: .google)
     let kakaoLoginButton = LoginButton(type: .kakao)
+    
+    // MARK: - bind
+    func bind(reactor: LoginReactor) {
+        kakaoLoginButton.rx
+            .tap
+            .map { .kakaoLogin }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        reactor.state
+            .map(\.kakaoLoginButtonDidTap)
+            .bind { status in
+                if status {
+                    // TODO: - 화면 전환 코드 넣어두기
+                }
+            }
+            .disposed(by: disposeBag)
+        
+    }
     
     // MARK: - set
     override func setupHierarchy() {
