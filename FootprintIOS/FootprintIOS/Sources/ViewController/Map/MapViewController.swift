@@ -7,7 +7,9 @@
 //
 
 import UIKit
+
 import NMapsMap
+
 
 class MapViewController: NavigationBarViewController {
     
@@ -20,14 +22,14 @@ class MapViewController: NavigationBarViewController {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-//        contentView.addSubviews([mapView])
+        contentView.addSubviews([mapView])
     }
     
     override func setupLayout() {
         super.setupLayout()
         
-//        mapView.snp.makeConstraints {
-//            $0.top.leading.trailing.bottom.equalToSuperview()
-//        }
+        mapView.snp.makeConstraints {
+            $0.top.leading.trailing.bottom.equalToSuperview()
+        }
     }
 }

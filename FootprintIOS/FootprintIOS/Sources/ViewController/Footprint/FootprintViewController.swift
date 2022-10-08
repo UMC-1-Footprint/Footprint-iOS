@@ -29,7 +29,7 @@ class FootprintViewController: NavigationBarViewController {
         settingButton.setTitle("세팅 버튼", for: .normal)
         settingButton.setTitleColor(.black, for: .normal)
         
-        mapButton.setTitle("세팅 버튼", for: .normal)
+        mapButton.setTitle("맵 버튼", for: .normal)
         mapButton.setTitleColor(.black, for: .normal)
     }
     

@@ -38,6 +38,7 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
+        "NMFClientId": "XXXX",
     ]
     
     func generateTarget() -> [Target] {

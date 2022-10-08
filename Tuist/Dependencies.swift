@@ -16,7 +16,9 @@ let dependencies = Dependencies(
         .remote(url: "https://github.com/devxoul/Then.git", requirement: .upToNextMinor(from: "3.0.0")),
         .remote(url: "https://github.com/RxSwiftCommunity/RxDataSources", requirement: .upToNextMinor(from: "5.0.0")),
         .remote(url: "https://github.com/RxSwiftCommunity/RxGesture.git", requirement: .upToNextMinor(from: "4.0.0")),
-        .remote(url: "https://github.com/stleamist/NMapsMap-SwiftPM.git", requirement: .upToNextMajor(from: "3.10.0")),
+//        .remote(url: "https://github.com/UMC-1-Footprint/NMapsMap", requirement: .branch("main")),
+        .package(url: "https://github.com/jaemyeong/NMapsMap-SPM.git", .upToNextMajor(from: "3.16.0")),
+//        .remote(url: "https://github.com/stleamist/NMapsMap-SwiftPM.git", requirement: .upToNextMajor(from: "3.10.0")),
     ],
     platforms: [.iOS]
 )
