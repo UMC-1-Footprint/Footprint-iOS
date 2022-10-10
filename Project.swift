@@ -24,6 +24,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "KakaoSDKCommon"),
         .external(name: "KakaoSDKAuth"),
         .external(name: "KakaoSDKUser"),
+        .external(name: "NMapsMap"),
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -44,6 +45,7 @@ class BaseProjectFactory: ProjectFactory {
         "KAKAO_APP_KEY": "$(KAKAO_APP_KEY)",
         "LSApplicationQueriesSchemes": ["kakaokompassauth", "kakaolink"],
         "CFBundleURLTypes": ["CFBundleURLSchemes": ["kakao$(KAKAO_APP_KEY)"]],
+        "NMFClientId": "$(NAVER_CLIENT_ID)"
     ]
     
     func generateTarget() -> [Target] {
