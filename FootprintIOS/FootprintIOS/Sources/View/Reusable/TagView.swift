@@ -8,7 +8,16 @@
 
 import UIKit
 
+enum TagViewType {
+    case gray
+    case translucent
+}
+
 class TagView: BaseView {
+    
+    // MARK: - Properties
+    
+    let type: TagViewType
     
     // MARK: - UI Components
     
@@ -16,7 +25,9 @@ class TagView: BaseView {
     
     // MARK: - Initializer
     
-    init(title: String) {
+    init(type: TagViewType, title: String) {
+        self.type = type
+        
         super.init(frame: .zero)
         
         label.text = title
