@@ -11,7 +11,11 @@ import UIKit
 import ReactorKit
 
 class HomeViewController: NavigationBarViewController, View {
+    
+    // MARK: - Properties
+    
     typealias Reactor = HomeReactor
+    let width = UIScreen.main.bounds.width
     
     // MARK: - UI Components
     
@@ -151,7 +155,7 @@ class HomeViewController: NavigationBarViewController, View {
             $0.top.equalTo(tabButtonStackView.snp.bottom)
             $0.height.equalTo(4)
             $0.width.equalTo(89)
-            $0.leading.equalToSuperview().inset(52)
+            $0.leading.equalToSuperview().inset(width * (52/375))
         }
         
         lineView.snp.makeConstraints {
@@ -172,20 +176,68 @@ class HomeViewController: NavigationBarViewController, View {
         
         todayView.snp.makeConstraints {
             $0.top.leading.equalTo(homeContentView)
-            $0.width.equalTo(UIScreen.main.bounds.width)
+            $0.width.equalTo(width)
             $0.height.equalTo(homeContentView)
         }
         
         monthView.snp.makeConstraints {
             $0.top.equalTo(homeContentView)
             $0.leading.equalTo(todayView.snp.trailing)
-            $0.width.equalTo(UIScreen.main.bounds.width)
+            $0.width.equalTo(width)
             $0.height.equalTo(homeContentView)
             $0.trailing.equalTo(homeContentView.snp.trailing)
         }
     }
     
     func bind(reactor: HomeReactor) {
+        homeContentScrollView.rx.contentOffset
+            .map { .scrollHomeContent(x: $0.x) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
+        todayButton.rx.tap
+            .map { .tapTodayButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        monthButton.rx.tap
+            .map { .tapMonthButton }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isTodayView)
+            .distinctUntilChanged()
+            .filter { $0 }
+            .subscribe(onNext: { [weak self] _ in
+                self?.homeContentScrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isMonthView)
+            .distinctUntilChanged()
+            .filter { $0 }
+            .subscribe(onNext: { [weak self] _ in
+                self?.homeContentScrollView.setContentOffset(CGPoint(x: self?.width ?? 0, y: 0), animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.indicatorX)
+            .bind { x in
+                if x != 0.0 {
+                    let tabWidth = self.width * (52/375)
+                    self.indicatorBar.snp.updateConstraints {
+                        $0.leading.equalToSuperview().inset(tabWidth + x)
+                    }
+                    if tabWidth + x > self.width - tabWidth {
+                        self.indicatorBar.snp.updateConstraints {
+                            $0.leading.equalToSuperview().inset(self.width * (240/375))
+                        }
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
     }
 }
