@@ -83,7 +83,7 @@ class CalendarViewController: NavigationBarViewController {
         homeButton.rx.tap
             .bind { [weak self] in
                 let homeVC = HomeViewController(reactor: .init())
-                homeVC.hidesBottomBarWhenPushed = true
+                self?.tabBarController?.tabBar.backgroundColor = .white
                 self?.navigationController?.pushViewController(homeVC, animated: true)
             }
             .disposed(by: disposeBag)

@@ -42,8 +42,8 @@ class HomeViewController: NavigationBarViewController, View {
     }
     
     private let homeView = UIView().then {
-        $0.layer.cornerRadius = 20
         $0.backgroundColor = .white
+        $0.cornerRound(radius: 20, direct: [.layerMaxXMinYCorner, .layerMinXMinYCorner])
     }
     
     private let todayButton = UIButton().then {
