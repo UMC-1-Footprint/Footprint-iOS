@@ -13,20 +13,28 @@ import SnapKit
 class CalendarViewController: NavigationBarViewController {
     
     private lazy var infoButton = UIButton().then {
-        $0.setTitle("정보 입력 뷰컨 이동", for: .normal)
+        $0.setTitle("정보 입력", for: .normal)
         $0.setTitleColor(.black, for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        $0.titleLabel?.font = .systemFont(ofSize: 20)
     }
     
     private lazy var alertButton = UIButton().then {
         $0.setTitle("알림창 띄우기", for: .normal)
         $0.setTitleColor(.black, for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        $0.titleLabel?.font = .systemFont(ofSize: 20)
+    }
+    
+    private lazy var homeButton = UIButton().then {
+        $0.setTitle("홈", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 20)
     }
     
     private lazy var stackView = UIStackView().then {
         $0.addArrangedSubview(infoButton)
         $0.addArrangedSubview(alertButton)
+        $0.addArrangedSubview(homeButton)
+        $0.spacing = 10
         $0.axis = .vertical
     }
     
@@ -69,6 +77,14 @@ class CalendarViewController: NavigationBarViewController {
         alertButton.rx.tap
             .bind { [weak self] in
                 self?.makeAlert(type: .delete)
+            }
+            .disposed(by: disposeBag)
+        
+        homeButton.rx.tap
+            .bind { [weak self] in
+                let homeVC = HomeViewController(reactor: .init())
+                homeVC.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(homeVC, animated: true)
             }
             .disposed(by: disposeBag)
     }
