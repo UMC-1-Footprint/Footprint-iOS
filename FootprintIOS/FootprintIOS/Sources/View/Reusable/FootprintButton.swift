@@ -44,8 +44,9 @@ class FootprintButton: UIButton {
         
         setTitle(type.title, for: .normal)
         setTitleColor(.white, for: .normal)
+        titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         backgroundColor = FootprintIOSAsset.Colors.blueM.color
-        cornerRound(radius: 28)
+        cornerRound(radius: 16)
     }
     
     @available(*, unavailable)
