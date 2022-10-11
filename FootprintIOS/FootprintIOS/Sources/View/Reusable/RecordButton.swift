@@ -18,7 +18,7 @@ enum RecordButtonType {
         case .stop:
             return FootprintIOSAsset.Images.iconStop.image
         case .footprint:
-            return FootprintIOSAsset.Images.iconLogo.image
+            return FootprintIOSAsset.Images.footBigLogo.image.withTintColor(.white)
         case .save:
             return FootprintIOSAsset.Images.iconSave.image
         }
@@ -37,6 +37,18 @@ class RecordButton: UIButton {
         self.type = type
         
         super.init(frame: .zero)
+        
+        setImage(type.image, for: .normal)
+        makeBorder(color: FootprintIOSAsset.Colors.blueM.color, width: 4)
+        
+        switch type {
+        case .stop, .save:
+            backgroundColor = .white
+            cornerRound(radius: 32)
+        case .footprint:
+            backgroundColor = FootprintIOSAsset.Colors.blueM.color
+            cornerRound(radius: 35)
+        }
     }
     
     @available(*, unavailable)

@@ -43,11 +43,20 @@ class TagView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        label.textColor = FootprintIOSAsset.Colors.blackL.color
         label.font = .systemFont(ofSize: 10)
         
-        self.cornerRound(radius: 5)
-        self.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
+        switch type {
+        case .gray:
+            label.textColor = FootprintIOSAsset.Colors.blackL.color
+            self.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
+        case .translucent:
+            label.textColor = .white
+            self.backgroundColor = FootprintIOSAsset.Colors.blackD.color.withAlphaComponent(0.6)
+            
+        }
+        
+        self.cornerRound(radius: 8)
+        
     }
     
     override func setupHierarchy() {
@@ -59,9 +68,17 @@ class TagView: BaseView {
     override func setupLayout() {
         super.setupLayout()
         
-        label.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(1)
-            $0.leading.trailing.equalToSuperview().inset(8)
+        switch type {
+        case .gray:
+            label.snp.makeConstraints {
+                $0.top.bottom.equalToSuperview().inset(1)
+                $0.leading.trailing.equalToSuperview().inset(8)
+            }
+        case .translucent:
+            label.snp.makeConstraints {
+                $0.top.bottom.equalToSuperview().inset(4)
+                $0.leading.trailing.equalToSuperview().inset(10)
+            }
         }
     }
 }

@@ -27,6 +27,12 @@ class RecordViewController: NavigationBarViewController {
     let divider2: UIView = .init()
     let progressView: UIView = .init()
     let progressBarView: UIView = .init()
+    let stopButton: RecordButton = .init(type: .stop)
+    let stopTagView: TagView = .init(type: .translucent, title: "일시정지")
+    let footprintButton: RecordButton = .init(type: .footprint)
+    let footprintTagView: TagView = .init(type: .translucent, title: "발자국 남기기")
+    let saveButton: RecordButton = .init(type: .save)
+    let saveTagView: TagView = .init(type: .translucent, title: "산책 저장")
     
     // MARK: - Setup Methods
     
@@ -45,17 +51,20 @@ class RecordViewController: NavigationBarViewController {
         timeLabel.font = .systemFont(ofSize: 28, weight: .bold)
         timeLabel.textColor = .black
         
-        distanceLabel.text = "21 km"
+        distanceLabel.attributedText = NSMutableAttributedString()
+            .bold(string: "21 ", fontSize: 18)
+            .regular(string: "km", fontSize: 14)
         distanceLabel.textColor = FootprintIOSAsset.Colors.blackD.color
-        distanceLabel.font = .systemFont(ofSize: 14)
         
-        calorieLabel.text = "120 kcal"
+        calorieLabel.attributedText = NSMutableAttributedString()
+            .bold(string: "120 ", fontSize: 18)
+            .regular(string: "kcal", fontSize: 14)
         calorieLabel.textColor = FootprintIOSAsset.Colors.blackD.color
-        calorieLabel.font = .systemFont(ofSize: 14)
         
-        paceLabel.text = "100 걸음/분"
+        paceLabel.attributedText = NSMutableAttributedString()
+            .bold(string: "100 ", fontSize: 18)
+            .regular(string: "걸음/분", fontSize: 14)
         calorieLabel.textColor = FootprintIOSAsset.Colors.blackD.color
-        paceLabel.font = .systemFont(ofSize: 14)
         
         divider1.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
         
@@ -73,7 +82,7 @@ class RecordViewController: NavigationBarViewController {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        contentView.addSubviews([mapView, topView])
+        contentView.addSubviews([mapView, topView, stopButton, stopTagView, footprintButton, footprintTagView, saveButton, saveTagView])
         topView.addSubviews([timeLabel, distanceTagView, distanceLabel, divider1, calorieTagView, calorieLabel, divider2, paceTagView, paceLabel, toggleButton, progressView])
         progressView.addSubviews([progressBarView])
     }
@@ -152,6 +161,39 @@ class RecordViewController: NavigationBarViewController {
         progressBarView.snp.makeConstraints {
             $0.top.leading.bottom.equalToSuperview()
             $0.trailing.equalToSuperview().multipliedBy(0.3)
+        }
+        
+        footprintButton.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(80)
+            $0.width.height.equalTo(70)
+        }
+        
+        footprintTagView.snp.makeConstraints {
+            $0.top.equalTo(footprintButton.snp.bottom).offset(11)
+            $0.centerX.equalTo(footprintButton)
+        }
+        
+        stopButton.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(38)
+            $0.centerY.equalTo(footprintButton)
+            $0.width.height.equalTo(64)
+        }
+        
+        stopTagView.snp.makeConstraints {
+            $0.top.equalTo(stopButton.snp.bottom).offset(12)
+            $0.centerX.equalTo(stopButton)
+        }
+        
+        saveButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(38)
+            $0.centerY.equalTo(footprintButton)
+            $0.width.height.equalTo(64)
+        }
+        
+        saveTagView.snp.makeConstraints {
+            $0.top.equalTo(saveButton.snp.bottom).offset(11)
+            $0.centerX.equalTo(saveButton)
         }
     }
 }
