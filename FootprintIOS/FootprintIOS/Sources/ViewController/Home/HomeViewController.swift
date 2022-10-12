@@ -9,6 +9,7 @@
 import UIKit
 
 import ReactorKit
+import SnapKit
 
 class HomeViewController: NavigationBarViewController, View {
     
@@ -16,6 +17,7 @@ class HomeViewController: NavigationBarViewController, View {
     
     typealias Reactor = HomeReactor
     let width = UIScreen.main.bounds.width
+    var leftInsetConstraint: Constraint?
     
     // MARK: - UI Components
     
@@ -152,10 +154,13 @@ class HomeViewController: NavigationBarViewController, View {
         }
         
         indicatorBar.snp.makeConstraints {
+            let tabWidth = self.width * (52/375)
             $0.top.equalTo(tabButtonStackView.snp.bottom)
             $0.height.equalTo(4)
             $0.width.equalTo(89)
-            $0.leading.equalToSuperview().inset(width * (52/375))
+            $0.left.greaterThanOrEqualToSuperview().inset(tabWidth)
+            $0.right.lessThanOrEqualToSuperview().inset(tabWidth)
+            self.leftInsetConstraint = $0.left.equalToSuperview().priority(999).constraint
         }
         
         lineView.snp.makeConstraints {
@@ -209,34 +214,24 @@ class HomeViewController: NavigationBarViewController, View {
             .map(\.isTodayView)
             .distinctUntilChanged()
             .filter { $0 }
-            .subscribe(onNext: { [weak self] _ in
+            .bind { [weak self] _ in
                 self?.homeContentScrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
-            })
+            }
             .disposed(by: disposeBag)
         
         reactor.state
             .map(\.isMonthView)
             .distinctUntilChanged()
             .filter { $0 }
-            .subscribe(onNext: { [weak self] _ in
+            .bind { [weak self] _ in
                 self?.homeContentScrollView.setContentOffset(CGPoint(x: self?.width ?? 0, y: 0), animated: true)
-            })
+            }
             .disposed(by: disposeBag)
         
         reactor.state
             .map(\.indicatorX)
             .bind { x in
-                if x != 0.0 {
-                    let tabWidth = self.width * (52/375)
-                    self.indicatorBar.snp.updateConstraints {
-                        $0.leading.equalToSuperview().inset(tabWidth + x)
-                    }
-                    if tabWidth + x > self.width - tabWidth {
-                        self.indicatorBar.snp.updateConstraints {
-                            $0.leading.equalToSuperview().inset(self.width * (240/375))
-                        }
-                    }
-                }
+                self.leftInsetConstraint?.update(inset: x)
             }
             .disposed(by: disposeBag)
     }
