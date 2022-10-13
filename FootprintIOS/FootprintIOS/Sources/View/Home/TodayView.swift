@@ -13,7 +13,26 @@ class TodayView: BaseView {
     // MARK: - UI Components
     
     private let todayContentView = UIView().then {
-        $0.backgroundColor = .lightGray
+        $0.layer.cornerRadius = 100
+    }
+    
+    private let todayFootprintImageView = UIImageView().then {
+        $0.image = FootprintIOSAsset.Images.homeFootprintGray.image
+    }
+    
+    private let todayFootprintLabel = UILabel().then {
+        $0.text = "0%"
+        $0.font = .systemFont(ofSize: 24, weight: .bold)
+        $0.textColor = FootprintIOSAsset.Colors.blackM.color
+    }
+    
+    private lazy var todayStackView = UIStackView().then {
+        $0.addArrangedSubview(todayFootprintImageView)
+        $0.addArrangedSubview(todayFootprintLabel)
+        $0.distribution = .fillProportionally
+        $0.alignment = .center
+        $0.spacing = 10
+        $0.axis = .vertical
     }
     
     private let todaySegmentControl = UISegmentedControl(items: ["달성률", "산책시간"]).then {
@@ -50,14 +69,40 @@ class TodayView: BaseView {
     
     // MARK: - Methods
     
+    override func draw(_ rect: CGRect) {
+        let width = UIScreen.main.bounds.width
+        let height = UIScreen.main.bounds.height
+        let layer = CAShapeLayer()
+        
+        let progressPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
+                                           radius: 110,
+                                           startAngle: 0,
+                                           endAngle: 360,
+                                           clockwise: true)
+        FootprintIOSAsset.Colors.whiteD.color.setStroke()
+        progressPath.lineWidth = 15
+        progressPath.stroke()
+        
+        let progressBarPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
+                                           radius: 110,
+                                           startAngle: 0,
+                                           endAngle: (135 * .pi) / 180,
+                                           clockwise: true)
+        FootprintIOSAsset.Colors.blueM.color.setStroke()
+        progressBarPath.lineWidth = 15
+        progressBarPath.stroke()
+    }
+    
     override func setupProperty() {
         super.setupProperty()
         
+        backgroundColor = .white
     }
     
     override func setupHierarchy() {
         super.setupHierarchy()
-        
+    
+        todayContentView.addSubview(todayStackView)
         addSubviews([todayContentView, todaySegmentControl, distanceLabel, lineView, calorieLabel, bottomButton])
     }
     
@@ -65,13 +110,22 @@ class TodayView: BaseView {
         super.setupLayout()
         
         todayContentView.snp.makeConstraints {
-            $0.width.height.equalTo(230)
-            $0.top.equalToSuperview().inset(39)
+            $0.width.height.equalTo(200)
+            $0.top.equalToSuperview().inset(55)
             $0.centerX.equalToSuperview()
         }
         
+        todayFootprintImageView.snp.makeConstraints {
+            $0.width.equalTo(45)
+            $0.height.equalTo(65)
+        }
+        
+        todayStackView.snp.makeConstraints {
+            $0.center.equalTo(todayContentView)
+        }
+        
         todaySegmentControl.snp.makeConstraints {
-            $0.top.equalTo(todayContentView.snp.bottom).offset(19)
+            $0.top.equalTo(todayContentView.snp.bottom).offset(39)
             $0.width.equalTo(115)
             $0.height.equalTo(30)
             $0.centerX.equalToSuperview()
