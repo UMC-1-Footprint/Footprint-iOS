@@ -196,7 +196,12 @@ class HomeViewController: NavigationBarViewController, View {
     
     func bind(reactor: HomeReactor) {
         homeContentScrollView.rx.contentOffset
-            .map { .scrollHomeContent(x: $0.x) }
+            .map { .scrollHomeContent(x: Int($0.x)) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        homeContentScrollView.rx.willEndDragging
+            .map { _ in .didEndScroll }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
