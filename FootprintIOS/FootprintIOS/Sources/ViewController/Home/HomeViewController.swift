@@ -200,8 +200,8 @@ class HomeViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        homeContentScrollView.rx.willEndDragging
-            .map { _ in .didEndScroll }
+        homeContentScrollView.rx.didEndDecelerating
+            .map { .didEndScroll }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -237,6 +237,17 @@ class HomeViewController: NavigationBarViewController, View {
             .map(\.indicatorX)
             .bind { x in
                 self.leftInsetConstraint?.update(inset: x)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.didEndScroll)
+            .distinctUntilChanged()
+            .withUnretained(self)
+            .bind { this, x in
+                let scaledX = x > (Int(this.width) / 2) ? this.width : 0
+                
+                this.homeContentScrollView.setContentOffset(CGPoint(x: scaledX, y: 0), animated: true)
             }
             .disposed(by: disposeBag)
     }

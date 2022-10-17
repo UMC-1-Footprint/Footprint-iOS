@@ -18,14 +18,14 @@ class HomeReactor: Reactor {
     
     enum Mutation {
         case showIndicatorBar(Int)
-        case showHomeContent
+        case showHomeContent(Int)
         case showTodayView
         case showMonthView
     }
     
     struct State {
         var indicatorX: Int = 0
-        var didEndScroll: Bool = false
+        var didEndScroll: Int = 0
         var isTodayView: Bool = true
         var isMonthView: Bool = false
     }
@@ -41,7 +41,7 @@ class HomeReactor: Reactor {
         case let .scrollHomeContent(x):
             return .just(.showIndicatorBar(x))
         case .didEndScroll:
-            return .just(.showHomeContent)
+            return .just(.showHomeContent(currentState.indicatorX))
         case .tapTodayButton:
             return .just(.showTodayView)
         case .tapMonthButton:
@@ -55,8 +55,8 @@ class HomeReactor: Reactor {
         switch mutation {
         case .showIndicatorBar(let x):
             newState.indicatorX = x
-        case .showHomeContent:
-            newState.didEndScroll = true
+        case .showHomeContent(let x):
+            newState.didEndScroll = x
         case .showTodayView:
             newState.isTodayView = true
             newState.isMonthView = false
