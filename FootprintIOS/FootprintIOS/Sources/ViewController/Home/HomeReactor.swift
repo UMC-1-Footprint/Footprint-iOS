@@ -9,25 +9,27 @@
 import ReactorKit
 
 class HomeReactor: Reactor {
+    enum HomeViewType {
+        case today
+        case month
+    }
+    
     enum Action {
         case scrollHomeContent(x: Int)
         case didEndScroll
-        case tapTodayButton
-        case tapMonthButton
+        case tapHomeViewTypeButton(HomeViewType)
     }
     
     enum Mutation {
         case showIndicatorBar(Int)
         case showHomeContent(Int)
-        case showTodayView
-        case showMonthView
+        case showHomeView(HomeViewType)
     }
     
     struct State {
         var indicatorX: Int = 0
         var didEndScroll: Int = 0
-        var isTodayView: Bool = true
-        var isMonthView: Bool = false
+        var homeViewType: HomeViewType = .today
     }
     
     var initialState: State
@@ -42,10 +44,8 @@ class HomeReactor: Reactor {
             return .just(.showIndicatorBar(x))
         case .didEndScroll:
             return .just(.showHomeContent(currentState.indicatorX))
-        case .tapTodayButton:
-            return .just(.showTodayView)
-        case .tapMonthButton:
-            return .just(.showMonthView)
+        case .tapHomeViewTypeButton(let type):
+            return .just(.showHomeView(type))
         }
     }
     
@@ -57,12 +57,8 @@ class HomeReactor: Reactor {
             newState.indicatorX = x
         case .showHomeContent(let x):
             newState.didEndScroll = x
-        case .showTodayView:
-            newState.isTodayView = true
-            newState.isMonthView = false
-        case .showMonthView:
-            newState.isTodayView = false
-            newState.isMonthView = true
+        case .showHomeView(let type):
+            newState.homeViewType = type
         }
         
         return newState

@@ -206,30 +206,21 @@ class HomeViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         todayButton.rx.tap
-            .map { .tapTodayButton }
+            .map { .tapHomeViewTypeButton(.today) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         monthButton.rx.tap
-            .map { .tapMonthButton }
+            .map { .tapHomeViewTypeButton(.month) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map(\.isTodayView)
+            .map(\.homeViewType)
             .distinctUntilChanged()
-            .filter { $0 }
-            .bind { [weak self] _ in
-                self?.homeContentScrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
-            }
-            .disposed(by: disposeBag)
-        
-        reactor.state
-            .map(\.isMonthView)
-            .distinctUntilChanged()
-            .filter { $0 }
-            .bind { [weak self] _ in
-                self?.homeContentScrollView.setContentOffset(CGPoint(x: self?.width ?? 0, y: 0), animated: true)
+            .bind { type in
+                let homeX = (type == .today) ? 0 : self.width
+                self.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)
             }
             .disposed(by: disposeBag)
         
