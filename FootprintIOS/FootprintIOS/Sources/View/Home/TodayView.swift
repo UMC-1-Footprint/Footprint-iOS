@@ -42,21 +42,24 @@ class TodayView: BaseView {
         $0.setTitleTextAttributes([NSAttributedString.Key.foregroundColor : UIColor.white, .font: UIFont.systemFont(ofSize: 12, weight: .semibold)], for: .selected)
         $0.setTitleTextAttributes([NSAttributedString.Key.foregroundColor : FootprintIOSAsset.Colors.blackL.color, .font: UIFont.systemFont(ofSize: 12)], for: .normal)
         $0.selectedSegmentIndex = 0
-        $0.layer.cornerRadius = 15
     }
     
     private let distanceLabel = UILabel().then {
-        $0.text = "거리 \n 2.1 km"
-        $0.font = .systemFont(ofSize: 20)
-        $0.textColor = FootprintIOSAsset.Colors.blackM.color
+        $0.attributedText = NSMutableAttributedString()
+            .regular(string: "거리 \n", fontSize: 12)
+            .bold(string: "2.1", fontSize: 24)
+            .regular(string: "km", fontSize: 12)
+        $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
     
     private let calorieLabel = UILabel().then {
-        $0.text = "칼로리 \n 120 kcal"
-        $0.font = .systemFont(ofSize: 20)
-        $0.textColor = FootprintIOSAsset.Colors.blackM.color
+        $0.attributedText = NSMutableAttributedString()
+            .regular(string: "칼로리 \n", fontSize: 12)
+            .bold(string: "120", fontSize: 24)
+            .regular(string: "kcal", fontSize: 12)
+        $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
@@ -72,7 +75,6 @@ class TodayView: BaseView {
     override func draw(_ rect: CGRect) {
         let width = UIScreen.main.bounds.width
         let height = UIScreen.main.bounds.height
-        let layer = CAShapeLayer()
         
         let progressPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
                                            radius: 110,
@@ -90,6 +92,7 @@ class TodayView: BaseView {
                                            clockwise: true)
         FootprintIOSAsset.Colors.blueM.color.setStroke()
         progressBarPath.lineWidth = 15
+        progressBarPath.lineCapStyle = .round
         progressBarPath.stroke()
     }
     

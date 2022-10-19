@@ -37,8 +37,9 @@ class HomeViewController: NavigationBarViewController, View {
     }
     
     private let titleLabel = UILabel().then {
-        $0.text = "발자국님!\n오늘도 발자국을 남겨볼까요?"
-        $0.font = .systemFont(ofSize: 24)
+        $0.attributedText = NSMutableAttributedString()
+            .bold(string: "발자국", fontSize: 24)
+            .regular(string: "님!\n오늘도 발자국을 남겨볼까요?", fontSize: 24)
         $0.numberOfLines = 0
         $0.textColor = .white
     }
