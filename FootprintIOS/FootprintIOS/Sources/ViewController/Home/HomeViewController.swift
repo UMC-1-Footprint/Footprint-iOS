@@ -253,6 +253,7 @@ class HomeViewController: NavigationBarViewController, View {
         
         reactor.state
             .map(\.todayDataType)
+            .distinctUntilChanged()
             .withUnretained(self)
             .bind { (this, type) in
                 print(type)
