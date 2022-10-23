@@ -8,25 +8,30 @@
 
 import UIKit
 
+enum TodayDataType: Int {
+    case percent
+    case time
+}
+
 class TodayView: BaseView {
     
     // MARK: - UI Components
     
-    private let todayContentView = UIView().then {
+    let todayContentView = UIView().then {
         $0.layer.cornerRadius = 100
     }
     
-    private let todayFootprintImageView = UIImageView().then {
+    let todayFootprintImageView = UIImageView().then {
         $0.image = FootprintIOSAsset.Images.homeFootprintGray.image
     }
     
-    private let todayFootprintLabel = UILabel().then {
+    let todayFootprintLabel = UILabel().then {
         $0.text = "0%"
         $0.font = .systemFont(ofSize: 24, weight: .bold)
         $0.textColor = FootprintIOSAsset.Colors.blackM.color
     }
     
-    private lazy var todayStackView = UIStackView().then {
+    lazy var todayStackView = UIStackView().then {
         $0.addArrangedSubview(todayFootprintImageView)
         $0.addArrangedSubview(todayFootprintLabel)
         $0.distribution = .fillProportionally
@@ -35,7 +40,7 @@ class TodayView: BaseView {
         $0.axis = .vertical
     }
     
-    private let todaySegmentControl = UISegmentedControl(items: ["달성률", "산책시간"]).then {
+    let todaySegmentControl = UISegmentedControl(items: ["달성률", "산책시간"]).then {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color.withAlphaComponent(0.5)
         $0.selectedSegmentTintColor = FootprintIOSAsset.Colors.blueM.color
@@ -44,7 +49,7 @@ class TodayView: BaseView {
         $0.selectedSegmentIndex = 0
     }
     
-    private let distanceLabel = UILabel().then {
+    let distanceLabel = UILabel().then {
         $0.attributedText = NSMutableAttributedString()
             .regular(string: "거리 \n", fontSize: 12)
             .bold(string: "2.1", fontSize: 24)
@@ -54,7 +59,7 @@ class TodayView: BaseView {
         $0.numberOfLines = 0
     }
     
-    private let calorieLabel = UILabel().then {
+    let calorieLabel = UILabel().then {
         $0.attributedText = NSMutableAttributedString()
             .regular(string: "칼로리 \n", fontSize: 12)
             .bold(string: "120", fontSize: 24)
@@ -64,11 +69,11 @@ class TodayView: BaseView {
         $0.numberOfLines = 0
     }
     
-    private let lineView = UIView().then {
+    let lineView = UIView().then {
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
     }
     
-    private let bottomButton = FootprintButton(type: .startWalk)
+    let bottomButton = FootprintButton(type: .startWalk)
     
     // MARK: - Methods
     

@@ -216,19 +216,28 @@ class HomeViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        todayView.todaySegmentControl.rx.selectedSegmentIndex
+            .map { index in
+                    .tapTodayDataButton(TodayDataType(rawValue: index) ?? .percent)
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map(\.homeViewType)
             .distinctUntilChanged()
-            .bind { type in
+            .withUnretained(self)
+            .bind { (this, type) in
                 let homeX = (type == .today) ? 0 : self.width
-                self.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)
+                this.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)
             }
             .disposed(by: disposeBag)
         
         reactor.state
             .map(\.indicatorX)
-            .bind { x in
-                self.leftInsetConstraint?.update(inset: x)
+            .withUnretained(self)
+            .bind { (this, x) in
+                this.leftInsetConstraint?.update(inset: x)
             }
             .disposed(by: disposeBag)
         
@@ -236,10 +245,17 @@ class HomeViewController: NavigationBarViewController, View {
             .map(\.didEndScroll)
             .distinctUntilChanged()
             .withUnretained(self)
-            .bind { this, x in
-                let scaledX = x > (Int(this.width) / 2) ? this.width : 0
-                
-                this.homeContentScrollView.setContentOffset(CGPoint(x: scaledX, y: 0), animated: true)
+            .bind { (this, x) in
+                let homeX = x > (Int(this.width) / 2) ? this.width : 0
+                this.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.todayDataType)
+            .withUnretained(self)
+            .bind { (this, type) in
+                print(type)
             }
             .disposed(by: disposeBag)
     }
