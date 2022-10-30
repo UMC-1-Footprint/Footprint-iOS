@@ -8,25 +8,30 @@
 
 import UIKit
 
+enum TodayDataType: Int {
+    case percent
+    case time
+}
+
 class TodayView: BaseView {
     
     // MARK: - UI Components
     
-    private let todayContentView = UIView().then {
+    let todayContentView = UIView().then {
         $0.layer.cornerRadius = 100
     }
     
-    private let todayFootprintImageView = UIImageView().then {
+    let todayFootprintImageView = UIImageView().then {
         $0.image = FootprintIOSAsset.Images.homeFootprintGray.image
     }
     
-    private let todayFootprintLabel = UILabel().then {
+    let todayFootprintLabel = UILabel().then {
         $0.text = "0%"
         $0.font = .systemFont(ofSize: 24, weight: .bold)
         $0.textColor = FootprintIOSAsset.Colors.blackM.color
     }
     
-    private lazy var todayStackView = UIStackView().then {
+    lazy var todayStackView = UIStackView().then {
         $0.addArrangedSubview(todayFootprintImageView)
         $0.addArrangedSubview(todayFootprintLabel)
         $0.distribution = .fillProportionally
@@ -35,44 +40,46 @@ class TodayView: BaseView {
         $0.axis = .vertical
     }
     
-    private let todaySegmentControl = UISegmentedControl(items: ["달성률", "산책시간"]).then {
+    let todaySegmentControl = UISegmentedControl(items: ["달성률", "산책시간"]).then {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color.withAlphaComponent(0.5)
         $0.selectedSegmentTintColor = FootprintIOSAsset.Colors.blueM.color
         $0.setTitleTextAttributes([NSAttributedString.Key.foregroundColor : UIColor.white, .font: UIFont.systemFont(ofSize: 12, weight: .semibold)], for: .selected)
         $0.setTitleTextAttributes([NSAttributedString.Key.foregroundColor : FootprintIOSAsset.Colors.blackL.color, .font: UIFont.systemFont(ofSize: 12)], for: .normal)
         $0.selectedSegmentIndex = 0
-        $0.layer.cornerRadius = 15
     }
     
-    private let distanceLabel = UILabel().then {
-        $0.text = "거리 \n 2.1 km"
-        $0.font = .systemFont(ofSize: 20)
-        $0.textColor = FootprintIOSAsset.Colors.blackM.color
+    let distanceLabel = UILabel().then {
+        $0.attributedText = NSMutableAttributedString()
+            .regular(string: "거리 \n", fontSize: 12)
+            .bold(string: "2.1", fontSize: 24)
+            .regular(string: "km", fontSize: 12)
+        $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
     
-    private let calorieLabel = UILabel().then {
-        $0.text = "칼로리 \n 120 kcal"
-        $0.font = .systemFont(ofSize: 20)
-        $0.textColor = FootprintIOSAsset.Colors.blackM.color
+    let calorieLabel = UILabel().then {
+        $0.attributedText = NSMutableAttributedString()
+            .regular(string: "칼로리 \n", fontSize: 12)
+            .bold(string: "120", fontSize: 24)
+            .regular(string: "kcal", fontSize: 12)
+        $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
     
-    private let lineView = UIView().then {
+    let lineView = UIView().then {
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
     }
     
-    private let bottomButton = FootprintButton(type: .startWalk)
+    let bottomButton = FootprintButton(type: .startWalk)
     
     // MARK: - Methods
     
     override func draw(_ rect: CGRect) {
         let width = UIScreen.main.bounds.width
         let height = UIScreen.main.bounds.height
-        let layer = CAShapeLayer()
         
         let progressPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
                                            radius: 110,
@@ -90,6 +97,7 @@ class TodayView: BaseView {
                                            clockwise: true)
         FootprintIOSAsset.Colors.blueM.color.setStroke()
         progressBarPath.lineWidth = 15
+        progressBarPath.lineCapStyle = .round
         progressBarPath.stroke()
     }
     

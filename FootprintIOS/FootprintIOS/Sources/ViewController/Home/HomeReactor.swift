@@ -18,18 +18,21 @@ class HomeReactor: Reactor {
         case scrollHomeContent(x: Int)
         case didEndScroll
         case tapHomeViewTypeButton(HomeViewType)
+        case tapTodayDataButton(TodayDataType)
     }
     
     enum Mutation {
         case showIndicatorBar(Int)
         case showHomeContent(Int)
         case showHomeView(HomeViewType)
+        case showTodayData(TodayDataType)
     }
     
     struct State {
         var indicatorX: Int = 0
         var didEndScroll: Int = 0
         var homeViewType: HomeViewType = .today
+        var todayDataType: TodayDataType = .percent
     }
     
     var initialState: State
@@ -46,6 +49,8 @@ class HomeReactor: Reactor {
             return .just(.showHomeContent(currentState.indicatorX))
         case .tapHomeViewTypeButton(let type):
             return .just(.showHomeView(type))
+        case .tapTodayDataButton(let type):
+            return .just(.showTodayData(type))
         }
     }
     
@@ -59,6 +64,8 @@ class HomeReactor: Reactor {
             newState.didEndScroll = x
         case .showHomeView(let type):
             newState.homeViewType = type
+        case .showTodayData(let type):
+            newState.todayDataType = type
         }
         
         return newState
