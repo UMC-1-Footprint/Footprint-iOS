@@ -39,10 +39,15 @@ class MyPageViewController: NavigationBarViewController {
         $0.setTitleColor(.black, for: .normal)
     }
     
+    let myFootprintButton = UIButton().then {
+        $0.setTitle("내 발자국 페이지로 이동", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+    }
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, testPageButton])
+        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, testPageButton, myFootprintButton])
     }
     
     override func setupLayout() {
@@ -64,6 +69,11 @@ class MyPageViewController: NavigationBarViewController {
         
         testPageButton.snp.makeConstraints {
             $0.top.equalTo(agreementPageButton.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
+        
+        myFootprintButton.snp.makeConstraints {
+            $0.top.equalTo(testPageButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
     }
@@ -104,6 +114,15 @@ class MyPageViewController: NavigationBarViewController {
                 let testVC = TestVC()
                 testVC.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(testVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        myFootprintButton.rx
+            .tap
+            .bind { [weak self] _ in
+                let myFootprintVC = MyFootprintViewController()
+                myFootprintVC.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(myFootprintVC, animated: true)
             }
             .disposed(by: disposeBag)
     }
