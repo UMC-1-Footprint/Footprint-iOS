@@ -7,12 +7,28 @@
 //
 
 import UIKit
+import ReactorKit
 
-class FootprintViewController: NavigationBarViewController {
+class FootprintMapViewController: NavigationBarViewController, View {
+    // MARK: - Constants
+    
+    typealias Reactor = FootprintMapReactor
+    
+    // MARK: - UI Components
     
     let onboardingButton: UIButton = .init()
     let settingButton: UIButton = .init()
     let mapButton: UIButton = .init()
+    
+//    init() {
+//        self.reactor = reactor
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//
+//    @available(*, unavailable)
+//    required init?(coder _: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
     
     override func setupNavigationBar() {
         super.setupNavigationBar()
@@ -56,6 +72,10 @@ class FootprintViewController: NavigationBarViewController {
             $0.top.equalTo(settingButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
+    }
+    
+    func bind(reactor: Reactor) {
+        
     }
     
     override func setupBind() {
