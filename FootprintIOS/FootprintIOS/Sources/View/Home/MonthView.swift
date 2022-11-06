@@ -8,8 +8,12 @@
 
 import UIKit
 
+import ReactorKit
+
 class MonthView: BaseView {
     
+    typealias Reactor = HomeReactor
+        
     // MARK: - UI Components
     
     let monthLabel = UILabel().then {
@@ -17,6 +21,12 @@ class MonthView: BaseView {
         $0.font = .systemFont(ofSize: 14, weight: .semibold)
         $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center
+    }
+    
+    lazy var dayStackView = UIStackView().then {
+        $0.distribution = .equalCentering
+        $0.alignment = .center
+        $0.axis = .horizontal
     }
     
     let collectionView = UIView().then {
@@ -66,11 +76,19 @@ class MonthView: BaseView {
     
     private let bottomButton = FootprintButton(type: .startWalk)
     
-    
     // MARK: - Methods
     
     override func setupProperty() {
         super.setupProperty()
+        
+        for day in ["일", "월", "화", "수", "목", "금", "토"] {
+            let dayLabel = UILabel().then {
+                $0.text = day
+                $0.font = .systemFont(ofSize: 12)
+                $0.textColor = FootprintIOSAsset.Colors.blackD.color
+            }
+            dayStackView.addArrangedSubview(dayLabel)
+        }
         
         [line1View, line2View].forEach {
             $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
@@ -80,7 +98,7 @@ class MonthView: BaseView {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        addSubviews([monthLabel, collectionView, monthStackView, bottomButton])
+        addSubviews([monthLabel, dayStackView, collectionView, monthStackView, bottomButton])
     }
     
     override func setupLayout() {
@@ -91,9 +109,15 @@ class MonthView: BaseView {
             $0.centerX.equalToSuperview()
         }
         
+        dayStackView.snp.makeConstraints {
+            $0.top.equalTo(monthLabel.snp.bottom).offset(15)
+            $0.leading.trailing.equalToSuperview().inset(30)
+            $0.height.equalTo(12)
+        }
+        
         collectionView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(monthLabel.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview().inset(10)
+            $0.top.equalTo(dayStackView.snp.bottom).offset(10)
             $0.bottom.equalTo(monthStackView.snp.top).offset(-10)
         }
         
@@ -114,5 +138,9 @@ class MonthView: BaseView {
             $0.height.equalTo(56)
             $0.bottom.equalToSuperview().inset(24)
         }
+    }
+    
+    func bind(reactor: HomeReactor) {
+        
     }
 }

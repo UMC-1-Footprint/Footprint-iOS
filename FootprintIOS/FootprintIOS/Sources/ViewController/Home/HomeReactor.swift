@@ -15,6 +15,7 @@ class HomeReactor: Reactor {
     }
     
     enum Action {
+        case refresh
         case scrollHomeContent(x: Int)
         case didEndScroll
         case tapHomeViewTypeButton(HomeViewType)
@@ -26,6 +27,8 @@ class HomeReactor: Reactor {
         case showHomeContent(Int)
         case showHomeView(HomeViewType)
         case showTodayData(TodayDataType)
+        
+        case setMonthSections([MonthSectionModel])
     }
     
     struct State {
@@ -33,6 +36,8 @@ class HomeReactor: Reactor {
         var didEndScroll: Int = 0
         var homeViewType: HomeViewType = .today
         var todayDataType: TodayDataType = .percent
+        
+        var monthSections: [MonthSectionModel] = []
     }
     
     var initialState: State
@@ -43,6 +48,8 @@ class HomeReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
+        case .refresh:
+            return .just(.setMonthSections(makeSections()))
         case let .scrollHomeContent(x):
             return .just(.showIndicatorBar(x))
         case .didEndScroll:
@@ -66,8 +73,22 @@ class HomeReactor: Reactor {
             newState.homeViewType = type
         case .showTodayData(let type):
             newState.todayDataType = type
+        case let.setMonthSections(sections):
+            newState.monthSections = sections
         }
         
         return newState
+    }
+}
+
+extension HomeReactor {
+    func makeSections() -> [MonthSectionModel] {
+        let items = [0...31].map { (day) -> MonthItem in
+            return .month(MonthCollectionViewCellReactor(state: .init(day: 0)))
+        }
+        
+        let section = MonthSectionModel.init(model: .month(items), items: items)
+        
+        return [section]
     }
 }

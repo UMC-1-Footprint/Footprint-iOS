@@ -9,6 +9,7 @@
 import UIKit
 
 import ReactorKit
+import RxDataSources
 import SnapKit
 
 class HomeViewController: NavigationBarViewController, View {
@@ -16,6 +17,8 @@ class HomeViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     typealias Reactor = HomeReactor
+    typealias DataSource = RxCollectionViewSectionedReloadDataSource<MonthSectionModel>
+
     let width = UIScreen.main.bounds.width
     var leftInsetConstraint: Constraint?
     
