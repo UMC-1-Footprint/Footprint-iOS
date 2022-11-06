@@ -21,3 +21,17 @@ public extension Reactive where Base: UIViewController {
         return ControlEvent(events: source)
     }
 }
+
+
+public extension Reactive where Base: UIScrollView {
+    var pageSet: ControlEvent<Int> {
+        let event = base.rx.didScroll
+            .withLatestFrom(base.rx.contentOffset)
+            .map { offset -> Int in
+                let screenWidth = UIScreen.main.bounds.width
+                let page = round(offset.x/screenWidth)
+                return Int(page)
+            }
+        return ControlEvent(events: event)
+    }
+}
