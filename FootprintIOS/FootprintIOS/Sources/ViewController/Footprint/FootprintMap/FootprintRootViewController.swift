@@ -9,10 +9,14 @@
 import UIKit
 import ReactorKit
 
-class FootprintMapViewController: NavigationBarViewController, View {
+class FootprintRootViewController: NavigationBarViewController, View {
     // MARK: - Constants
     
-    typealias Reactor = FootprintMapReactor
+    typealias Reactor = FootprintRootReactor
+    
+    // MARK: - Properties
+    
+    var pushFootprintMapScreen: () -> FootprintMapViewController
     
     // MARK: - UI Components
     
@@ -20,15 +24,19 @@ class FootprintMapViewController: NavigationBarViewController, View {
     let settingButton: UIButton = .init()
     let mapButton: UIButton = .init()
     
-//    init() {
-//        self.reactor = reactor
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//
-//    @available(*, unavailable)
-//    required init?(coder _: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    init(reactor: Reactor,
+         pushFootprintMapScreen: @escaping () -> FootprintMapViewController) {
+        self.pushFootprintMapScreen = pushFootprintMapScreen
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
+    }
+    
+    // MARK: - Initializer
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func setupNavigationBar() {
         super.setupNavigationBar()
@@ -102,15 +110,15 @@ class FootprintMapViewController: NavigationBarViewController, View {
             }
             .disposed(by: disposeBag)
         
-        mapButton
-            .rx
-            .tap
+        mapButton.rx.tap
             .bind { [weak self] in
-                let recordViewController = RecordViewController()
-                
-                recordViewController.hidesBottomBarWhenPushed = true
-                self?.navigationController?.pushViewController(recordViewController, animated: true)
+                self?.goToFootprintMapScreen()
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func goToFootprintMapScreen() {
+        let controller = self.pushFootprintMapScreen()
+        self.navigationController?.pushViewController(controller, animated: true)
     }
 }

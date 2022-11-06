@@ -9,38 +9,20 @@
 import Foundation
 import ReactorKit
 
-class FootprintMapReactor: Reactor {
+class FootprintRootReactor: Reactor {
     enum Action {
         
     }
     
     enum Mutation {
-        
     }
     
     struct State {
-        
     }
     
     var initialState: State
     
     init(state: State) {
         self.initialState = state
-    }
-}
-
-extension FootprintMapReactor {
-    func mutate(action: Action) -> Observable<Mutation> {
-        return .empty()
-    }
-    
-    func reduce(state: State, mutation: Mutation) -> State {
-        var newState = state
-        
-        switch mutation {
-            
-        }
-        
-        return newState
     }
 }

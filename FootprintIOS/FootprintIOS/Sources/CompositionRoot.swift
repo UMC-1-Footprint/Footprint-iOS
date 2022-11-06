@@ -37,7 +37,7 @@ extension CompositionRoot {
         
         let tabBarViewController = TabBarViewController()
         
-        let footprintViewController = makeFootprintScreen()
+        let footprintRootViewController = makeFootprintRootScreen()
         
         let calendarViewController = makeCalendarScreen()
         
@@ -46,7 +46,7 @@ extension CompositionRoot {
         let myPageViewController = makeMyPageScreen()
         
         tabBarViewController.viewControllers = [
-            footprintViewController.navigationWrap(),
+            footprintRootViewController.navigationWrap(),
             calendarViewController.navigationWrap(),
             recommendViewController.navigationWrap(),
             myPageViewController.navigationWrap()
@@ -55,8 +55,24 @@ extension CompositionRoot {
         return tabBarViewController
     }
     
-    static func makeFootprintScreen() -> FootprintMapViewController {
-        let controller = FootprintMapViewController()
+    static func makeFootprintRootScreen() -> FootprintRootViewController {
+        var pushFootprintWriteScreen: () -> FootprintWriteViewController
+        pushFootprintWriteScreen = {
+            let reactor = FootprintWriteReactor(state: .init())
+            let controller = FootprintWriteViewController(reactor: reactor)
+            return controller
+        }
+        
+        var pushFootprintMapScreen: () -> FootprintMapViewController
+        pushFootprintMapScreen = {
+            let reactor = FootprintMapReactor(state: .init())
+            let controller = FootprintMapViewController(reactor: reactor, pushFootprintWriteScreen: pushFootprintWriteScreen)
+            return controller
+        }
+        
+        let reactor = FootprintRootReactor(state: .init())
+        let controller = FootprintRootViewController(reactor: reactor,
+                                                     pushFootprintMapScreen: pushFootprintMapScreen)
         
         controller.title = "홈"
         controller.tabBarItem.image = nil
