@@ -13,7 +13,7 @@ import Then
 import RxSwift
 
 class MyFootprintViewController: BaseViewController {
-    // MARK: - UI Components
+// MARK: - UI Components
     
     // MARK: - topInfo
     let myFootprintLabel: UILabel = .init()
@@ -55,7 +55,8 @@ class MyFootprintViewController: BaseViewController {
     let goalStackView: UIStackView = .init()
     
     let testView: UIView = .init()
- 
+    
+// MARK: - setupProperty
     override func setupProperty() {
         super.setupProperty()
         
@@ -101,7 +102,7 @@ class MyFootprintViewController: BaseViewController {
             $0.alignment = .center
         }
         
-        // MARK: - middleSummary
+        // MARK: - 산책 목표
         goalNavigationLabel.text = "산책 목표"
         goalNavigationLabel.font = .systemFont(ofSize: 18, weight: UIFont.Weight(rawValue: 700))
         goalNavigationLabel.textColor = FootprintIOSAsset.Colors.blackD.color
@@ -114,6 +115,7 @@ class MyFootprintViewController: BaseViewController {
         testView.backgroundColor = .blue
     }
     
+// MARK: - setupLayout
     override func setupLayout() {
         super.setupLayout()
         
@@ -168,6 +170,7 @@ class MyFootprintViewController: BaseViewController {
             $0.trailing.equalTo(topInfoView.snp.trailing).inset(16)
         }
         
+        // MARK: - middleSummary
         [todayChartView, monthChartView, monthFootprintView].forEach {
             $0.snp.makeConstraints {
                 $0.width.height.equalTo(100)
@@ -185,6 +188,7 @@ class MyFootprintViewController: BaseViewController {
             $0.width.equalTo(320)
         }
         
+        // MARK: - 산책 목표
         goalUnderlineView.snp.makeConstraints {
             $0.width.equalTo(self.view)
             $0.height.equalTo(8)
@@ -220,6 +224,7 @@ class MyFootprintViewController: BaseViewController {
             $0.centerX.equalToSuperview()
         }
         
+        // MARK: - test
         testView.snp.makeConstraints {
             $0.top.equalTo(goalStackView.snp.bottom).offset(10)
             $0.width.equalTo(self.view)
@@ -228,6 +233,7 @@ class MyFootprintViewController: BaseViewController {
         }
     }
     
+// MARK: - setupHierarchy
     override func setupHierarchy() {
         super.setupHierarchy()
         
