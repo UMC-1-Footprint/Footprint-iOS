@@ -43,7 +43,16 @@ class MyFootprintViewController: BaseViewController {
     let monthFootprintCountStackView: UIStackView = .init()
     let middleSummaryStackView: UIStackView = .init()
     
+    // MARK: - 산책 목표
+    let goalUnderlineView = UnderLineView()
+    let goalNavigationView: UIView = .init()
+    let goalNavigationLabel: UILabel = .init()
+    let goalNavigationButton: UIButton = .init()
     
+    let goalDateView = FootprintGoalView(goalType: .date, userGoal: "매주 화,목,토")
+    let goalTimeView = FootprintGoalView(goalType: .time, userGoal: "하루 30분")
+    let goalTimeZoneView = FootprintGoalView(goalType: .timeZone, userGoal: "이른 오전")
+    let goalStackView: UIStackView = .init()
     
     let testView: UIView = .init()
  
@@ -93,6 +102,15 @@ class MyFootprintViewController: BaseViewController {
         }
         
         // MARK: - middleSummary
+        goalNavigationLabel.text = "산책 목표"
+        goalNavigationLabel.font = .systemFont(ofSize: 18, weight: UIFont.Weight(rawValue: 700))
+        goalNavigationLabel.textColor = FootprintIOSAsset.Colors.blackD.color
+        
+        goalNavigationButton.setImage(FootprintIOSAsset.Images.backIcon.image, for: .normal)
+        
+        goalStackView.axis = .vertical
+        goalStackView.spacing = 0
+        
         testView.backgroundColor = .blue
     }
     
@@ -150,16 +168,10 @@ class MyFootprintViewController: BaseViewController {
             $0.trailing.equalTo(topInfoView.snp.trailing).inset(16)
         }
         
-        todayChartView.snp.makeConstraints {
-            $0.width.height.equalTo(100)
-        }
-        
-        monthChartView.snp.makeConstraints {
-            $0.width.height.equalTo(100)
-        }
-        
-        monthFootprintView.snp.makeConstraints {
-            $0.width.height.equalTo(100)
+        [todayChartView, monthChartView, monthFootprintView].forEach {
+            $0.snp.makeConstraints {
+                $0.width.height.equalTo(100)
+            }
         }
         
         monthFootprintCountLabel.snp.makeConstraints {
@@ -173,8 +185,43 @@ class MyFootprintViewController: BaseViewController {
             $0.width.equalTo(320)
         }
         
-        testView.snp.makeConstraints {
+        goalUnderlineView.snp.makeConstraints {
+            $0.width.equalTo(self.view)
+            $0.height.equalTo(8)
             $0.top.equalTo(middleSummaryStackView.snp.bottom).offset(10)
+        }
+        
+        goalNavigationLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(24)
+            $0.centerY.equalToSuperview()
+        }
+        
+        goalNavigationButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(16)
+            $0.width.height.equalTo(18)
+            $0.centerY.equalToSuperview()
+        }
+        
+        goalNavigationView.snp.makeConstraints {
+            $0.height.equalTo(50)
+            $0.width.equalTo(self.view)
+            $0.top.equalTo(goalUnderlineView.snp.bottom).offset(10)
+        }
+        
+        [goalDateView, goalTimeView, goalTimeZoneView].forEach {
+            $0.snp.makeConstraints {
+                $0.width.equalTo(325)
+                $0.height.equalTo(50)
+            }
+        }
+        
+        goalStackView.snp.makeConstraints {
+            $0.top.equalTo(goalNavigationView.snp.bottom)
+            $0.centerX.equalToSuperview()
+        }
+        
+        testView.snp.makeConstraints {
+            $0.top.equalTo(goalStackView.snp.bottom).offset(10)
             $0.width.equalTo(self.view)
             $0.height.equalTo(800)
             $0.bottom.equalToSuperview().inset(30)
@@ -207,7 +254,13 @@ class MyFootprintViewController: BaseViewController {
             middleSummaryStackView.addArrangedSubview($0)
         }
         
-        myFootprintScrollView.addSubviews([topInfoView, middleSummaryStackView, testView])
+        [goalDateView, goalTimeView, goalTimeZoneView].forEach {
+            goalStackView.addArrangedSubview($0)
+        }
+        
+        goalNavigationView.addSubviews([goalNavigationLabel, goalNavigationButton])
+        
+        myFootprintScrollView.addSubviews([topInfoView, middleSummaryStackView, goalUnderlineView, goalNavigationView, goalStackView, testView])
         view.addSubviews([navigationView, underlineView, myFootprintScrollView])
     }
 }
