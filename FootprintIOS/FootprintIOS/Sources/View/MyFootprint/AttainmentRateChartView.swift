@@ -24,7 +24,7 @@ class AttainmentRateChartView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        self.backgroundColor = .black
+        self.backgroundColor = .white
         percentageLabel.text = String(petcentageAngle) + "%"
         percentageLabel.font = .systemFont(ofSize: 18, weight: UIFont.Weight(rawValue: 800))
         percentageLabel.textColor = keyColor
