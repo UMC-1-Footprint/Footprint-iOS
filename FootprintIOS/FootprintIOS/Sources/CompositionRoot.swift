@@ -66,10 +66,11 @@ extension CompositionRoot {
         var pushFootprintMapScreen: () -> FootprintMapViewController
         pushFootprintMapScreen = {
             let reactor = FootprintMapReactor(state: .init())
-            let controller = FootprintMapViewController(reactor: reactor, pushFootprintWriteScreen: pushFootprintWriteScreen)
+            let controller = FootprintMapViewController(reactor: reactor,
+                                                        pushFootprintWriteScreen: pushFootprintWriteScreen)
             return controller
         }
-        
+
         let reactor = FootprintRootReactor(state: .init())
         let controller = FootprintRootViewController(reactor: reactor,
                                                      pushFootprintMapScreen: pushFootprintMapScreen)
