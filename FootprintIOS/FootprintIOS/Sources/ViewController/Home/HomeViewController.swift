@@ -54,14 +54,16 @@ class HomeViewController: NavigationBarViewController, View {
     
     private let todayButton = UIButton().then {
         $0.setTitle("오늘", for: .normal)
-        $0.setTitleColor(FootprintIOSAsset.Colors.blueD.color, for: .normal)
+        $0.setTitleColor(FootprintIOSAsset.Colors.blackL.color, for: .normal)
+        $0.setTitleColor(FootprintIOSAsset.Colors.blueD.color, for: .selected)
         $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
     }
     
     private let monthButton = UIButton().then {
         $0.setTitle("이번 달", for: .normal)
         $0.setTitleColor(FootprintIOSAsset.Colors.blackL.color, for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 14)
+        $0.setTitleColor(FootprintIOSAsset.Colors.blueD.color, for: .selected)
+        $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
     }
     
     private lazy var tabButtonStackView = UIStackView().then {
@@ -81,6 +83,7 @@ class HomeViewController: NavigationBarViewController, View {
     
     private let homeContentScrollView = UIScrollView().then {
         $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.showsHorizontalScrollIndicator = false
     }
     
     private let homeContentView = UIView().then {
@@ -204,8 +207,8 @@ class HomeViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        homeContentScrollView.rx.didEndDecelerating
-            .map { .didEndScroll }
+        homeContentScrollView.rx.didEndDragging
+            .map { _ in .didEndScroll }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -232,6 +235,8 @@ class HomeViewController: NavigationBarViewController, View {
             .withUnretained(self)
             .bind { (this, type) in
                 let homeX = (type == .today) ? 0 : self.width
+                this.todayButton.isSelected = (type == .today) ? true : false
+                this.monthButton.isSelected = (type == .month) ? true : false
                 this.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)
             }
             .disposed(by: disposeBag)
@@ -248,6 +253,7 @@ class HomeViewController: NavigationBarViewController, View {
             .map(\.didEndScroll)
             .distinctUntilChanged()
             .withUnretained(self)
+            .observe(on: MainScheduler.asyncInstance)
             .bind { (this, x) in
                 let homeX = x > (Int(this.width) / 2) ? this.width : 0
                 this.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)

@@ -6,6 +6,8 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+import UIKit
+
 import ReactorKit
 
 class HomeReactor: Reactor {
@@ -63,12 +65,14 @@ class HomeReactor: Reactor {
     
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
+        let width = UIScreen.main.bounds.width
         
         switch mutation {
         case .showIndicatorBar(let x):
             newState.indicatorX = x
         case .showHomeContent(let x):
             newState.didEndScroll = x
+            newState.homeViewType = (currentState.indicatorX < Int(width) / 2) ? .today : .month
         case .showHomeView(let type):
             newState.homeViewType = type
         case .showTodayData(let type):
