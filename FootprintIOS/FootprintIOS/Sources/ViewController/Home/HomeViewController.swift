@@ -235,8 +235,8 @@ class HomeViewController: NavigationBarViewController, View {
             .withUnretained(self)
             .bind { (this, type) in
                 let homeX = (type == .today) ? 0 : self.width
-                this.todayButton.isSelected = (type == .today) ? true : false
-                this.monthButton.isSelected = (type == .month) ? true : false
+                this.todayButton.isSelected = (type == .today)
+                this.monthButton.isSelected = (type == .month)
                 this.homeContentScrollView.setContentOffset(CGPoint(x: homeX, y: 0), animated: true)
             }
             .disposed(by: disposeBag)

@@ -26,7 +26,7 @@ class HomeReactor: Reactor {
     
     enum Mutation {
         case showIndicatorBar(Int)
-        case showHomeContent(Int)
+        case showHomeContent(Int, HomeViewType)
         case showHomeView(HomeViewType)
         case showTodayData(TodayDataType)
         
@@ -55,7 +55,7 @@ class HomeReactor: Reactor {
         case let .scrollHomeContent(x):
             return .just(.showIndicatorBar(x))
         case .didEndScroll:
-            return .just(.showHomeContent(currentState.indicatorX))
+            return showHomeContentMutation()
         case .tapHomeViewTypeButton(let type):
             return .just(.showHomeView(type))
         case .tapTodayDataButton(let type):
@@ -65,14 +65,13 @@ class HomeReactor: Reactor {
     
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-        let width = UIScreen.main.bounds.width
         
         switch mutation {
         case .showIndicatorBar(let x):
             newState.indicatorX = x
-        case .showHomeContent(let x):
+        case .showHomeContent(let x, let type):
             newState.didEndScroll = x
-            newState.homeViewType = (currentState.indicatorX < Int(width) / 2) ? .today : .month
+            newState.homeViewType = type
         case .showHomeView(let type):
             newState.homeViewType = type
         case .showTodayData(let type):
@@ -86,6 +85,14 @@ class HomeReactor: Reactor {
 }
 
 extension HomeReactor {
+    func showHomeContentMutation() -> Observable<Mutation> {
+        let width = UIScreen.main.bounds.width
+        let x = currentState.indicatorX
+        let type: HomeViewType = (x < Int(width) / 2) ? .today : .month
+        
+        return .just(.showHomeContent(x, type))
+    }
+    
     func makeSections() -> [MonthSectionModel] {
         let items = [0...31].map { (day) -> MonthItem in
             return .month(MonthCollectionViewCellReactor(state: .init(day: 0)))
