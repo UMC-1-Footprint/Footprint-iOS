@@ -14,10 +14,20 @@ import SnapKit
 
 class HomeViewController: NavigationBarViewController, View {
     
-    // MARK: - Properties
-    
     typealias Reactor = HomeReactor
     typealias DataSource = RxCollectionViewSectionedReloadDataSource<MonthSectionModel>
+    
+    // MARK: - Properties
+    
+    lazy var monthDataSource = DataSource { [weak self] _, collectionView, indexPath, item -> UICollectionViewCell in
+        switch item {
+        case let .month(reactor):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MonthCollectionViewCell.self), for: indexPath) as? MonthCollectionViewCell else { return .init() }
+            
+            cell.reactor = reactor
+            return cell
+        }
+    }
 
     let width = UIScreen.main.bounds.width
     var leftInsetConstraint: Constraint?
@@ -265,8 +275,18 @@ class HomeViewController: NavigationBarViewController, View {
             .distinctUntilChanged()
             .withUnretained(self)
             .bind { (this, type) in
-                print(type)
+                // 달성률, 산책시간
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.monthSections)
+            .bind(to: monthView.collectionView.rx.items(dataSource: monthDataSource))
+            .disposed(by: disposeBag)
+        
+        rx.viewWillAppear
+            .map { _ in .refresh }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
 }

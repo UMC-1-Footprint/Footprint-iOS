@@ -94,12 +94,12 @@ extension HomeReactor {
     }
     
     func makeSections() -> [MonthSectionModel] {
-        let items = [0...31].map { (day) -> MonthItem in
-            return .month(MonthCollectionViewCellReactor(state: .init(day: 0)))
+        let items = Array(1...31).map { (day) -> MonthItem in
+            return .month(MonthCollectionViewCellReactor(state: .init(day: day)))
         }
         
         let section = MonthSectionModel.init(model: .month(items), items: items)
-        
+
         return [section]
     }
 }
