@@ -19,6 +19,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         static let titleLabel: String = "발자국 남기기"
         static let saveButton: String = "저장"
         static let textViewPlaceholder: String = "본문에 #을 이용해 태그를 입력해보세요! (최대 5개)"
+        static let addPictureButton: String = "사진 추가하기"
     }
     
     fileprivate struct Font {
@@ -26,6 +27,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         static let titleLabel: UIFont = .systemFont(ofSize: 16, weight: .bold)
         static let saveButton: UIFont = .systemFont(ofSize: 12, weight: .bold)
         static let textView: UIFont = .systemFont(ofSize: 14, weight: .regular)
+        static let addPictureButton: UIFont = .systemFont(ofSize: 14, weight: .medium)
     }
     
     fileprivate struct Color {
@@ -36,6 +38,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         static let divider: UIColor = FootprintIOSAsset.Colors.whiteD.color
         static let textView: UIColor = FootprintIOSAsset.Colors.blackD.color
         static let textViewPlaceholder: UIColor = FootprintIOSAsset.Colors.whiteD.color
+        static let addPictureButton: UIColor = FootprintIOSAsset.Colors.blackM.color
     }
     
     // MARK: - UI Components
@@ -46,6 +49,8 @@ class FootprintWriteViewController: NavigationBarViewController, View {
     let divider: UIView = .init()
     let textView: UITextView = .init()
     let divider2: UIView = .init()
+    let addPictureView: AddPictureButtonView = .init()
+    lazy var accessoryView: AddPictureButtonView = .init(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.width, height: 44))
     
     // MARK: - Initializer
     
@@ -89,8 +94,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         textView.font = Font.textView
         textView.text = Text.textViewPlaceholder
         textView.textColor = Color.textViewPlaceholder
-        
-        
+        textView.inputAccessoryView = accessoryView
     }
     
     override func setupHierarchy() {
@@ -101,7 +105,8 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             titleLabel,
             saveButton,
             divider,
-            textView
+            textView,
+            addPictureView
         ])
     }
     
@@ -135,6 +140,12 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             $0.top.equalTo(divider.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalToSuperview()
+        }
+        
+        addPictureView.snp.makeConstraints {
+            $0.height.equalTo(44)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(33)
         }
     }
     
