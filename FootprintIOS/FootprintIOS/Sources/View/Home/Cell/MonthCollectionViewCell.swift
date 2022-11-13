@@ -19,7 +19,7 @@ class MonthCollectionViewCell: BaseCollectionViewCell, View {
     // MARK: - UI Components
     
     let dayRoundView = UIView().then {
-        $0.backgroundColor = FootprintIOSAsset.Colors.blueM.color.withAlphaComponent(0.5)
+        //$0.backgroundColor = FootprintIOSAsset.Colors.blueM.color.withAlphaComponent(0.5)
         $0.layer.cornerRadius = 16
     }
     
@@ -51,6 +51,6 @@ class MonthCollectionViewCell: BaseCollectionViewCell, View {
     }
     
     func bind(reactor: Reactor) {
-        dayLabel.text = "\(reactor.currentState.day)"
+        dayLabel.text = reactor.currentState.day
     }
 }
