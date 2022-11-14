@@ -90,10 +90,13 @@ class TodayView: BaseView {
         progressPath.lineWidth = 15
         progressPath.stroke()
         
+        let percent = 30 * 360 / 100
+        let endAngle = (CGFloat(percent) / 360) * (.pi * 2)
+        
         let progressBarPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
                                            radius: 110,
-                                           startAngle: 0,
-                                           endAngle: (135 * .pi) / 180,
+                                           startAngle: (-(.pi) / 2),
+                                           endAngle: (-(.pi) / 2) + endAngle,
                                            clockwise: true)
         FootprintIOSAsset.Colors.blueM.color.setStroke()
         progressBarPath.lineWidth = 15
