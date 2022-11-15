@@ -7,12 +7,36 @@
 //
 
 import UIKit
+import ReactorKit
 
-class FootprintViewController: NavigationBarViewController {
+class FootprintRootViewController: NavigationBarViewController, View {
+    // MARK: - Constants
+    
+    typealias Reactor = FootprintRootReactor
+    
+    // MARK: - Properties
+    
+    var pushFootprintMapScreen: () -> FootprintMapViewController
+    
+    // MARK: - UI Components
     
     let onboardingButton: UIButton = .init()
     let settingButton: UIButton = .init()
     let mapButton: UIButton = .init()
+    
+    init(reactor: Reactor,
+         pushFootprintMapScreen: @escaping () -> FootprintMapViewController) {
+        self.pushFootprintMapScreen = pushFootprintMapScreen
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
+    }
+    
+    // MARK: - Initializer
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func setupNavigationBar() {
         super.setupNavigationBar()
@@ -58,6 +82,10 @@ class FootprintViewController: NavigationBarViewController {
         }
     }
     
+    func bind(reactor: Reactor) {
+        
+    }
+    
     override func setupBind() {
         super.setupBind()
         
@@ -82,15 +110,15 @@ class FootprintViewController: NavigationBarViewController {
             }
             .disposed(by: disposeBag)
         
-        mapButton
-            .rx
-            .tap
+        mapButton.rx.tap
             .bind { [weak self] in
-                let recordViewController = RecordViewController()
-                
-                recordViewController.hidesBottomBarWhenPushed = true
-                self?.navigationController?.pushViewController(recordViewController, animated: true)
+                self?.goToFootprintMapScreen()
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func goToFootprintMapScreen() {
+        let controller = self.pushFootprintMapScreen()
+        self.navigationController?.pushViewController(controller, animated: true)
     }
 }
