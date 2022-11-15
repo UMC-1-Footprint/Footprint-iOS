@@ -15,11 +15,10 @@ class MonthCollectionViewCell: BaseCollectionViewCell, View {
     // MARK: - Properties
     
     typealias Reactor = MonthCollectionViewCellReactor
-    //var percent = 10
     
     // MARK: - UI Components
     
-    var dayRoundView = monthRoundChartView(percent: 10)
+    var dayRoundView = roundChartView(percent: 80, lineWidth: 2, radius: 14)
     
     let dayLabel = UILabel().then {
         $0.textColor = FootprintIOSAsset.Colors.blackD.color
@@ -29,17 +28,10 @@ class MonthCollectionViewCell: BaseCollectionViewCell, View {
     
     // MARK: - Methods
     
-    override func setupProperty() {
-        super.setupProperty()
-        
-        backgroundColor = .systemBackground
-    }
-    
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        contentView.addSubview(dayRoundView)
-        dayRoundView.addSubview(dayLabel)
+        contentView.addSubviews([dayRoundView, dayLabel])
     }
     
     override func setupLayout() {
@@ -57,5 +49,6 @@ class MonthCollectionViewCell: BaseCollectionViewCell, View {
     
     func bind(reactor: Reactor) {
         dayLabel.text = reactor.currentState.day
+        dayRoundView.isHidden = reactor.currentState.day == ""
     }
 }

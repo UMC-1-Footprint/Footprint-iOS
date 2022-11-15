@@ -40,7 +40,8 @@ class HomeViewController: NavigationBarViewController, View {
     }
     
     private let todayInfo = UILabel().then {
-        $0.text = "2022.9.9 목 | 1° 맑음"
+        let now = Date()
+        $0.text = "\(now.year).\(now.month).\(now.day) \(now.weekday) | 1° 맑음"
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .white
     }

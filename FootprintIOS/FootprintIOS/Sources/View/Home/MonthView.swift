@@ -11,11 +11,12 @@ import UIKit
 import ReactorKit
 
 class MonthView: BaseView {
-        
+    
     // MARK: - UI Components
     
     let monthLabel = UILabel().then {
-        $0.text = "2022년 9월"
+        let now = Date()
+        $0.text = "\(now.year)년 \(now.month)월"
         $0.font = .systemFont(ofSize: 14, weight: .semibold)
         $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center

@@ -17,9 +17,7 @@ class TodayView: BaseView {
     
     // MARK: - UI Components
     
-    let todayContentView = UIView().then {
-        $0.layer.cornerRadius = 100
-    }
+    let todayContentView = roundChartView(percent: 80, lineWidth: 10, radius: 110)
     
     let todayFootprintImageView = UIImageView().then {
         $0.image = FootprintIOSAsset.Images.homeFootprintGray.image
@@ -77,33 +75,6 @@ class TodayView: BaseView {
     
     // MARK: - Methods
     
-    override func draw(_ rect: CGRect) {
-        let width = UIScreen.main.bounds.width
-        let height = UIScreen.main.bounds.height
-        
-        let progressPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
-                                           radius: 110,
-                                           startAngle: 0,
-                                           endAngle: 360,
-                                           clockwise: true)
-        FootprintIOSAsset.Colors.whiteD.color.setStroke()
-        progressPath.lineWidth = 15
-        progressPath.stroke()
-        
-        let percent = 30 * 360 / 100
-        let endAngle = (CGFloat(percent) / 360) * (.pi * 2)
-        
-        let progressBarPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height * (155/812)),
-                                           radius: 110,
-                                           startAngle: (-(.pi) / 2),
-                                           endAngle: (-(.pi) / 2) + endAngle,
-                                           clockwise: true)
-        FootprintIOSAsset.Colors.blueM.color.setStroke()
-        progressBarPath.lineWidth = 15
-        progressBarPath.lineCapStyle = .round
-        progressBarPath.stroke()
-    }
-    
     override func setupProperty() {
         super.setupProperty()
         
@@ -121,7 +92,7 @@ class TodayView: BaseView {
         super.setupLayout()
         
         todayContentView.snp.makeConstraints {
-            $0.width.height.equalTo(200)
+            $0.width.height.equalTo(230)
             $0.top.equalToSuperview().inset(55)
             $0.centerX.equalToSuperview()
         }

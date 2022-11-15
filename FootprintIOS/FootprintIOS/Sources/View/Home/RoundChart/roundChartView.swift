@@ -1,5 +1,5 @@
 //
-//  monthRoundChartView.swift
+//  roundChartView.swift
 //  Footprint-iOS
 //
 //  Created by 김영인 on 2022/11/14.
@@ -8,16 +8,20 @@
 
 import UIKit
 
-class monthRoundChartView: BaseView {
+class roundChartView: BaseView {
     
     // MARK: - Properties
     
     var percent: Int
+    var lineWidth: CGFloat
+    var radius: CGFloat
     
     // MARK: - Initializer
     
-    init(percent: Int) {
+    init(percent: Int, lineWidth: CGFloat, radius: CGFloat) {
         self.percent = percent
+        self.lineWidth = lineWidth
+        self.radius = radius
         
         super.init(frame: .zero)
     }
@@ -27,11 +31,9 @@ class monthRoundChartView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        backgroundColor = .systemGray6
-        
-        print(#function)
+        backgroundColor = .systemBackground
     }
-    
+
     override func draw(_ rect: CGRect) {
         self.backgroundColor = .clear
         
@@ -39,24 +41,24 @@ class monthRoundChartView: BaseView {
         let height = self.frame.height
         
         let progressPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height / 2),
-                                           radius: 32,
+                                           radius: radius,
                                            startAngle: 0,
                                            endAngle: 360,
                                            clockwise: true)
         FootprintIOSAsset.Colors.whiteD.color.setStroke()
-        progressPath.lineWidth = 5
+        progressPath.lineWidth = lineWidth
         progressPath.stroke()
         
         let percentAngle = (percent) * 360 / 100
         let endAngle = (CGFloat(percentAngle) / 360) * (.pi * 2)
         
         let progressBarPath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height / 2),
-                                           radius: 32,
+                                           radius: radius,
                                            startAngle: (-(.pi) / 2),
                                            endAngle: (-(.pi) / 2) + endAngle,
                                            clockwise: true)
         FootprintIOSAsset.Colors.blueM.color.setStroke()
-        progressBarPath.lineWidth = 5
+        progressBarPath.lineWidth = lineWidth
         progressBarPath.lineCapStyle = .round
         progressBarPath.stroke()
     }
