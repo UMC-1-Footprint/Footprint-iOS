@@ -4,7 +4,8 @@
 //
 //  Created by Sojin Lee on 2022/11/18.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
-//
+
+//  마이페이지 - 그래프: 그래프 왼쪽에 있는 숫자를 나타내는 뷰 
 
 import UIKit
 
@@ -35,14 +36,30 @@ class AttainmentPercentageView: BaseView {
     
     override func setupHierarchy() {
         for i in stride(from: endPoint, to: -increasementPoint, by: -increasementPoint) {
-            let label: UILabel = .init()
-            label.text = "\(i)"
-            label.font = .systemFont(ofSize: 10, weight: .light)
-            label.textColor = FootprintIOSAsset.Colors.blackL.color
-            
+            let label = PercentageLable("\(i)")
             stackView.addArrangedSubview(label)
         }
+        let label = PercentageLable("(%)")
+        stackView.addArrangedSubview(label)
 
         addSubview(stackView)
     }
+}
+
+class PercentageLable: UILabel {
+    init(_ labelText: String) {
+        super.init(frame: .zero)
+        self.text = labelText
+        setupProperty()
+    }
+    
+    private func setupProperty() {
+        font = .systemFont(ofSize: 10, weight: .light)
+        textColor = FootprintIOSAsset.Colors.blackL.color
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }

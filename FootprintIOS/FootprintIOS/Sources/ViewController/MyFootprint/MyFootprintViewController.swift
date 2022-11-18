@@ -93,18 +93,15 @@ class MyFootprintViewController: BaseViewController {
     }
     
     let tabStackView: UIStackView = .init()
-    let test1VC = DayAchievementViewController()
+    let dayAchievementViewController = DayAchievementViewController()
+    let monthRecordViewController = MonthRecordViewController()
     let test2VC = MonthAchievementViewController()
-    let test3VC = Test3VC()
     
-    lazy var tabViews: [UIViewController] = [test1VC, test2VC, test3VC]
+    lazy var tabViews: [UIViewController] = [dayAchievementViewController, monthRecordViewController, test2VC]
     lazy var tabPageVC: UIPageViewController = {
         let vc = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
         return vc
     }()
-    
-    
-    let testView: UIView = .init()
     
 // MARK: - viewdidload
     override func viewDidLoad() {
@@ -183,8 +180,6 @@ class MyFootprintViewController: BaseViewController {
             $0.layoutMargins = UIEdgeInsets(top: .zero, left: 20, bottom: .zero, right: 20)
             $0.isLayoutMarginsRelativeArrangement = true
         }
-        
-        testView.backgroundColor = .blue
     }
     
 // MARK: - setupLayout
@@ -313,17 +308,17 @@ class MyFootprintViewController: BaseViewController {
             $0.top.equalTo(tabStackView.snp.bottom)
             $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(290)
+            $0.bottom.equalToSuperview()
         }
-        
         tabPageVC.didMove(toParent: self)
         
         // MARK: - test
-        testView.snp.makeConstraints {
-            $0.top.equalTo(tabPageVC.view.snp.bottom).offset(10)
-            $0.width.equalTo(self.view)
-            $0.height.equalTo(400)
-            $0.bottom.equalToSuperview().inset(30)
-        }
+//        testView.snp.makeConstraints {
+//            $0.top.equalTo(tabPageVC.view.snp.bottom).offset(10)
+//            $0.width.equalTo(self.view)
+//            $0.height.equalTo(400)
+//            $0.bottom.equalToSuperview().inset(30)
+//        }
     }
     
 // MARK: - setupHierarchy
@@ -365,7 +360,7 @@ class MyFootprintViewController: BaseViewController {
         
         addChild(tabPageVC) // 추가됨
         
-        myFootprintScrollView.addSubviews([topInfoView, middleSummaryStackView, goalUnderlineView, goalNavigationView, goalStackView, tabUnderlineView, tabStackView, tabPageVC.view, testView])
+        myFootprintScrollView.addSubviews([topInfoView, middleSummaryStackView, goalUnderlineView, goalNavigationView, goalStackView, tabUnderlineView, tabStackView, tabPageVC.view])
         view.addSubviews([navigationView, underlineView, myFootprintScrollView])
     }
 }

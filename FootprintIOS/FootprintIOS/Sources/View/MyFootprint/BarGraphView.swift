@@ -4,7 +4,8 @@
 //
 //  Created by Sojin Lee on 2022/11/18.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
-//
+
+//  마이페이지 - 그래프 : 막대 그래프 
 
 import UIKit
 

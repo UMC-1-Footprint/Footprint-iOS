@@ -4,7 +4,8 @@
 //
 //  Created by Sojin Lee on 2022/11/18.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
-//
+
+//  마이페이지 - 그래프: 뒷 배경에 있는 라인으로 그려질 뷰 
 
 import UIKit
 
