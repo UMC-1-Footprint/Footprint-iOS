@@ -312,7 +312,7 @@ class MyFootprintViewController: BaseViewController {
         tabPageVC.view.snp.makeConstraints {
             $0.top.equalTo(tabStackView.snp.bottom)
             $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(150)
+            $0.height.equalTo(290)
         }
         
         tabPageVC.didMove(toParent: self)
