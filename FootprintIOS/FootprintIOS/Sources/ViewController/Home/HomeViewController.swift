@@ -14,13 +14,24 @@ import SnapKit
 
 class HomeViewController: NavigationBarViewController, View {
     
-    // MARK: - Properties
-    
     typealias Reactor = HomeReactor
     typealias DataSource = RxCollectionViewSectionedReloadDataSource<MonthSectionModel>
+    
+    // MARK: - Properties
+    
+    lazy var monthDataSource = DataSource { [weak self] _, collectionView, indexPath, item -> UICollectionViewCell in
+        switch item {
+        case let .month(reactor):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MonthCollectionViewCell.self), for: indexPath) as? MonthCollectionViewCell else { return .init() }
+            
+            cell.reactor = reactor
+            return cell
+        }
+    }
 
     let width = UIScreen.main.bounds.width
     var leftInsetConstraint: Constraint?
+    var monthRow: CGFloat = 0
     
     // MARK: - UI Components
     
@@ -30,7 +41,8 @@ class HomeViewController: NavigationBarViewController, View {
     }
     
     private let todayInfo = UILabel().then {
-        $0.text = "2022.9.9 목 | 1° 맑음"
+        let now = Date()
+        $0.text = "\(now.year).\(now.month).\(now.day) \(now.weekday) | 1° 맑음"
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .white
     }
@@ -265,8 +277,42 @@ class HomeViewController: NavigationBarViewController, View {
             .distinctUntilChanged()
             .withUnretained(self)
             .bind { (this, type) in
-                print(type)
+                // 달성률, 산책시간
             }
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.monthSections)
+            .bind(to: monthView.collectionView.rx.items(dataSource: monthDataSource))
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.monthRow)
+            .withUnretained(self)
+            .bind { (this, _) in
+                this.monthRow = reactor.currentState.monthRow
+            }
+            .disposed(by: disposeBag)
+        
+        monthView.collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+
+        rx.viewWillAppear
+            .map { _ in .refresh }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Extension
+
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = monthView.collectionView.frame.width
+        let height = monthView.collectionView.frame.height
+        
+        let cellWidth = width / 7.0
+        let cellHeight = height / monthRow
+        
+        return CGSize(width: cellWidth, height: cellHeight)
     }
 }

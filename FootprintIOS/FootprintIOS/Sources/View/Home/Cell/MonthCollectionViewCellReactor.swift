@@ -13,7 +13,7 @@ class MonthCollectionViewCellReactor: Reactor {
     enum Mutation {}
     
     struct State {
-        var day: Int
+        var day: String
     }
     
     var initialState: State

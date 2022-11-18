@@ -12,12 +12,11 @@ import ReactorKit
 
 class MonthView: BaseView {
     
-    typealias Reactor = HomeReactor
-        
     // MARK: - UI Components
     
     let monthLabel = UILabel().then {
-        $0.text = "2022년 9월"
+        let now = Date()
+        $0.text = "\(now.year)년 \(now.month)월"
         $0.font = .systemFont(ofSize: 14, weight: .semibold)
         $0.textColor = FootprintIOSAsset.Colors.blackD.color
         $0.textAlignment = .center
@@ -29,8 +28,16 @@ class MonthView: BaseView {
         $0.axis = .horizontal
     }
     
-    let collectionView = UIView().then {
-        $0.backgroundColor = .lightGray
+    let line1View = UIView()
+    let line2View = UIView()
+    
+    let collectionViewFlowLayout = UICollectionViewFlowLayout().then {
+        $0.minimumLineSpacing = 0
+        $0.minimumInteritemSpacing = 0
+    }
+    
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewFlowLayout).then {
+        $0.register(MonthCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: MonthCollectionViewCell.self))
     }
     
     let timeLabel = UILabel().then {
@@ -63,12 +70,12 @@ class MonthView: BaseView {
         $0.numberOfLines = 0
     }
     
-    let line1View = UIView()
-    let line2View = UIView()
+    let line3View = UIView()
+    let line4View = UIView()
     
     lazy var monthStackView = UIStackView().then {
-        $0.addArrangedSubviews(timeLabel, line1View, distanceLabel, line2View, calorieLabel)
-        $0.distribution = .fillProportionally
+        $0.addArrangedSubviews(timeLabel, line3View, distanceLabel, line4View, calorieLabel)
+        $0.distribution = .fill
         $0.alignment = .center
         $0.spacing = 10
         $0.axis = .horizontal
@@ -91,6 +98,10 @@ class MonthView: BaseView {
         }
         
         [line1View, line2View].forEach {
+            $0.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
+        }
+        
+        [line3View, line4View].forEach {
             $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
         }
     }
@@ -98,7 +109,7 @@ class MonthView: BaseView {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        addSubviews([monthLabel, dayStackView, collectionView, monthStackView, bottomButton])
+        addSubviews([monthLabel, dayStackView, line1View, collectionView,line2View,  monthStackView, bottomButton])
     }
     
     override func setupLayout() {
@@ -112,7 +123,13 @@ class MonthView: BaseView {
         dayStackView.snp.makeConstraints {
             $0.top.equalTo(monthLabel.snp.bottom).offset(15)
             $0.leading.trailing.equalToSuperview().inset(30)
-            $0.height.equalTo(12)
+            $0.height.equalTo(28)
+        }
+        
+        line1View.snp.makeConstraints {
+            $0.top.equalTo(dayStackView.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(1)
         }
         
         collectionView.snp.makeConstraints {
@@ -121,7 +138,13 @@ class MonthView: BaseView {
             $0.bottom.equalTo(monthStackView.snp.top).offset(-10)
         }
         
-        [line1View, line2View].forEach {
+        line2View.snp.makeConstraints {
+            $0.top.equalTo(collectionView.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(1)
+        }
+        
+        [line3View, line4View].forEach {
             $0.snp.makeConstraints {
                 $0.width.equalTo(1)
                 $0.height.equalTo(35)
@@ -138,9 +161,5 @@ class MonthView: BaseView {
             $0.height.equalTo(56)
             $0.bottom.equalToSuperview().inset(24)
         }
-    }
-    
-    func bind(reactor: HomeReactor) {
-        
     }
 }

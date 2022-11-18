@@ -40,6 +40,7 @@ class HomeReactor: Reactor {
         var todayDataType: TodayDataType = .percent
         
         var monthSections: [MonthSectionModel] = []
+        var monthRow: CGFloat = 0
     }
     
     var initialState: State
@@ -78,6 +79,7 @@ class HomeReactor: Reactor {
             newState.todayDataType = type
         case let.setMonthSections(sections):
             newState.monthSections = sections
+            newState.monthRow = getRow()
         }
         
         return newState
@@ -94,12 +96,40 @@ extension HomeReactor {
     }
     
     func makeSections() -> [MonthSectionModel] {
-        let items = [0...31].map { (day) -> MonthItem in
-            return .month(MonthCollectionViewCellReactor(state: .init(day: 0)))
+        let days = getDays()
+        
+        let items = days.map { (day) -> MonthItem in
+            return .month(MonthCollectionViewCellReactor(state: .init(day: day)))
         }
         
         let section = MonthSectionModel.init(model: .month(items), items: items)
-        
+
         return [section]
+    }
+}
+
+extension HomeReactor {
+    func getDays() -> [String] {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: Date())
+        let calendarDate = calendar.date(from: components)
+
+        let daysCount = calendar.range(of: .day, in: .month, for: calendarDate!)?.count ?? 0
+        let firstDay = calendar.component(.weekday, from: calendarDate!)
+        
+        var days = [String](repeating: "", count: firstDay)
+        
+        for day in 1...daysCount {
+            days.append("\(day)")
+        }
+        
+        return days
+    }
+    
+    
+    func getRow() -> CGFloat {
+        let row = getDays().count > 35 ? 6 : 5
+        
+        return CGFloat(row)
     }
 }
