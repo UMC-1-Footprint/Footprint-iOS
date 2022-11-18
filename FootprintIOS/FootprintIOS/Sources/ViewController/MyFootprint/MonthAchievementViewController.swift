@@ -1,5 +1,5 @@
 //
-//  DayAchievementViewController.swift
+//  MonthAchievementViewController.swift
 //  Footprint-iOS
 //
 //  Created by Sojin Lee on 2022/11/14.
@@ -8,13 +8,11 @@
 
 import UIKit
 
-import SnapKit
-
-class DayAchievementViewController: BaseViewController {
+class MonthAchievementViewController: BaseViewController {
     let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20)
     let lineView = PercentageLineView()
-    let daysList = ["일","월","화","수","목","금","토"]
-    lazy var dateView = DateIndicatingView(dateList: daysList, beThick: false)
+    lazy var daysList = setMonth()
+    lazy var dateView = DateIndicatingView(dateList: daysList, beThick: true)
     let backgroundView = UIView()
     let percentages = [60,70,80,80,90,50,60] // 수정
     lazy var barGraphStackView = UIStackView().then {
@@ -57,7 +55,7 @@ class DayAchievementViewController: BaseViewController {
         }
         
         dateView.snp.makeConstraints {
-            $0.width.equalTo(244)
+            $0.width.equalTo(260)
             $0.top.equalTo(barGraphStackView.snp.bottom).offset(17)
             $0.leading.equalTo(percentageView.snp.trailing).offset(30)
         }
@@ -86,5 +84,23 @@ class DayAchievementViewController: BaseViewController {
             
             barGraphStackView.addArrangedSubview(graph)
         }
+    }
+    
+    func setMonth() -> [String] {
+        let date = Date()
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: date)
+        var monthList: [String] = .init()
+        
+        for i in 0...5 {
+            let newMonth = month - (6-i)
+            if newMonth <= 0 {
+                monthList.append("\(newMonth + 12)월")
+            } else {
+                monthList.append("\(newMonth)월")
+            }
+        }
+        monthList.append("이번달")
+        return monthList
     }
 }
