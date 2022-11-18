@@ -8,8 +8,16 @@
 
 import UIKit
 import NMapsMap
+import ReactorKit
 
-class RecordViewController: NavigationBarViewController {
+class FootprintMapViewController: NavigationBarViewController, View {
+    // MARK: - Constants
+    
+    typealias Reactor = FootprintMapReactor
+    
+    // MARK: - Properties
+    
+    var pushFootprintWriteScreen: () -> FootprintWriteViewController
     
     // MARK: - UI Components
     
@@ -33,6 +41,20 @@ class RecordViewController: NavigationBarViewController {
     let footprintTagView: TagView = .init(type: .translucent, title: "발자국 남기기")
     let saveButton: RecordButton = .init(type: .save)
     let saveTagView: TagView = .init(type: .translucent, title: "산책 저장")
+    
+    // MARK: - Initializer
+    
+    init(reactor: Reactor,
+         pushFootprintWriteScreen: @escaping () -> FootprintWriteViewController) {
+        self.pushFootprintWriteScreen = pushFootprintWriteScreen
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
+    }
+    
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Setup Methods
     
@@ -195,5 +217,18 @@ class RecordViewController: NavigationBarViewController {
             $0.top.equalTo(saveButton.snp.bottom).offset(11)
             $0.centerX.equalTo(saveButton)
         }
+    }
+    
+    func bind(reactor: Reactor) {
+        footprintButton.rx.tap
+            .bind { [weak self] _ in
+                self?.goToFootprintWriteScreen()
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func goToFootprintWriteScreen() {
+        let controller = self.pushFootprintWriteScreen()
+        self.present(controller, animated: true)
     }
 }
