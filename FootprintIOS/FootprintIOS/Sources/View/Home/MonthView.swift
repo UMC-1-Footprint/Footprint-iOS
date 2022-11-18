@@ -32,10 +32,7 @@ class MonthView: BaseView {
     let line2View = UIView()
     
     let collectionViewFlowLayout = UICollectionViewFlowLayout().then {
-        let width = UIScreen.main.bounds.width
-        
-        // 높이는 여기서 설정
-        $0.minimumLineSpacing = width * (5 / 375)
+        $0.minimumLineSpacing = 0
         $0.minimumInteritemSpacing = 0
     }
     

@@ -31,6 +31,7 @@ class HomeViewController: NavigationBarViewController, View {
 
     let width = UIScreen.main.bounds.width
     var leftInsetConstraint: Constraint?
+    var monthRow: CGFloat = 0
     
     // MARK: - UI Components
     
@@ -285,9 +286,33 @@ class HomeViewController: NavigationBarViewController, View {
             .bind(to: monthView.collectionView.rx.items(dataSource: monthDataSource))
             .disposed(by: disposeBag)
         
+        reactor.state
+            .map(\.monthRow)
+            .withUnretained(self)
+            .bind { (this, row) in
+                this.monthRow = row
+            }
+            .disposed(by: disposeBag)
+        
+        monthView.collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+
         rx.viewWillAppear
             .map { _ in .refresh }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Extension
+
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = monthView.collectionView.frame.width
+        let height = monthView.collectionView.frame.height
+        
+        let cellWidth = width / 7
+        let cellHeight = height / monthRow
+        
+        return CGSize(width: cellWidth, height: cellHeight)
     }
 }
