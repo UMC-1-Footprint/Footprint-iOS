@@ -289,8 +289,8 @@ class HomeViewController: NavigationBarViewController, View {
         reactor.state
             .map(\.monthRow)
             .withUnretained(self)
-            .bind { (this, row) in
-                this.monthRow = row
+            .bind { (this, _) in
+                this.monthRow = reactor.currentState.monthRow
             }
             .disposed(by: disposeBag)
         
@@ -310,7 +310,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         let width = monthView.collectionView.frame.width
         let height = monthView.collectionView.frame.height
         
-        let cellWidth = width / 7
+        let cellWidth = width / 7.0
         let cellHeight = height / monthRow
         
         return CGSize(width: cellWidth, height: cellHeight)

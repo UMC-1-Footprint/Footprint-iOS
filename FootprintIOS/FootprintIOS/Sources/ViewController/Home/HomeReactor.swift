@@ -31,7 +31,6 @@ class HomeReactor: Reactor {
         case showTodayData(TodayDataType)
         
         case setMonthSections([MonthSectionModel])
-        case setMonthRow(CGFloat)
     }
     
     struct State {
@@ -53,10 +52,7 @@ class HomeReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .refresh:
-            return .concat([
-                .just(.setMonthSections(makeSections())),
-                setMonthRowMutation()
-                ])
+            return .just(.setMonthSections(makeSections()))
         case let .scrollHomeContent(x):
             return .just(.showIndicatorBar(x))
         case .didEndScroll:
@@ -83,8 +79,7 @@ class HomeReactor: Reactor {
             newState.todayDataType = type
         case let.setMonthSections(sections):
             newState.monthSections = sections
-        case .setMonthRow(let row):
-            newState.monthRow = row
+            newState.monthRow = getRow()
         }
         
         return newState
@@ -102,6 +97,7 @@ extension HomeReactor {
     
     func makeSections() -> [MonthSectionModel] {
         let days = getDays()
+        
         let items = days.map { (day) -> MonthItem in
             return .month(MonthCollectionViewCellReactor(state: .init(day: day)))
         }
@@ -109,12 +105,6 @@ extension HomeReactor {
         let section = MonthSectionModel.init(model: .month(items), items: items)
 
         return [section]
-    }
-    
-    func setMonthRowMutation() -> Observable<Mutation> {
-        let row = getDays().count > 35 ? 6 : 5
-        
-        return .just(.setMonthRow(CGFloat(row)))
     }
 }
 
@@ -134,5 +124,12 @@ extension HomeReactor {
         }
         
         return days
+    }
+    
+    
+    func getRow() -> CGFloat {
+        let row = getDays().count > 35 ? 6 : 5
+        
+        return CGFloat(row)
     }
 }
