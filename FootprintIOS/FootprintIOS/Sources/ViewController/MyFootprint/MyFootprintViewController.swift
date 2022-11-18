@@ -14,6 +14,33 @@ import RxSwift
 
 class MyFootprintViewController: BaseViewController {
 // MARK: - UI Components
+    enum TabItem: CaseIterable {
+        case dayAchievement
+        case monthRecord
+        case monthAchievement
+
+        var text: String {
+            switch self {
+            case .dayAchievement:
+                return "요일별 달성률"
+            case .monthRecord:
+                return "월별 기록 횟수"
+            case .monthAchievement:
+                return "월별 달성률"
+            }
+        }
+        
+        var index: Int {
+            switch self {
+            case .dayAchievement:
+                return 0
+            case .monthRecord:
+                return 1
+            case .monthAchievement:
+                return 2
+            }
+        }
+    }
     
     // MARK: - topInfo
     let myFootprintLabel: UILabel = .init()
@@ -54,7 +81,44 @@ class MyFootprintViewController: BaseViewController {
     let goalTimeZoneView = FootprintGoalView(goalType: .timeZone, userGoal: "이른 오전")
     let goalStackView: UIStackView = .init()
     
+    // MARK: - tab
+    let tabUnderlineView = UnderLineView()
+    let dayAchievementTabButton = TabButton(.dayAchievement)
+    let monthRecordTabButton = TabButton(.monthRecord)
+    let monthAchievementTabButton = TabButton(.monthAchievement)
+    var selectedTab: TabItem = .dayAchievement {
+        didSet {
+            indexBind(oldValue: oldValue.index, newValue: selectedTab.index)
+        }
+    }
+    
+    let tabStackView: UIStackView = .init()
+    let test1VC = DayAchievementViewController()
+    let test2VC = MonthAchievementViewController()
+    let test3VC = Test3VC()
+    
+    lazy var tabViews: [UIViewController] = [test1VC, test2VC, test3VC]
+    lazy var tabPageVC: UIPageViewController = {
+        let vc = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
+        return vc
+    }()
+    
+    
     let testView: UIView = .init()
+    
+// MARK: - viewdidload
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tabSelected(selectedTab)
+        tabBind()
+        
+        tabPageVC.delegate = self
+        tabPageVC.dataSource = self
+        
+        if let firstVC = tabViews.first {
+            tabPageVC.setViewControllers([firstVC], direction: .forward, animated: true)
+        }
+    }
     
 // MARK: - setupProperty
     override func setupProperty() {
@@ -111,6 +175,14 @@ class MyFootprintViewController: BaseViewController {
         
         goalStackView.axis = .vertical
         goalStackView.spacing = 0
+        
+        // MARK: - 달성률 탭바
+        tabStackView.do {
+            $0.axis = .horizontal
+            $0.distribution = .fillEqually
+            $0.layoutMargins = UIEdgeInsets(top: .zero, left: 20, bottom: .zero, right: 20)
+            $0.isLayoutMarginsRelativeArrangement = true
+        }
         
         testView.backgroundColor = .blue
     }
@@ -224,11 +296,32 @@ class MyFootprintViewController: BaseViewController {
             $0.centerX.equalToSuperview()
         }
         
+        // MARK: - 달성률 탭바
+        tabUnderlineView.snp.makeConstraints {
+            $0.width.equalTo(self.view)
+            $0.height.equalTo(8)
+            $0.top.equalTo(goalStackView.snp.bottom).offset(10)
+        }
+        
+        tabStackView.snp.makeConstraints {
+            $0.height.equalTo(40)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(tabUnderlineView.snp.bottom).offset(5)
+        }
+        
+        tabPageVC.view.snp.makeConstraints {
+            $0.top.equalTo(tabStackView.snp.bottom)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(150)
+        }
+        
+        tabPageVC.didMove(toParent: self)
+        
         // MARK: - test
         testView.snp.makeConstraints {
-            $0.top.equalTo(goalStackView.snp.bottom).offset(10)
+            $0.top.equalTo(tabPageVC.view.snp.bottom).offset(10)
             $0.width.equalTo(self.view)
-            $0.height.equalTo(800)
+            $0.height.equalTo(400)
             $0.bottom.equalToSuperview().inset(30)
         }
     }
@@ -266,7 +359,135 @@ class MyFootprintViewController: BaseViewController {
         
         goalNavigationView.addSubviews([goalNavigationLabel, goalNavigationButton])
         
-        myFootprintScrollView.addSubviews([topInfoView, middleSummaryStackView, goalUnderlineView, goalNavigationView, goalStackView, testView])
+        [dayAchievementTabButton, monthRecordTabButton, monthAchievementTabButton].forEach {
+            tabStackView.addArrangedSubview($0)
+        }
+        
+        addChild(tabPageVC) // 추가됨
+        
+        myFootprintScrollView.addSubviews([topInfoView, middleSummaryStackView, goalUnderlineView, goalNavigationView, goalStackView, tabUnderlineView, tabStackView, tabPageVC.view, testView])
         view.addSubviews([navigationView, underlineView, myFootprintScrollView])
+    }
+}
+
+// MARK: - 달성률 탭바
+class TabButton: UIButton {
+    let bottomLineView: UIView = .init()
+    
+    override var isSelected: Bool {
+        didSet {
+            bottomLineView.isHidden = !isSelected
+        }
+    }
+    
+    init(_ type: MyFootprintViewController.TabItem) {
+        super.init(frame: .zero)
+        setTitle(type.text, for: .normal)
+        setTitle(type.text, for: .selected)
+        setupProperty()
+        setupLayout()
+    }
+    
+    private func setupProperty() {
+        setTitleColor(FootprintIOSAsset.Colors.whiteD.color, for: .normal)
+        setTitleColor(FootprintIOSAsset.Colors.blueM.color, for: .selected)
+        titleLabel?.font = .systemFont(ofSize: 14, weight: UIFont.Weight(rawValue: 500))
+        configuration?.contentInsets = NSDirectionalEdgeInsets(
+            top: .zero,
+            leading: 10,
+            bottom: 8,
+            trailing: 10
+        )
+        bottomLineView.backgroundColor = FootprintIOSAsset.Colors.blueM.color
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupLayout() {
+        addSubview(bottomLineView)
+        bottomLineView.snp.makeConstraints {
+            $0.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(10)
+            $0.height.equalTo(2)
+        }
+    }
+}
+
+extension MyFootprintViewController {
+    private func tabSelected(_ type: TabItem) {
+        switch type {
+        case .dayAchievement:
+            selectedTabButton(true, false, false)
+        case .monthRecord:
+            selectedTabButton(false, true, false)
+        case .monthAchievement:
+            selectedTabButton(false, false, true)
+        }
+        self.selectedTab = type
+    }
+    
+    private func selectedTabButton(_ day: Bool, _ monthRecord: Bool, _ month: Bool) {
+        dayAchievementTabButton.isSelected = day
+        monthRecordTabButton.isSelected = monthRecord
+        monthAchievementTabButton.isSelected = month
+    }
+    
+    private func tabBind() {
+        Observable.merge(
+            dayAchievementTabButton.rx.tap.map { _ -> TabItem in return .dayAchievement },
+            monthRecordTabButton.rx.tap.map { _ -> TabItem in return .monthRecord },
+            monthAchievementTabButton.rx.tap.map { _ -> TabItem in return .monthAchievement }
+        ).subscribe { [weak self] tabItem in
+            guard tabItem == self?.selectedTab else {
+                self?.tabSelected(tabItem)
+                return
+            }
+        }
+        .disposed(by: disposeBag)
+    }
+}
+
+extension MyFootprintViewController: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        guard let index = tabViews.firstIndex(of: viewController) else { return nil }
+        let previousIndex = index - 1
+        if previousIndex < 0 {
+            return nil
+        }
+        return tabViews[previousIndex]
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        guard let index = tabViews.firstIndex(of: viewController) else { return nil }
+        let nextIndex = index + 1
+        if nextIndex == tabViews.count {
+            return nil
+        }
+        return tabViews[nextIndex]
+    }
+    
+    private func indexBind(oldValue: Int, newValue: Int) {
+        let direction: UIPageViewController.NavigationDirection = oldValue < newValue ? .forward : .reverse
+        tabPageVC.setViewControllers([tabViews[selectedTab.index]], direction: direction, animated: true, completion: nil)
+        
+        let tabCase = TabItem.allCases.filter { return $0.index == newValue }
+        switch tabCase[0] {
+        case .dayAchievement:
+            selectedTabButton(true, false, false)
+        case .monthRecord:
+            selectedTabButton(false, true, false)
+        case .monthAchievement:
+            selectedTabButton(false, false, true)
+        }
+    }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+            guard let currentVC = tabPageVC.viewControllers?.first,
+                  let currentIndex = tabViews.firstIndex(of: currentVC) else { return }
+        
+        let tabCase = TabItem.allCases.filter { return $0.index == currentIndex }
+        selectedTab = tabCase[0]
     }
 }
