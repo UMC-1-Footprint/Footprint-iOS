@@ -56,31 +56,21 @@ class InfoViewController: NavigationBarViewController, View {
         $0.textColor = FootprintIOSAsset.Colors.blackL.color
     }
     
-    private let nicknameLabel = UILabel().then {
-        $0.text = "닉네임*"
-    }
+    private let nicknameLabel = UserInfoLabel(title: "닉네임*")
+    private let genderLabel = UserInfoLabel(title: "성별*")
+    private let birthLabel = UserInfoLabel(title: "생년월일")
+    private let bodyLabel = UserInfoLabel(title: "키/몸무게")
     
-    private let nicknameTextField = UITextField().then {
-        $0.placeholder = "닉네임을 입력해 주세요 (최대 8자)"
-    }
+    private let nicknameTextField = InfoTextField(type: .nickname)
+    private let heightTextField = InfoTextField(type: .height)
+    private let weightTextField = InfoTextField(type: .weight)
     
-    private let nicknameTFlineView = UIView().then {
-        $0.backgroundColor = FootprintIOSAsset.Colors.grayL.color
-    }
-    
-    private let heightTFlineView = UIView().then {
-        $0.backgroundColor = FootprintIOSAsset.Colors.blueL.color
-    }
-    
-    private let weightTFlineView = UIView().then {
-        $0.backgroundColor = FootprintIOSAsset.Colors.blueL.color
-    }
-    
-    private let genderLabel = UILabel().then {
-        $0.text = "성별*"
-    }
-    
-    private let genderSegmentControl = UISegmentedControl(items: ["여", "남", "선택안함"]).then {
+    private let genderSegmentControl = UISegmentedControl(items: ["여자", "남자", "선택안함"]).then {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color.withAlphaComponent(0.5)
+        $0.selectedSegmentTintColor = FootprintIOSAsset.Colors.blueM.color
+        $0.setTitleTextAttributes([NSAttributedString.Key.foregroundColor : UIColor.white, .font: UIFont.systemFont(ofSize: 12, weight: .semibold)], for: .selected)
+        $0.setTitleTextAttributes([NSAttributedString.Key.foregroundColor : FootprintIOSAsset.Colors.blackL.color, .font: UIFont.systemFont(ofSize: 12)], for: .normal)
         $0.layer.cornerRadius = 15
     }
     
@@ -88,18 +78,7 @@ class InfoViewController: NavigationBarViewController, View {
         $0.backgroundColor = .systemGray6
     }
     
-    private let birthLabel = UILabel().then {
-        $0.text = "생년월일"
-    }
-    
-    private let birthDatePicker = UIDatePicker().then {
-        $0.preferredDatePickerStyle = .wheels
-        $0.datePickerMode = .date
-    }
-    
-    private let bodyLabel = UILabel().then {
-        $0.text = "키/몸무게"
-    }
+    private let birthSelectView = UserInfoSelectBar(type: .birth)
     
     private lazy var bodyInfoButton = UIButton().then {
         $0.setImage(FootprintIOSAsset.Images.bodyInfoButtonIcon.image, for: .normal)
@@ -119,30 +98,19 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     private let bodyInfoStackView = UIStackView().then {
-        $0.spacing = 40
+        $0.spacing = 10
         $0.axis = .horizontal
         $0.alignment = .center
     }
     
     private let heightLabel = UILabel().then {
         $0.text = "cm"
-        $0.textColor = FootprintIOSAsset.Colors.blueL.color
-        $0.font = .systemFont(ofSize: 16)
-    }
-    
-    private let heightTextField = UITextField().then {
-        $0.placeholder = "170"
     }
     
     private let weightLabel = UILabel().then {
         $0.text = "kg"
-        $0.textColor = FootprintIOSAsset.Colors.blueL.color
-        $0.font = .systemFont(ofSize: 16)
     }
     
-    private let weightTextField = UITextField().then {
-        $0.placeholder = "50"
-    }
     
     private lazy var bottomButton: UIButton = FootprintButton.init(type: .next)
     
@@ -167,40 +135,33 @@ class InfoViewController: NavigationBarViewController, View {
         pageStackView.addArrangedSubview(selectedPageCircle)
         pageStackView.addArrangedSubview(unSelectedPageCircle)
         
-        [nicknameLabel, genderLabel, birthLabel, bodyLabel].forEach {
-            $0.textColor = .black
-            $0.font = .systemFont(ofSize: 16, weight: .semibold)
-        }
-        
         [nicknameTextField, heightTextField, weightTextField].forEach {
             $0.textColor = .black
             $0.font = .systemFont(ofSize: 14)
         }
         
-        heightTextField.rightView = heightLabel
-        weightTextField.rightView = weightLabel
-        heightTextField.rightViewMode = .always
-        weightTextField.rightViewMode = .always
+        [heightLabel, weightLabel].forEach {
+            $0.textColor = FootprintIOSAsset.Colors.blackL.color
+            $0.font = .systemFont(ofSize: 14)
+        }
         
-        bodyInfoStackView.addArrangedSubview(heightTextField)
-        bodyInfoStackView.addArrangedSubview(weightTextField)
+        bodyInfoStackView.addArrangedSubviews(heightTextField, heightLabel, weightTextField, weightLabel)
     }
-
+    
     
     override func setupHierarchy() {
         super.setupHierarchy()
         
         selectedPageCircle.addSubview(pageNumLabel)
-        view.addSubviews([infoScrollView, pageStackView, titleLabel, subtitleLabel,
-                          bottomButton])
+        view.addSubviews([infoScrollView, pageStackView, bottomButton])
         infoScrollView.addSubview(infoContentView)
         bodyInfoImageView.addSubview(bodyInfoLabel)
-        infoContentView.addSubviews([nicknameLabel, nicknameTextField, nicknameTFlineView, genderLabel,
-                                     genderSegmentControl, lineView, birthLabel, birthDatePicker,
-                                     bodyLabel, bodyInfoButton, bodyInfoImageView, bodyInfoStackView,
-                                     heightTFlineView, weightTFlineView])
+        infoContentView.addSubviews([titleLabel, subtitleLabel, nicknameLabel, nicknameTextField,
+                                     genderLabel, genderSegmentControl,lineView, birthLabel,
+                                     birthSelectView, bodyLabel,bodyInfoButton, bodyInfoImageView,
+                                     bodyInfoStackView])
     }
-
+    
     
     override func setupLayout() {
         super.setupLayout()
@@ -218,22 +179,12 @@ class InfoViewController: NavigationBarViewController, View {
         }
         
         pageStackView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(40)
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(25)
             $0.centerX.equalToSuperview()
         }
         
-        titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(24)
-            $0.top.equalTo(pageStackView.snp.bottom).offset(34)
-        }
-        
-        subtitleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(28)
-            $0.top.equalTo(titleLabel.snp.bottom).offset(14)
-        }
-        
         infoScrollView.snp.makeConstraints {
-            $0.top.equalTo(subtitleLabel.snp.bottom).offset(40)
+            $0.top.equalTo(pageStackView.snp.bottom).offset(24)
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
@@ -242,30 +193,35 @@ class InfoViewController: NavigationBarViewController, View {
             $0.width.equalTo(infoScrollView.snp.width)
         }
         
+        titleLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(24)
+            $0.top.equalTo(infoContentView.snp.top)
+        }
+        
+        subtitleLabel.snp.makeConstraints {
+            $0.leading.equalTo(titleLabel)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(14)
+        }
+        
         nicknameLabel.snp.makeConstraints {
-            $0.top.equalTo(infoContentView.snp.top).offset(10)
-            $0.leading.equalToSuperview().inset(34)
+            $0.top.equalTo(subtitleLabel.snp.bottom).offset(40)
+            $0.leading.equalTo(titleLabel)
         }
         
         nicknameTextField.snp.makeConstraints {
             $0.top.equalTo(nicknameLabel.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(35)
-            $0.height.equalTo(30)
-        }
-        
-        nicknameTFlineView.snp.makeConstraints {
-            $0.bottom.leading.trailing.equalTo(nicknameTextField)
-            $0.height.equalTo(1)
+            $0.leading.trailing.equalToSuperview().inset(30)
+            $0.height.equalTo(40)
         }
         
         genderLabel.snp.makeConstraints {
-            $0.top.equalTo(nicknameTFlineView.snp.bottom).offset(40)
+            $0.top.equalTo(nicknameTextField.snp.bottom).offset(40)
             $0.leading.equalTo(nicknameLabel)
         }
         
         genderSegmentControl.snp.makeConstraints {
             $0.top.equalTo(genderLabel.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(35)
+            $0.leading.trailing.equalToSuperview().inset(34)
         }
         
         lineView.snp.makeConstraints {
@@ -279,14 +235,13 @@ class InfoViewController: NavigationBarViewController, View {
             $0.leading.equalTo(nicknameLabel)
         }
         
-        birthDatePicker.snp.makeConstraints {
+        birthSelectView.snp.makeConstraints {
             $0.top.equalTo(birthLabel.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(35)
-            $0.height.equalTo(40)
+            $0.leading.trailing.equalToSuperview().inset(34)
         }
         
         bodyLabel.snp.makeConstraints {
-            $0.top.equalTo(birthDatePicker.snp.bottom).offset(40)
+            $0.top.equalTo(birthSelectView.snp.bottom).offset(40)
             $0.leading.equalTo(nicknameLabel)
         }
         
@@ -308,26 +263,11 @@ class InfoViewController: NavigationBarViewController, View {
             $0.centerX.equalTo(bodyInfoImageView)
         }
         
-        heightTextField.snp.makeConstraints {
-            $0.height.equalTo(30)
-            $0.width.equalTo(100)
-        }
-        
-        heightTFlineView.snp.makeConstraints {
-            $0.top.equalTo(heightTextField.snp.bottom)
-            $0.leading.trailing.equalTo(heightTextField)
-            $0.height.equalTo(1)
-        }
-        
-        weightTextField.snp.makeConstraints {
-            $0.height.equalTo(30)
-            $0.width.equalTo(100)
-        }
-        
-        weightTFlineView.snp.makeConstraints {
-            $0.top.equalTo(weightTextField.snp.bottom)
-            $0.leading.trailing.equalTo(weightTextField)
-            $0.height.equalTo(1)
+        [heightTextField, weightTextField].forEach {
+            $0.snp.makeConstraints {
+                $0.height.equalTo(40)
+                $0.width.equalTo(120)
+            }
         }
         
         bodyInfoStackView.snp.makeConstraints {
@@ -342,10 +282,8 @@ class InfoViewController: NavigationBarViewController, View {
             $0.bottom.equalToSuperview().inset(70)
         }
     }
-
     
     func bind(reactor: InfoReactor) {
-        // Action
         bottomButton
             .rx
             .tap
@@ -353,7 +291,6 @@ class InfoViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        // State
         reactor.state
             .map(\.isPresent)
             .filter { $0 }

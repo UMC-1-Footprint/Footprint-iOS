@@ -1,5 +1,5 @@
 //
-//  SelectBar.swift
+//  UserInfoSelectBar.swift
 //  Footprint-iOS
 //
 //  Created by 김영인 on 2022/08/30.
@@ -8,12 +8,15 @@
 
 import UIKit
 
-enum SelectBarType {
+enum UserInfoSelectBarType {
+    case birth
     case goalTime
     case time
     
     var title: String {
         switch self {
+        case .birth:
+            return "생일을 입력해 주세요"
         case .goalTime:
             return "목표시간을 선택해 주세요"
         case .time:
@@ -22,22 +25,22 @@ enum SelectBarType {
     }
 }
 
-class SelectBar: BaseView {
+class UserInfoSelectBar: BaseView {
     
     // MARK: - Properties
     
-    let type: SelectBarType
+    let type: UserInfoSelectBarType
     
     // MARK: - UIComponents
     
     private let selectBarView = UIView().then {
-        $0.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+        $0.layer.borderColor = FootprintIOSAsset.Colors.whiteD.color.cgColor
         $0.layer.borderWidth = 1
-        $0.layer.cornerRadius = 20
+        $0.layer.cornerRadius = 12
     }
     
     let selectLabel = UILabel().then {
-        $0.textColor = FootprintIOSAsset.Colors.white3.color
+        $0.textColor = FootprintIOSAsset.Colors.whiteD.color
         $0.font = .systemFont(ofSize: 14)
     }
     
@@ -47,7 +50,7 @@ class SelectBar: BaseView {
     
     // MARK: - Initiailizer
     
-    init(type: SelectBarType) {
+    init(type: UserInfoSelectBarType) {
         self.type = type
         
         super.init(frame: .zero)
@@ -84,7 +87,7 @@ class SelectBar: BaseView {
         selectButton.snp.makeConstraints {
             $0.trailing.equalTo(selectBarView.snp.trailing).inset(5)
             $0.centerY.equalTo(selectBarView)
-            $0.width.height.equalTo(24)
+            $0.width.height.equalTo(20)
         }
     }
 }
