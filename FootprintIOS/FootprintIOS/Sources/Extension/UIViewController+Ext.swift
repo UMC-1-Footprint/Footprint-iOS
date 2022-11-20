@@ -12,4 +12,12 @@ extension UIViewController {
     func navigationWrap() -> UINavigationController {
         return UINavigationController(rootViewController: self)
     }
+    
+    func hideKeyboard() {
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(endEditing)))
+    }
+    
+    @objc func endEditing() {
+        view.endEditing(true)
+    }
 }
