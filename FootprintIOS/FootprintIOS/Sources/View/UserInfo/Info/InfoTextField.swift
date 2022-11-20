@@ -47,9 +47,11 @@ class InfoTextField: UITextField {
         case .nickname:
             textAlignment = .natural
             keyboardType = .default
+            leftViewMode = ViewMode.always
         case .height, .weight:
             textAlignment = .center
             keyboardType = .numberPad
+            leftViewMode = ViewMode.never
         }
     }
     
@@ -63,6 +65,5 @@ class InfoTextField: UITextField {
     func addLeftPadding() {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: self.frame.height))
         self.leftView = paddingView
-        self.leftViewMode = ViewMode.always
     }
 }
