@@ -120,6 +120,9 @@ class InfoViewController: NavigationBarViewController, View {
         super.init(nibName: nil, bundle: nil)
         
         self.reactor = reactor
+        
+        hideKeyboard()
+        setKeyboardNotification()
     }
     
     @available(*, unavailable)
@@ -284,9 +287,7 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     func bind(reactor: InfoReactor) {
-        bottomButton
-            .rx
-            .tap
+        bottomButton.rx.tap
             .map { .tapBottomButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -299,5 +300,21 @@ class InfoViewController: NavigationBarViewController, View {
                 self?.navigationController?.pushViewController(goalViewController, animated: true)
             }
             .disposed(by: disposeBag)
+    }
+    
+    override func keyboardWillShow(height: CGFloat) {
+        super.keyboardWillShow(height: height)
+        
+        if !nicknameTextField.isEditing {
+            view.window?.frame.origin.y = -(height - 150)
+        }
+    }
+    
+    override func keyboardWillHide() {
+        super.keyboardWillHide()
+        
+        if !nicknameTextField.isEditing {
+            view.window?.frame.origin.y = 0
+        }
     }
 }
