@@ -10,10 +10,6 @@ import UIKit
 
 class UserInfoLabel: UILabel {
     
-    // MARK: - Properties
-    
-    let star: String = "*"
-    
     // MARK: - Initiailizer
     
     init(title: String) {
@@ -22,7 +18,7 @@ class UserInfoLabel: UILabel {
         text = title
         textColor = FootprintIOSAsset.Colors.blackD.color
         font = .systemFont(ofSize: 14, weight: .semibold)
-        color(string: star, color: FootprintIOSAsset.Colors.blueM.color)
+        color(string: "*", color: FootprintIOSAsset.Colors.blueM.color)
     }
     
     @available(*, unavailable)
