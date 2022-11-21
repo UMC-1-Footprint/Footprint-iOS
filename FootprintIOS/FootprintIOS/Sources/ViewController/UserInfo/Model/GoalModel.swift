@@ -1,5 +1,5 @@
 //
-//  goalModel.swift
+//  GoalModel.swift
 //  Footprint-iOS
 //
 //  Created by 김영인 on 2022/11/21.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct goalModel {
+struct GoalModel {
     let dayIdx: [Int]
     let walkGoalTime, walkTimeSlot: Int
 }

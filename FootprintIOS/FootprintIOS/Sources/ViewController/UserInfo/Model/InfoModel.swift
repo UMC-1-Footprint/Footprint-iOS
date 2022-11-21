@@ -9,6 +9,6 @@
 import Foundation
 
 struct InfoModel {
-    let nickname,sex,birth: String
+    var nickname,sex,birth: String
     let height,weight: Int
 }

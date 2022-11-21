@@ -11,6 +11,23 @@ import UIKit
 import ReactorKit
 import Then
 
+enum GenderType: Int {
+    case female
+    case male
+    case none
+    
+    var genderType: String {
+        switch self {
+        case .female:
+            return "female"
+        case .male:
+            return "male"
+        case .none:
+            return "none"
+        }
+    }
+}
+
 class InfoViewController: NavigationBarViewController, View {
     
     typealias Reactor = InfoReactor
@@ -295,8 +312,10 @@ class InfoViewController: NavigationBarViewController, View {
         bottomButton.rx.tap
             .withUnretained(self)
             .map { (this, _) -> InfoModel in
+                let idx = this.genderSegmentControl.selectedSegmentIndex
+                let gender = GenderType(rawValue: idx)?.genderType
                 let info = InfoModel(nickname: this.nicknameTextField.text ?? "",
-                                     sex: "여",
+                                     sex: gender ?? "none",
                                      birth: "1999-12-20",
                                      height: Int(this.heightTextField.text ?? "0") ?? 0,
                                      weight: Int(this.weightTextField.text ?? "0") ?? 0)
@@ -311,6 +330,8 @@ class InfoViewController: NavigationBarViewController, View {
             .withUnretained(self)
             .bind { (this, info) in
                 this.goToGoalScreen()
+                // infoModel을 goalVC.~ 프로퍼티로 넘겨줌
+                print(reactor.currentState)
             }
             .disposed(by: disposeBag)
     }
