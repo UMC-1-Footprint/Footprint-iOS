@@ -13,9 +13,12 @@ import Then
 
 class InfoViewController: NavigationBarViewController, View {
     
+    typealias Reactor = InfoReactor
+
     // MARK: - Properties
     
-    typealias Reactor = InfoReactor
+    var pushGoalScreen: () -> GoalViewController
+    
     
     // MARK: - UI Components
     
@@ -116,9 +119,11 @@ class InfoViewController: NavigationBarViewController, View {
     
     // MARK: - Initializer
     
-    init(reactor: Reactor) {
-        super.init(nibName: nil, bundle: nil)
+    init(reactor: Reactor,
+         pushGoalScreen: @escaping () -> GoalViewController) {
+        self.pushGoalScreen = pushGoalScreen
         
+        super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
         
         hideKeyboard()
@@ -288,16 +293,24 @@ class InfoViewController: NavigationBarViewController, View {
     
     func bind(reactor: InfoReactor) {
         bottomButton.rx.tap
-            .map { .tapBottomButton }
+            .withUnretained(self)
+            .map { (this, _) -> InfoModel in
+                let info = InfoModel(nickname: this.nicknameTextField.text ?? "",
+                                     sex: "여",
+                                     birth: "1999-12-20",
+                                     height: Int(this.heightTextField.text ?? "0") ?? 0,
+                                     weight: Int(this.weightTextField.text ?? "0") ?? 0)
+                return info
+            }
+            .map { .tapDoneButton($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reactor.state
-            .map(\.isPresent)
-            .filter { $0 }
-            .bind { [weak self] _ in
-                let goalViewController = GoalViewController(reactor: .init())
-                self?.navigationController?.pushViewController(goalViewController, animated: true)
+            .map(\.userInfo)
+            .withUnretained(self)
+            .bind { (this, info) in
+                this.goToGoalScreen()
             }
             .disposed(by: disposeBag)
     }
@@ -316,5 +329,10 @@ class InfoViewController: NavigationBarViewController, View {
         if !nicknameTextField.isEditing {
             view.window?.frame.origin.y = 0
         }
+    }
+    
+    private func goToGoalScreen() {
+        let controller = self.pushGoalScreen()
+        self.navigationController?.pushViewController(controller, animated: true)
     }
 }
