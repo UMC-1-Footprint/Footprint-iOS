@@ -82,7 +82,26 @@ extension CompositionRoot {
     }
     
     static func makeCalendarScreen() -> CalendarViewController {
-        let controller = CalendarViewController()
+        var pushGoalScreen: () -> GoalViewController
+        pushGoalScreen = {
+            let reactor = GoalReactor.init()
+            let controller = GoalViewController(reactor: reactor)
+            
+            return controller
+        }
+    
+        var pushInfoScreen: () -> InfoViewController
+        pushInfoScreen = {
+            let reactor = InfoReactor.init()
+            let controller = InfoViewController(reactor: reactor,
+                                                pushGoalScreen: pushGoalScreen)
+            
+            return controller
+        }
+        
+        let reactor = CalendarReactor(state: .init())
+        let controller = CalendarViewController(reactor: reactor,
+                                                pushInfoScreen: pushInfoScreen)
         
         controller.title = "캘린더"
         controller.tabBarItem.image = nil

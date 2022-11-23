@@ -41,6 +41,7 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
+        "UIUserInterfaceStyle": "Light",
         "API_BASE_URL": "$(ROOT_URL)",
         "KAKAO_APP_KEY": "$(KAKAO_APP_KEY)",
         "LSApplicationQueriesSchemes": ["kakaokompassauth", "kakaolink"],

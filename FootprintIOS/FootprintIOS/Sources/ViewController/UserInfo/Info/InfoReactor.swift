@@ -10,18 +10,19 @@ import ReactorKit
 
 class InfoReactor: Reactor {
     enum Action {
-        case tapBottomButton
+        case tapDoneButton(InfoModel)
     }
 
     enum Mutation {
-        case updateIsPresent(Bool)
+        case setUserInfo(InfoModel)
     }
 
     struct State {
-        var isPresent: Bool = false
+        var userInfo: InfoModel?
     }
 
     var initialState: State
+    
 
     init() {
         self.initialState = State()
@@ -29,8 +30,8 @@ class InfoReactor: Reactor {
 
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapBottomButton:
-            return .just(.updateIsPresent(true))
+        case .tapDoneButton(let info):
+            return .just(.setUserInfo(info))
         }
     }
 
@@ -38,8 +39,8 @@ class InfoReactor: Reactor {
         var newState = state
 
         switch mutation {
-        case .updateIsPresent(let bool):
-            newState.isPresent = bool
+        case .setUserInfo(let info):
+            newState.userInfo = info
         }
 
         return newState

@@ -60,29 +60,12 @@ class GoalViewController: NavigationBarViewController, View {
         $0.alignment = .center
     }
     
-    private let line1View = UIView().then {
-        $0.backgroundColor = .systemGray6
-    }
+    private let goalDayLabel = UserInfoLabel(title: "목표 요일")
+    private let goalTimeLabel = UserInfoLabel(title: "목표 산책 시간")
+    private let timeLabel = UserInfoLabel(title: "산책 시간대")
     
-    private let goalDayLabel = UILabel().then {
-        $0.text = "목표 요일"
-    }
-    
-    private let goalTimeLabel = UILabel().then {
-        $0.text = "목표 산책 시간"
-    }
-    
-    private let goalTimeSelectView = SelectBar(type: .goalTime)
-    
-    private let line2View = UIView().then {
-        $0.backgroundColor = .systemGray6
-    }
-    
-    private let timeLabel = UILabel().then {
-        $0.text = "산책 시간대"
-    }
-    
-    private let timeSelectView  = SelectBar(type: .time)
+    private let goalTimeSelectView = UserInfoSelectBar(type: .goalTime)
+    private let timeSelectView  = UserInfoSelectBar(type: .time)
     
     private lazy var bottomButton: UIButton = FootprintButton.init(type: .complete)
 
@@ -107,15 +90,11 @@ class GoalViewController: NavigationBarViewController, View {
         pageStackView.addArrangedSubview(unSelectedPageCircle)
         pageStackView.addArrangedSubview(selectedPageCircle)
         
-        [goalDayLabel, goalTimeLabel, timeLabel].forEach {
-            $0.textColor = .black
-            $0.font = .systemFont(ofSize: 16, weight: .semibold)
-        }
-        
         for day in ["월", "화", "수", "목", "금", "토", "일"] {
             let dayButton = UIButton().then {
                 $0.layer.cornerRadius = 20
                 $0.setTitleColor(FootprintIOSAsset.Colors.blackD.color, for: .normal)
+                $0.setTitleColor(.white, for: .selected)
                 $0.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
                 $0.layer.borderWidth = 1
                 $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
@@ -134,8 +113,8 @@ class GoalViewController: NavigationBarViewController, View {
         
         selectedPageCircle.addSubview(pageNumLabel)
         view.addSubviews([pageStackView, titleLabel, subtitleLabel, goalDayLabel,
-                         dayButtonStackView, line1View, goalTimeLabel, goalTimeSelectView,
-                          line2View, timeLabel, timeSelectView, bottomButton])
+                         dayButtonStackView, goalTimeLabel, goalTimeSelectView, timeLabel,
+                          timeSelectView, bottomButton])
     }
     
     override func setupLayout() {
@@ -154,22 +133,22 @@ class GoalViewController: NavigationBarViewController, View {
         }
         
         pageStackView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(40)
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(25)
             $0.centerX.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints {
+            $0.top.equalTo(pageStackView.snp.bottom).offset(24)
             $0.leading.equalToSuperview().inset(24)
-            $0.top.equalTo(pageStackView.snp.bottom).offset(34)
         }
         
         subtitleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(28)
+            $0.leading.equalTo(titleLabel)
             $0.top.equalTo(titleLabel.snp.bottom).offset(14)
         }
         
         goalDayLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(34)
+            $0.leading.equalTo(subtitleLabel)
             $0.top.equalTo(subtitleLabel.snp.bottom).offset(40)
         }
         
@@ -178,36 +157,24 @@ class GoalViewController: NavigationBarViewController, View {
             $0.centerX.equalToSuperview()
         }
         
-        line1View.snp.makeConstraints {
-            $0.top.equalTo(dayButtonStackView.snp.bottom).offset(25)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(7)
-        }
-        
         goalTimeLabel.snp.makeConstraints {
-            $0.top.equalTo(line1View.snp.bottom).offset(34)
+            $0.top.equalTo(dayButtonStackView.snp.bottom).offset(34)
             $0.leading.equalTo(goalDayLabel)
         }
         
         goalTimeSelectView.snp.makeConstraints {
             $0.top.equalTo(goalTimeLabel.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview().inset(40)
-        }
-        
-        line2View.snp.makeConstraints {
-            $0.top.equalTo(goalTimeSelectView.snp.bottom).offset(35)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(7)
+            $0.leading.trailing.equalToSuperview().inset(34)
         }
         
         timeLabel.snp.makeConstraints {
-            $0.top.equalTo(line2View.snp.bottom).offset(34)
+            $0.top.equalTo(goalTimeSelectView.snp.bottom).offset(34)
             $0.leading.equalTo(goalDayLabel)
         }
         
         timeSelectView.snp.makeConstraints {
             $0.top.equalTo(timeLabel.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview().inset(40)
+            $0.leading.trailing.equalToSuperview().inset(34)
         }
         
         bottomButton.snp.makeConstraints {

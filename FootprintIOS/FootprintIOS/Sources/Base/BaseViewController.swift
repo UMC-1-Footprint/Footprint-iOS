@@ -34,3 +34,34 @@ class BaseViewController: UIViewController, BaseViewProtocol {
     
     func setupBind() { }
 }
+
+extension BaseViewController {
+    @objc func keyboardWillShow(height: CGFloat) {}
+    
+    @objc func keyboardWillHide() {}
+    
+    func setKeyboardNotification() {
+        NotificationCenter.default.rx
+            .notification(UIResponder.keyboardWillShowNotification)
+            .withUnretained(self)
+            .bind { (this, notification) in
+                let height = this.keyboardHeight(notification: notification)
+                this.keyboardWillShow(height: height)
+            }
+            .disposed(by: disposeBag)
+        
+        NotificationCenter.default.rx
+            .notification(UIResponder.keyboardWillHideNotification)
+            .withUnretained(self)
+            .bind { (this, notification) in
+                this.keyboardWillHide()
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func keyboardHeight(notification: Notification) -> CGFloat {
+        let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
+        
+        return keyboardFrame.cgRectValue.height
+    }
+}
