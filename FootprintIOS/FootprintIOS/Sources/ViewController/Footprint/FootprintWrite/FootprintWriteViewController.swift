@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import PhotosUI
 import ReactorKit
+import RxDataSources
 
 class FootprintWriteViewController: NavigationBarViewController, View {
+
     // MARK: - Constants
-    
-    typealias Reactor = FootprintWriteReactor
     
     fileprivate struct Text {
         static let cancleButton: String = "취소"
@@ -41,6 +42,21 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         static let addPictureButton: UIColor = FootprintIOSAsset.Colors.blackM.color
     }
     
+    // MARK: - Properties
+    
+    typealias Reactor = FootprintWriteReactor
+    
+    typealias DataSource = RxCollectionViewSectionedReloadDataSource<ImageSectionModel>
+    
+    private lazy var dataSource = DataSource { _, collectionView, indexPath, item -> UICollectionViewCell in
+        switch item {
+        case let .image(reactor):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: ImageCollectionViewCell.self), for: indexPath) as? ImageCollectionViewCell else { return .init() }
+            cell.reactor = reactor
+            return cell
+        }
+    }
+    
     // MARK: - UI Components
     
     let cancleButton: UIButton = .init(type: .system)
@@ -51,6 +67,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
     let divider2: UIView = .init()
     let addPictureView: AddPictureButtonView = .init()
     lazy var accessoryView: AddPictureButtonView = .init(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.width, height: 44))
+    let collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     // MARK: - Initializer
     
@@ -95,6 +112,11 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         textView.text = Text.textViewPlaceholder
         textView.textColor = Color.textViewPlaceholder
         textView.inputAccessoryView = accessoryView
+        
+        collectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: ImageCollectionViewCell.self))
+        collectionView.sizeToFit()
+        
+        addPictureView.isHidden = true
     }
     
     override func setupHierarchy() {
@@ -106,7 +128,8 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             saveButton,
             divider,
             textView,
-            addPictureView
+            addPictureView,
+            collectionView
         ])
     }
     
@@ -134,6 +157,11 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(1)
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(divider.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(24)
         }
         
         textView.snp.makeConstraints {
@@ -178,5 +206,39 @@ class FootprintWriteViewController: NavigationBarViewController, View {
                 }
             }
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.sections)
+            .bind(to: collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+    }
+}
+
+extension FootprintWriteViewController {
+    private func goToPickerScreen() {
+        var configure = PHPickerConfiguration()
+        configure.selectionLimit = 10
+        configure.filter = .images
+        let picker = PHPickerViewController(configuration: configure)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+}
+
+extension FootprintWriteViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        var images: [UIImage] = []
+        for result in results {
+            let itemProvider = result.itemProvider
+            if itemProvider.canLoadObject(ofClass: UIImage.self) {
+//                itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+//                    DispatchQueue.main.async {
+//                        images.append(image)
+//                    }
+//                }
+            }
+        }
+        
     }
 }
