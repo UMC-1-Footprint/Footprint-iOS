@@ -9,8 +9,17 @@
 import UIKit
 
 import SnapKit
+import ReactorKit
 
-class CalendarViewController: NavigationBarViewController {
+class CalendarViewController: NavigationBarViewController, View {
+    
+    typealias Reactor = CalendarReactor
+    
+    // MARK: - Properties
+    
+    var pushInfoScreen: () -> InfoViewController
+    
+    // MARK: - UI Components
     
     private lazy var infoButton = UIButton().then {
         $0.setTitle("정보 입력", for: .normal)
@@ -38,6 +47,23 @@ class CalendarViewController: NavigationBarViewController {
         $0.axis = .vertical
     }
     
+    // MARK: - Initializer
+    
+    init(reactor: Reactor,
+         pushInfoScreen: @escaping () -> InfoViewController) {
+        self.pushInfoScreen = pushInfoScreen
+        
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
+    }
+    
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Methods
+    
     override func setupNavigationBar() {
         super.setupNavigationBar()
         
@@ -63,14 +89,10 @@ class CalendarViewController: NavigationBarViewController {
         }
     }
     
-    override func setupBind() {
-        super.setupBind()
-        
+    func bind(reactor: CalendarReactor) {
         infoButton.rx.tap
             .bind { [weak self] in
-                let infoVC = InfoViewController(reactor: .init())
-                infoVC.hidesBottomBarWhenPushed = true
-                self?.navigationController?.pushViewController(infoVC, animated: true)
+                self?.goToInfoScreen()
             }
             .disposed(by: disposeBag)
         
@@ -87,5 +109,11 @@ class CalendarViewController: NavigationBarViewController {
                 self?.navigationController?.pushViewController(homeVC, animated: true)
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func goToInfoScreen() {
+        let controller = self.pushInfoScreen()
+        controller.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(controller, animated: true)
     }
 }
