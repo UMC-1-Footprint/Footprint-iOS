@@ -9,7 +9,7 @@
 import UIKit
 
 class MonthAchievementViewController: BaseViewController {
-    let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20)
+    let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20, setPercentage: true)
     let lineView = PercentageLineView()
     lazy var daysList = setMonth()
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: true)
@@ -56,7 +56,7 @@ class MonthAchievementViewController: BaseViewController {
         
         dateView.snp.makeConstraints {
             $0.width.equalTo(260)
-            $0.top.equalTo(barGraphStackView.snp.bottom).offset(17)
+            $0.bottom.equalTo(barGraphStackView.snp.bottom).offset(17)
             $0.leading.equalTo(percentageView.snp.trailing).offset(30)
         }
     }

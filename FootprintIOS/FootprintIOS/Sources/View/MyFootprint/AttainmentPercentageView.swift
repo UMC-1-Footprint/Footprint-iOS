@@ -20,10 +20,12 @@ class AttainmentPercentageView: BaseView {
     }
     let endPoint: Int
     let increasementPoint: Int
+    let setPercentage: Bool
     
-    init(endPoint: Int, increasementPoint: Int) {
+    init(endPoint: Int, increasementPoint: Int, setPercentage: Bool) {
         self.endPoint = endPoint
         self.increasementPoint = increasementPoint
+        self.setPercentage = setPercentage
         
         super.init(frame: .zero)
     }
@@ -39,7 +41,7 @@ class AttainmentPercentageView: BaseView {
             let label = PercentageLable("\(i)")
             stackView.addArrangedSubview(label)
         }
-        let label = PercentageLable("(%)")
+        let label = setPercentage ? PercentageLable("(%)") : PercentageLable("(회)")
         stackView.addArrangedSubview(label)
 
         addSubview(stackView)

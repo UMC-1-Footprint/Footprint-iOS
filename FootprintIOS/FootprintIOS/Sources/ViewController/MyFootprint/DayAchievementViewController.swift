@@ -11,7 +11,7 @@ import UIKit
 import SnapKit
 
 class DayAchievementViewController: BaseViewController {
-    let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20)
+    let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20, setPercentage: true)
     let lineView = PercentageLineView()
     let daysList = ["일","월","화","수","목","금","토"]
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: false)
