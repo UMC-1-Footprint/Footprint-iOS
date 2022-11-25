@@ -53,7 +53,7 @@ class GoalViewController: NavigationBarViewController, View {
         $0.textColor = FootprintIOSAsset.Colors.blackL.color
     }
     
-    private var dayButtons: [UIButton] = []
+    private lazy var dayButtons: [UIButton] = []
     
     private let dayButtonStackView = UIStackView().then {
         $0.spacing = 5
@@ -73,7 +73,7 @@ class GoalViewController: NavigationBarViewController, View {
     
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
-        
+    
         self.reactor = reactor
     }
     
@@ -89,23 +89,6 @@ class GoalViewController: NavigationBarViewController, View {
         
         pageStackView.addArrangedSubview(unSelectedPageCircle)
         pageStackView.addArrangedSubview(selectedPageCircle)
-        
-        for day in ["월", "화", "수", "목", "금", "토", "일"] {
-            let dayButton = UIButton().then {
-                $0.layer.cornerRadius = 20
-                $0.setTitleColor(FootprintIOSAsset.Colors.blackD.color, for: .normal)
-                $0.setTitleColor(.white, for: .selected)
-                $0.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
-                $0.layer.borderWidth = 1
-                $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-            }
-            dayButton.snp.makeConstraints {
-                $0.width.height.equalTo(40)
-            }
-            dayButton.setTitle(day, for: .normal)
-            dayButtons.append(dayButton)
-            dayButtonStackView.addArrangedSubview(dayButton)
-        }
     }
     
     override func setupHierarchy() {
@@ -184,8 +167,70 @@ class GoalViewController: NavigationBarViewController, View {
         }
     }
     
+    private func setDayButton() {
+        for day in ["월", "화", "수", "목", "금", "토", "일"] {
+            let dayButton = UIButton().then {
+                $0.layer.cornerRadius = 20
+                $0.setTitleColor(FootprintIOSAsset.Colors.blackD.color, for: .normal)
+                $0.setTitleColor(.white, for: .selected)
+                $0.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+                $0.layer.borderWidth = 1
+                $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+            }
+            dayButton.snp.makeConstraints {
+                $0.width.height.equalTo(40)
+            }
+            dayButton.setTitle(day, for: .normal)
+            dayButtons.append(dayButton)
+            dayButtonStackView.addArrangedSubview(dayButton)
+        }
+    }
+    
     func bind(reactor: GoalReactor) {
-        // Action
-        // State
+        setDayButton()
+        
+        for day in 0..<7 {
+            dayButtons[day].rx.tap
+                .map { .tapDayButton(day) }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        }
+        
+        bottomButton.rx.tap
+            .withUnretained(self)
+            .map { (this, _) -> GoalModel in
+                let info = GoalModel(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                                     walkGoalTime: 0,
+                                     walkTimeSlot: 0)
+                
+                return info
+            }
+            .map { .tapDoneButton($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.day)
+            .withUnretained(self)
+            .bind { (this, day) in
+                this.dayButtons[day].isSelected = reactor.currentState.isSelectedButtons[day]
+                
+                if reactor.currentState.isSelectedButtons[day] {
+                    this.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
+                    this.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
+                } else {
+                    this.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+                    this.dayButtons[day].backgroundColor = .white
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.goalInfo)
+            .withUnretained(self)
+            .bind { (this, info) in
+                print(info)
+            }
+            .disposed(by: disposeBag)
     }
 }

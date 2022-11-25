@@ -326,12 +326,12 @@ class InfoViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map(\.userInfo)
+            .compactMap(\.userInfo)
             .withUnretained(self)
             .bind { (this, info) in
                 this.goToGoalScreen()
                 // infoModel을 goalVC.~ 프로퍼티로 넘겨줌
-                print(reactor.currentState)
+                print(info)
             }
             .disposed(by: disposeBag)
     }

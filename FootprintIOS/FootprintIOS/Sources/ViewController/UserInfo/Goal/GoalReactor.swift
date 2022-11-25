@@ -10,38 +10,47 @@ import ReactorKit
 
 class GoalReactor: Reactor {
     enum Action {
-        case tapBottomButton
+        case tapDayButton(Int)
+        case tapDoneButton(GoalModel)
     }
-
+    
     enum Mutation {
-        case updateIsComplete(Bool)
+        case updateDayButton(Int)
+        case setInfo(GoalModel)
     }
-
+    
     struct State {
-        var isComplete: Bool = false
+        var day: Int?
+        var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
+        var goalInfo: GoalModel?
     }
-
+    
     var initialState: State
 
     init() {
         self.initialState = State()
     }
-
+    
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapBottomButton:
-            return .just(.updateIsComplete(true))
+        case .tapDayButton(let day):
+            return .just(.updateDayButton(day))
+        case .tapDoneButton(let info):
+            return .just(.setInfo(info))
         }
     }
-
+    
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-
+        
         switch mutation {
-        case .updateIsComplete(let bool):
-            newState.isComplete = bool
+        case .updateDayButton(let day):
+            newState.day = day
+            newState.isSelectedButtons[day] = !newState.isSelectedButtons[day]
+        case .setInfo(let info):
+            newState.goalInfo = info
         }
-
+        
         return newState
     }
 }
