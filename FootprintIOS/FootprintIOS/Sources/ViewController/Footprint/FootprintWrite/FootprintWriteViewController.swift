@@ -123,8 +123,6 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.isPagingEnabled = true
         
-        addPictureView.isHidden = true
-        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification , object:nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification , object:nil)
     }
@@ -218,6 +216,13 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             }
             .disposed(by: disposeBag)
         
+        addPictureView.addPictureButton.rx.tap
+            .withUnretained(self)
+            .bind { this, _ in
+                this.goToPickerScreen()
+            }
+            .disposed(by: disposeBag)
+        
         accessoryView.addPictureButton.rx.tap
             .withUnretained(self)
             .bind { this, _ in
@@ -251,10 +256,12 @@ class FootprintWriteViewController: NavigationBarViewController, View {
     
     @objc func keyboardWillShow(notification: NSNotification) {
         textView.inputAccessoryView?.isHidden = false
+        addPictureView.isHidden = true
     }
 
     @objc func keyboardWillHide(notification: NSNotification) {
         textView.inputAccessoryView?.isHidden = true
+        addPictureView.isHidden = false
     }
 }
 
