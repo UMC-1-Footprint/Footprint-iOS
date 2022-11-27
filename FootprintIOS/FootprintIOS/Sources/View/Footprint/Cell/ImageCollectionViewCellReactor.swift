@@ -6,35 +6,20 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+import UIKit
 import ReactorKit
 
 class ImageCollectionViewCellReactor: Reactor {
     enum Action {}
     enum Mutation {}
-    struct State {}
+    struct State {
+        var image: UIImage
+    }
     
     var initialState: State
     
-    init() {
-        initialState = State()
+    init(image: UIImage) {
+        initialState = State(image: image)
     }
 }
 
-extension ImageCollectionViewCellReactor {
-    func mutate(action: Action) -> Observable<Mutation> {
-        switch action {
-            
-        }
-        return .empty()
-    }
-    
-    func reduce(state: State, mutation: Mutation) -> State {
-        var newState = state
-        
-        switch mutation {
-            
-        }
-        
-        return newState
-    }
-}

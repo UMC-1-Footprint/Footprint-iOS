@@ -8,19 +8,22 @@
 
 import UIKit
 import ReactorKit
+import PhotosUI
 
 class FootprintWriteReactor: Reactor {
     enum Action {
         case refresh
-        case editText(String)
-        case resetPicker
-        case pickImage(UIImage)
+        case text(String)
+        case resolve
+        case resolving(UIImage)
+        case resolved
     }
     
     enum Mutation {
         case setSections([ImageSectionModel])
-        case addImage(UIImage)
-        case updateText(String)
+        case setText(String)
+        case appendImage(UIImage)
+        case resetImage
     }
     
     struct State {
@@ -42,11 +45,17 @@ extension FootprintWriteReactor {
         case .refresh:
             return refreshMutation()
 
-        case let .editText(text):
-            return .just(.updateText(text))
+        case let .text(text):
+            return textMutation(text)
             
-        case let .pickImage(image):
-            return pickImagesMutation(image)
+        case .resolve:
+            return resolveMutation()
+            
+        case let .resolving(image):
+            return resolvingMutation(image)
+            
+        case .resolved:
+            return resolved()
         }
     }
     
@@ -57,8 +66,14 @@ extension FootprintWriteReactor {
         case let .setSections(sections):
             newState.sections = sections
             
-        case let .updateText(text):
+        case let .setText(text):
             newState.text = text
+            
+        case let .appendImage(image):
+            newState.images.append(image)
+            
+        case .resetImage:
+            newState.images.removeAll()
         }
         
         return newState
@@ -68,16 +83,28 @@ extension FootprintWriteReactor {
         return .empty()
     }
     
-    private func pickImagesMutation(_ image: UIImage) -> Observable<Mutation> {
-        return .just(.set)
-        return .just(.setSections(makeSections(from: images)))
+    private func textMutation(_ text: String) -> Observable<Mutation> {
+        return .just(.setText(text))
+    }
+    
+    private func resolveMutation() -> Observable<Mutation> {
+        return .just(.resetImage)
+    }
+    
+    private func resolvingMutation(_ image: UIImage) -> Observable<Mutation> {
+        return .just(.appendImage(image))
+    }
+    
+    private func resolved() -> Observable<Mutation> {
+        return .just(.setSections(makeSections(from: currentState.images)))
     }
     
     private func makeSections(from images: [UIImage]) -> [ImageSectionModel] {
         let items: [ImageItem] = images.map({ (image) -> ImageItem in
-            return .image(.init())
+            return .image(.init(image: image))
         })
         let section: ImageSectionModel = .init(model: .image(items), items: items)
+        
         return [section]
     }
 }

@@ -67,7 +67,9 @@ class FootprintWriteViewController: NavigationBarViewController, View {
     let divider2: UIView = .init()
     let addPictureView: AddPictureButtonView = .init()
     lazy var accessoryView: AddPictureButtonView = .init(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.width, height: 44))
-    let collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    let flowLayout: UICollectionViewFlowLayout = .init()
+    lazy var collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: flowLayout)
+    
     
     // MARK: - Initializer
     
@@ -113,8 +115,12 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         textView.textColor = Color.textViewPlaceholder
         textView.inputAccessoryView = accessoryView
         
+        flowLayout.scrollDirection = .horizontal
+        
         collectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: ImageCollectionViewCell.self))
-        collectionView.sizeToFit()
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.isPagingEnabled = true
         
         addPictureView.isHidden = true
     }
@@ -162,10 +168,11 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         collectionView.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(24)
+            $0.height.equalTo(0)
         }
         
         textView.snp.makeConstraints {
-            $0.top.equalTo(divider.snp.bottom).offset(16)
+            $0.top.equalTo(collectionView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalToSuperview()
         }
@@ -193,7 +200,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         textView.rx.text
             .compactMap{$0}
             .debounce(.milliseconds(200), scheduler:MainScheduler.instance)
-            .map { .editText($0) }
+            .map { .text($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -207,10 +214,25 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             }
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map(\.sections)
+        accessoryView.addPictureButton.rx.tap
+            .withUnretained(self)
+            .bind { this, _ in
+                this.goToPickerScreen()
+            }
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+        
+        reactor.state.map(\.sections)
             .bind(to: collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        reactor.state.map(\.sections)
+            .bind(to: rx.show)
+            .disposed(by: disposeBag)
+    }
+    
+    private func showCollectionView(sections: [ImageSectionModel]) {
     }
 }
 
@@ -228,17 +250,45 @@ extension FootprintWriteViewController {
 extension FootprintWriteViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        var images: [UIImage] = []
+        reactor?.action.onNext(.resolve)
         for result in results {
             let itemProvider = result.itemProvider
             if itemProvider.canLoadObject(ofClass: UIImage.self) {
-//                itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
-//                    DispatchQueue.main.async {
-//                        images.append(image)
-//                    }
-//                }
+                itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                    DispatchQueue.main.async {
+                        if let image = image as? UIImage {
+                            self?.reactor?.action.onNext(.resolving(image))
+                            if result.hashValue == results.last?.hashValue {
+                                self?.reactor?.action.onNext(.resolved)
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+extension FootprintWriteViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width
+        let height = collectionView.bounds.height
         
+        return .init(width: width, height: height)
+    }
+}
+
+extension Reactive where Base: FootprintWriteViewController {
+    var show: Binder<[ImageSectionModel]> {
+        return Binder(self.base) { (viewController, sections) in
+            if !sections.isEmpty {
+                viewController.collectionView.snp.remakeConstraints {
+                    $0.top.equalTo(viewController.divider.snp.bottom).offset(16)
+                    $0.leading.trailing.equalToSuperview().inset(24)
+                    $0.height.equalTo(viewController.collectionView.frame.width)
+                }
+            }
+            viewController.collectionView.performBatchUpdates(nil)
+        }
     }
 }
