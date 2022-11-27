@@ -8,6 +8,7 @@
 
 import UIKit
 import PhotosUI
+import RxSwift
 import ReactorKit
 import RxDataSources
 
@@ -123,6 +124,9 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         collectionView.isPagingEnabled = true
         
         addPictureView.isHidden = true
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification , object:nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification , object:nil)
     }
     
     override func setupHierarchy() {
@@ -228,11 +232,29 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state.map(\.sections)
-            .bind(to: rx.show)
+            .bind { [weak self] sections in
+                self?.showCollectionView(sections: sections)
+            }
             .disposed(by: disposeBag)
     }
     
     private func showCollectionView(sections: [ImageSectionModel]) {
+        if !sections.isEmpty {
+            self.collectionView.snp.remakeConstraints {
+                $0.top.equalTo(self.divider.snp.bottom).offset(16)
+                $0.leading.trailing.equalToSuperview().inset(24)
+                $0.height.equalTo(self.collectionView.frame.width)
+            }
+        }
+        collectionView.performBatchUpdates(nil)
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        textView.inputAccessoryView?.isHidden = false
+    }
+
+    @objc func keyboardWillHide(notification: NSNotification) {
+        textView.inputAccessoryView?.isHidden = true
     }
 }
 
@@ -244,6 +266,7 @@ extension FootprintWriteViewController {
         let picker = PHPickerViewController(configuration: configure)
         picker.delegate = self
         present(picker, animated: true)
+        view.endEditing(false)
     }
 }
 
