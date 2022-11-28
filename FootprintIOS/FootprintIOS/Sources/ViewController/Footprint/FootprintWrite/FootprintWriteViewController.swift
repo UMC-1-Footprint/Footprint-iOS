@@ -280,16 +280,17 @@ extension FootprintWriteViewController {
 extension FootprintWriteViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        reactor?.action.onNext(.resolve)
+        var images: [UIImage] = []
+        
         for result in results {
             let itemProvider = result.itemProvider
             if itemProvider.canLoadObject(ofClass: UIImage.self) {
                 itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
                     DispatchQueue.main.async {
                         if let image = image as? UIImage {
-                            self?.reactor?.action.onNext(.resolving(image))
+                            images.append(image)
                             if result.hashValue == results.last?.hashValue {
-                                self?.reactor?.action.onNext(.resolved)
+                                self?.reactor?.action.onNext(.uploadImage(images))
                             }
                         }
                     }
