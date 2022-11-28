@@ -14,11 +14,13 @@ import Then
 class LineGraphView: BaseView {
     var graphLayer = CAShapeLayer()
     var path = UIBezierPath()
+    var pointImageSize: CGFloat = 12
     
-    var values:[CGFloat] = .init()
+    var pointValues: [CGFloat] = .init()
+    var pointValueLocation: [CGRect] = .init()
     
     init(values: [CGFloat]) {
-        self.values = values
+        self.pointValues = values
         
         super.init(frame: .zero)
     }
@@ -26,22 +28,24 @@ class LineGraphView: BaseView {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
-        self.layer.addSublayer(graphLayer)
-        
-        let xOffset: CGFloat = self.frame.width / (CGFloat(values.count) - 1)
+        let xOffset: CGFloat = self.frame.width / (CGFloat(pointValues.count) - 1)
         var currentX: CGFloat = 0
         let startPosition = CGPoint(x: currentX, y: getHeight(point: 0))
         
         self.path.move(to: startPosition)
         
-        for i in 0..<values.count {
+        for i in 0..<pointValues.count {
             if i == 0 {
                 currentX = 0
             } else {
                 currentX += xOffset
             }
+            
             let newPosition = CGPoint(x: currentX,
                                       y: getHeight(point: i))
+            
+            pointValueLocation.append(CGRect(x: currentX - pointImageSize / 2, y: getHeight(point: i) - pointImageSize / 2, width: pointImageSize, height: pointImageSize))
+            
             self.path.addLine(to: newPosition)
         }
         
@@ -52,12 +56,34 @@ class LineGraphView: BaseView {
         graphLayer.lineCap = .round
         
         self.layer.addSublayer(graphLayer)
+        
+        setGraphPointView()
+    }
+    
+    func setGraphPointView() {
+        for i in 0..<pointValues.count {
+            let graphView = UIView(frame: pointValueLocation[i])
+            let graphPointImage = UIImageView().then {
+                $0.image = FootprintIOSAsset.Images.iconGraphPointBlue.image
+            }
+            
+            if(i == pointValues.count - 1) {
+                graphPointImage.image = FootprintIOSAsset.Images.iconGraphPointYellow.image
+            }
+
+            graphView.addSubview(graphPointImage)
+            self.addSubview(graphView)
+
+            graphPointImage.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+        }
     }
 }
 
 extension LineGraphView {
     func getHeight(point: Int) -> CGFloat {
-        let height = self.frame.height - (self.values[point] / 50) * 125
+        let height = self.frame.height - (self.pointValues[point] / 50) * 125
         return height
     }
 }
