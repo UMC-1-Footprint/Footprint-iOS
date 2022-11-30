@@ -9,6 +9,7 @@
 import UIKit
 
 import ReactorKit
+import RxGesture
 import Then
 
 enum GenderType: Int {
@@ -323,6 +324,16 @@ class InfoViewController: NavigationBarViewController, View {
             }
             .map { .tapDoneButton($0) }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        birthSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { this, _ in
+                let reactor = BirthBottomSheetReactor.init(state: .init())
+                let birthBottomSheet = BirthBottomSheetViewController(reactor: reactor)
+                this.present(birthBottomSheet, animated: true)
+            }
             .disposed(by: disposeBag)
         
         reactor.state
