@@ -12,7 +12,16 @@ import SnapKit
 import RxGesture
 import Then
 
+enum BottomSheetType {
+    case fix
+    case drag
+}
+
 class BottomSheetViewController: BaseViewController {
+    
+    // MARK: - Properties
+    
+    var type: BottomSheetType
     
     // MARK: - UI Components
     
@@ -25,6 +34,17 @@ class BottomSheetViewController: BaseViewController {
         $0.layer.cornerRadius = 20
         $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         $0.layer.masksToBounds = true
+    }
+    
+    // MARK: - Initializer
+    
+    init(type: BottomSheetType) {
+        self.type = type
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - View Life Cycle
@@ -71,7 +91,10 @@ class BottomSheetViewController: BaseViewController {
             .withUnretained(self)
             .bind { this, gesture in
                 let transition = gesture.translation(in: this.view)
-                guard transition.y > 0 else { return }
+                
+                guard
+                    transition.y > 0,
+                    this.type == .drag else { return }
                 
                 switch gesture.state {
                 case .changed:
