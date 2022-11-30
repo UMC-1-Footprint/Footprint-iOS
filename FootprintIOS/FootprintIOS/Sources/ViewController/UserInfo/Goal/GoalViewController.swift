@@ -64,8 +64,8 @@ class GoalViewController: NavigationBarViewController, View {
     private let goalTimeLabel = UserInfoLabel(title: "목표 산책 시간")
     private let timeLabel = UserInfoLabel(title: "산책 시간대")
     
-    private let goalTimeSelectView = UserInfoSelectBar(type: .goalTime)
-    private let timeSelectView  = UserInfoSelectBar(type: .time)
+    private let goalWalkSelectView = UserInfoSelectBar(type: .goalTime)
+    private let walkSelectView  = UserInfoSelectBar(type: .time)
     
     private lazy var bottomButton: UIButton = FootprintButton.init(type: .complete)
 
@@ -96,8 +96,8 @@ class GoalViewController: NavigationBarViewController, View {
         
         selectedPageCircle.addSubview(pageNumLabel)
         view.addSubviews([pageStackView, titleLabel, subtitleLabel, goalDayLabel,
-                         dayButtonStackView, goalTimeLabel, goalTimeSelectView, timeLabel,
-                          timeSelectView, bottomButton])
+                         dayButtonStackView, goalTimeLabel, goalWalkSelectView, timeLabel,
+                          walkSelectView, bottomButton])
     }
     
     override func setupLayout() {
@@ -145,17 +145,17 @@ class GoalViewController: NavigationBarViewController, View {
             $0.leading.equalTo(goalDayLabel)
         }
         
-        goalTimeSelectView.snp.makeConstraints {
+        goalWalkSelectView.snp.makeConstraints {
             $0.top.equalTo(goalTimeLabel.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(34)
         }
         
         timeLabel.snp.makeConstraints {
-            $0.top.equalTo(goalTimeSelectView.snp.bottom).offset(34)
+            $0.top.equalTo(goalWalkSelectView.snp.bottom).offset(34)
             $0.leading.equalTo(goalDayLabel)
         }
         
-        timeSelectView.snp.makeConstraints {
+        walkSelectView.snp.makeConstraints {
             $0.top.equalTo(timeLabel.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(34)
         }
@@ -207,6 +207,26 @@ class GoalViewController: NavigationBarViewController, View {
             }
             .map { .tapDoneButton($0) }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        walkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = WalkBottomSheetReactor.init()
+                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
+                owner.present(walkBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        goalWalkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = GoalWalkBottomSheetReactor.init()
+                let goalWalkBottomSheet = GoalWalkBottomSheetViewController(reactor: reactor)
+                owner.present(goalWalkBottomSheet, animated: true)
+            }
             .disposed(by: disposeBag)
         
         reactor.state
