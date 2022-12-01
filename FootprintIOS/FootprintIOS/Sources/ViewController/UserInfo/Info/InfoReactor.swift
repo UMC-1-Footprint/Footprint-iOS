@@ -22,7 +22,6 @@ class InfoReactor: Reactor {
     }
 
     var initialState: State
-    
 
     init() {
         self.initialState = State()
@@ -37,7 +36,7 @@ class InfoReactor: Reactor {
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-
+        
         switch mutation {
         case .setUserInfo(let info):
             newState.userInfo = info

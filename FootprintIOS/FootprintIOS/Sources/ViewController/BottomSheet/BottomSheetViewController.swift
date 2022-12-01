@@ -41,6 +41,7 @@ class BottomSheetViewController: BaseViewController {
     init(type: BottomSheetType) {
         self.type = type
         super.init(nibName: nil, bundle: nil)
+        self.modalPresentationStyle = .overFullScreen
     }
     
     required init?(coder: NSCoder) {

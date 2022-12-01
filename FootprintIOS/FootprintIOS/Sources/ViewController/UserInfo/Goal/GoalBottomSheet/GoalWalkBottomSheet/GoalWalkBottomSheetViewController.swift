@@ -82,7 +82,6 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
             $0.top.equalTo(titleLabel.snp.bottom).offset(28)
         }
     }
-
     
     // MARK: - Methods
     
