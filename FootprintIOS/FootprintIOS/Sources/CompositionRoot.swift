@@ -109,6 +109,19 @@ extension CompositionRoot {
         return controller
     }
     
+    static func makeRecordCalendarScreen() -> RecordCalendarViewController {
+        var pushRecordSearchScreen: () -> RecordSearchViewController = {
+            let reactor: RecordSearchReactor = .init()
+            return .init(reactor: reactor)
+        }
+        
+        let reactor: RecordCalendarReactor = .init()
+        let controller: RecordCalendarViewController = .init(reactor: reactor, pushRecordSearchScreen: pushRecordSearchScreen)
+        
+        controller.title = "산책기록"
+        return controller
+    }
+    
     static func makeRecommendScreen() -> RecommendViewController {
         let controller = RecommendViewController()
         
