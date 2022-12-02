@@ -16,8 +16,8 @@ enum RecordSearchSection {
 }
 
 enum RecordSearchItem {
-    case search
-    case record
+    case search(SearchCollectionViewCellReactor)
+    case record(RecordCollectionViewCellReactor)
 }
 
 extension RecordSearchSection: SectionModelType {

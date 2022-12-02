@@ -7,7 +7,12 @@
 //
 
 import UIKit
+import ReactorKit
 
-class SearchCollectionViewCell: BaseCollectionViewCell {
+class SearchCollectionViewCell: BaseCollectionViewCell, View {
+    typealias Reactor = SearchCollectionViewCellReactor
     
+    func bind(reactor: Reactor) {
+        
+    }
 }

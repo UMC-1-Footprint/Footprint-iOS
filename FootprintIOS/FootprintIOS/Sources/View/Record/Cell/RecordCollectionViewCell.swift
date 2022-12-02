@@ -7,7 +7,12 @@
 //
 
 import Foundation
+import ReactorKit
 
-class RecordCollectionViewCell: BaseCollectionViewCell {
+class RecordCollectionViewCell: BaseCollectionViewCell, View {
+    typealias Reactor = RecordCollectionViewCellReactor
     
+    func bind(reactor: Reactor) {
+        
+    }
 }

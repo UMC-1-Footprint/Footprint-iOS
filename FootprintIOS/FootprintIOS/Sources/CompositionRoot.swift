@@ -70,10 +70,16 @@ extension CompositionRoot {
                                                         pushFootprintWriteScreen: pushFootprintWriteScreen)
             return controller
         }
+        
+        let pushRecordSearchScreen: () -> RecordSearchViewController = {
+            let reactor: RecordSearchReactor = .init()
+            return .init(reactor: reactor)
+        }
 
         let reactor = FootprintRootReactor(state: .init())
         let controller = FootprintRootViewController(reactor: reactor,
-                                                     pushFootprintMapScreen: pushFootprintMapScreen)
+                                                     pushFootprintMapScreen: pushFootprintMapScreen,
+                                                     pushRecordSearchScreen: pushRecordSearchScreen)
         
         controller.title = "홈"
         controller.tabBarItem.image = nil
@@ -110,7 +116,7 @@ extension CompositionRoot {
     }
     
     static func makeRecordCalendarScreen() -> RecordCalendarViewController {
-        var pushRecordSearchScreen: () -> RecordSearchViewController = {
+        let pushRecordSearchScreen: () -> RecordSearchViewController = {
             let reactor: RecordSearchReactor = .init()
             return .init(reactor: reactor)
         }
