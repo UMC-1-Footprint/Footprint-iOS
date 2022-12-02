@@ -56,5 +56,6 @@ class FootprintButton: UIButton {
     
     func setupEnabled(isEnabled: Bool) {
         backgroundColor = isEnabled ? FootprintIOSAsset.Colors.blueM.color : FootprintIOSAsset.Colors.whiteD.color
+        self.isEnabled = isEnabled
     }
 }

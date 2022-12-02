@@ -347,15 +347,6 @@ class InfoViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap(\.userInfo?.birth)
-            .withUnretained(self)
-            .bind { owner, birth in
-                owner.birthSelectView.selectLabel.text = birth
-                owner.birthSelectView.selectLabel.textColor = FootprintIOSAsset.Colors.blackM.color
-            }
-            .disposed(by: disposeBag)
-        
-        reactor.state
             .compactMap(\.userInfo)
             .withUnretained(self)
             .bind { (this, info) in
@@ -366,8 +357,7 @@ class InfoViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map(\.birth)
-            .skip(1)
+            .compactMap(\.birth)
             .withUnretained(self)
             .bind { (owner, birth) in
                 print(birth)

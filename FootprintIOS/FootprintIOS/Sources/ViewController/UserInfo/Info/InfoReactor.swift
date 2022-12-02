@@ -20,7 +20,7 @@ class InfoReactor: Reactor {
 
     struct State {
         var userInfo: InfoModel?
-        var birth: String = ""
+        var birth: String?
     }
 
     var initialState: State
