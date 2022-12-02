@@ -85,12 +85,20 @@ final class BirthBottomSheetViewController: BottomSheetViewController, View {
     func bind(reactor: BirthBottomSheetReactor) {
         completeButton.rx.tap
             .withUnretained(self)
-            .bind { owner, _ in
+            .map { (owner, _) -> String in
                 let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
+                dateFormatter.dateFormat = "yyyy년 MM월 dd일"
                 let birth = dateFormatter.string(from: owner.datePicker.date)
-                print(birth)
-                
+                return birth
+            }
+            .map { .tapDoneButton($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.dismiss)
+            .withUnretained(self)
+            .bind { (owner, _) in
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)

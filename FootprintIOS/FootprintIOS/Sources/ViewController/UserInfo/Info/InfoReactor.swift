@@ -15,16 +15,20 @@ class InfoReactor: Reactor {
 
     enum Mutation {
         case setUserInfo(InfoModel)
+        case updateBirth(String)
     }
 
     struct State {
         var userInfo: InfoModel?
+        var birth: String = ""
     }
 
     var initialState: State
+    var service: InfoServiceProtocol
 
-    init() {
+    init(service: InfoServiceProtocol) {
         self.initialState = State()
+        self.service = service
     }
 
     func mutate(action: Action) -> Observable<Mutation> {
@@ -33,6 +37,17 @@ class InfoReactor: Reactor {
             return .just(.setUserInfo(info))
         }
     }
+    
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let event = service.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case .updateBirth(let birth):
+                return .just(.updateBirth(birth))
+            }
+        }
+        
+        return Observable.merge(mutation, event)
+    }
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
@@ -40,8 +55,16 @@ class InfoReactor: Reactor {
         switch mutation {
         case .setUserInfo(let info):
             newState.userInfo = info
+        case .updateBirth(let birth):
+            newState.birth = birth
         }
 
         return newState
+    }
+}
+
+extension InfoReactor {
+    func reactorForBirth() -> BirthBottomSheetReactor {
+        return BirthBottomSheetReactor(service: service)
     }
 }

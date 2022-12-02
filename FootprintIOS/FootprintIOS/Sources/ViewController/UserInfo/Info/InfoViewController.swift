@@ -10,6 +10,7 @@ import UIKit
 
 import ReactorKit
 import RxGesture
+import RxCocoa
 import Then
 
 enum GenderType: Int {
@@ -36,7 +37,6 @@ class InfoViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     var pushGoalScreen: () -> GoalViewController
-    
     
     // MARK: - UI Components
     
@@ -340,7 +340,7 @@ class InfoViewController: NavigationBarViewController, View {
             .when(.recognized)
             .withUnretained(self)
             .bind { this, _ in
-                let reactor = BirthBottomSheetReactor.init(state: .init())
+                let reactor = reactor.reactorForBirth()
                 let birthBottomSheet = BirthBottomSheetViewController(reactor: reactor)
                 this.present(birthBottomSheet, animated: true)
             }
@@ -362,6 +362,17 @@ class InfoViewController: NavigationBarViewController, View {
                 this.goToGoalScreen()
                 // infoModel을 goalVC.~ 프로퍼티로 넘겨줌
                 print(info)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.birth)
+            .skip(1)
+            .withUnretained(self)
+            .bind { (owner, birth) in
+                print(birth)
+                owner.birthSelectView.selectLabel.text = birth
+                owner.birthSelectView.selectLabel.textColor = FootprintIOSAsset.Colors.blackM.color
             }
             .disposed(by: disposeBag)
     }

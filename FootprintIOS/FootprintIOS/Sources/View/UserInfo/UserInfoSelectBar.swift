@@ -8,6 +8,8 @@
 
 import UIKit
 
+import ReactorKit
+
 enum UserInfoSelectBarType {
     case birth
     case goalTime

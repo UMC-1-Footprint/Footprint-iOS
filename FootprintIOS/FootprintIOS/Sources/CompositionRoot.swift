@@ -92,7 +92,7 @@ extension CompositionRoot {
     
         var pushInfoScreen: () -> InfoViewController
         pushInfoScreen = {
-            let reactor = InfoReactor.init()
+            let reactor = InfoReactor.init(service: InfoService())
             let controller = InfoViewController(reactor: reactor,
                                                 pushGoalScreen: pushGoalScreen)
             

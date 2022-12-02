@@ -115,8 +115,8 @@ class BottomSheetViewController: BaseViewController {
         backgroundView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
-            .bind { this, _ in
-                this.dismiss(animated: true)
+            .bind { owner, _ in
+                owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
     }
