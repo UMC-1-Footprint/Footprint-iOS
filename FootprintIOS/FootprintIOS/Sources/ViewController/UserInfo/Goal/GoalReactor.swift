@@ -26,9 +26,11 @@ class GoalReactor: Reactor {
     }
     
     var initialState: State
+    var service: InfoServiceProtocol
 
-    init() {
+    init(service: InfoServiceProtocol) {
         self.initialState = State()
+        self.service = service
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

@@ -19,7 +19,7 @@ class InfoReactor: Reactor {
     }
 
     struct State {
-        var userInfo: InfoModel?
+        var userInfo: InfoModel = InfoModel(nickname: "", sex: "", birth: "", height: 0, weight: 0)
         var birth: String?
     }
 
@@ -41,8 +41,12 @@ class InfoReactor: Reactor {
     func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
         let event = service.event.flatMap { event -> Observable<Mutation> in
             switch event {
-            case .updateBirth(let birth):
-                return .just(.updateBirth(birth))
+            case .updateInfo(type: let type, content: let birth):
+                if type == .birth {
+                    return .just(.updateBirth(birth))
+                } else {
+                    return .never()
+                }
             }
         }
         
@@ -66,5 +70,9 @@ class InfoReactor: Reactor {
 extension InfoReactor {
     func reactorForBirth() -> BirthBottomSheetReactor {
         return BirthBottomSheetReactor(service: service)
+    }
+    
+    func reactorForGoal() -> GoalReactor {
+        return GoalReactor(service: service)
     }
 }

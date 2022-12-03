@@ -309,17 +309,6 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     func bind(reactor: InfoReactor) {
-        Observable.combineLatest(
-            nicknameTextField.rx.text,
-            genderSegmentControl.rx.selectedSegmentIndex
-        )
-        .map { !($0.0 == "") && $0.1 != -1 }
-        .withUnretained(self)
-        .bind { owner, bool in
-            owner.bottomButton.setupEnabled(isEnabled: bool)
-        }
-        .disposed(by: disposeBag)
-        
         bottomButton.rx.tap
             .withUnretained(self)
             .map { (owner, _) -> InfoModel in
@@ -336,6 +325,15 @@ class InfoViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        bottomButton.rx.tap
+            .withUnretained(self)
+            .bind { this, _ in
+                reactor.service.updateUserInfo(userInfo: reactor.currentState.userInfo)
+                let vc = GoalViewController(reactor: reactor.reactorForGoal())
+                this.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         birthSelectView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
@@ -343,16 +341,6 @@ class InfoViewController: NavigationBarViewController, View {
                 let reactor = reactor.reactorForBirth()
                 let birthBottomSheet = BirthBottomSheetViewController(reactor: reactor)
                 this.present(birthBottomSheet, animated: true)
-            }
-            .disposed(by: disposeBag)
-        
-        reactor.state
-            .compactMap(\.userInfo)
-            .withUnretained(self)
-            .bind { (this, info) in
-                this.goToGoalScreen()
-                // infoModel을 goalVC.~ 프로퍼티로 넘겨줌
-                print(info)
             }
             .disposed(by: disposeBag)
         
