@@ -9,13 +9,56 @@
 import ReactorKit
 
 class RecordSearchReactor: Reactor {
-    enum Action {}
-    enum Mutation {}
-    struct State {}
+    enum Action {
+        case refresh
+    }
+    
+    enum Mutation {
+        case setSections([RecordSearchSectionModel])
+    }
+    
+    struct State {
+        var sections: [RecordSearchSectionModel] = []
+    }
     
     var initialState: State
     
     init() {
         self.initialState = State()
+    }
+}
+
+extension RecordSearchReactor {
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .refresh:
+            return refreshSections()
+        }
+    }
+    
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+        
+        switch mutation {
+        case let .setSections(sections):
+            newState.sections = sections
+        }
+        
+        return newState
+    }
+    
+    func refreshSections() -> Observable<Mutation> {
+        return .just(.setSections(makeSections()))
+    }
+    
+    
+    //TODO: 서버 통신 후 로직 변경
+    private func makeSections() -> [RecordSearchSectionModel] {
+        var items: [RecordSearchItem] = []
+        items.append(.record(.init()))
+        items.append(.record(.init()))
+        items.append(.record(.init()))
+        let section: RecordSearchSectionModel = .init(model: .record(items), items: items)
+        return [section]
     }
 }

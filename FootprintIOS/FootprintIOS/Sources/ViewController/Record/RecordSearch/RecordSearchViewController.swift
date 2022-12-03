@@ -11,6 +11,9 @@ import ReactorKit
 import RxDataSources
 
 class RecordSearchViewController: NavigationBarViewController, View {
+
+    // MARK: - Properties
+    
     typealias Reactor = RecordSearchReactor
     
     typealias DataSource = RxCollectionViewSectionedReloadDataSource<RecordSearchSectionModel>
@@ -29,6 +32,13 @@ class RecordSearchViewController: NavigationBarViewController, View {
         }
     }
     
+    // MARK: - UI Components
+    
+    let searchView: UIView = .init()
+    let searchTextField: UITextField = .init()
+    let imageView: UIImageView = .init()
+    let collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -45,8 +55,42 @@ class RecordSearchViewController: NavigationBarViewController, View {
         setNavigationBarHidden(true)
     }
     
-    func bind(reactor: Reactor) {
+    override func setupProperty() {
+        super.setupProperty()
+        collectionView.backgroundColor = FootprintIOSAsset.Colors.whiteBG.color
+        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
+    }
+    
+    override func setupHierarchy() {
+        super.setupHierarchy()
         
+        contentView.addSubviews([collectionView])
+    }
+    
+    override func setupLayout() {
+        super.setupLayout()
+        
+        collectionView.snp.makeConstraints {
+            $0.top.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+    
+    func bind(reactor: Reactor) {
+        rx.viewWillAppear
+            .map { _ in .refresh }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.setDataSource(dataSource).disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.sections)
+            .withUnretained(self)
+            .bind { this, sections in
+                this.dataSource.setSections(sections)
+                this.collectionView.collectionViewLayout = this.makeCompositionLayout(from: sections)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -75,9 +119,12 @@ extension RecordSearchViewController {
     
     func makeRecordLayoutSection(from items: [RecordSearchItem]) -> NSCollectionLayoutSection {
         let layoutItems: [NSCollectionLayoutItem] = items.map { item in
-            .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(200)))
+            let layoutItem: NSCollectionLayoutItem = .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(104)))
+            layoutItem.contentInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)
+            return layoutItem
         }
         let layoutGroup: NSCollectionLayoutGroup = .vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)), subitems: layoutItems)
+        layoutGroup.interItemSpacing = .fixed(12)
         let layoutSection: NSCollectionLayoutSection = .init(group: layoutGroup)
         return layoutSection
     }
