@@ -25,6 +25,7 @@ class GoalReactor: Reactor {
         var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
         var walk: String?
         var goalWalk: String?
+        var isEnabledDoneButton: [Bool] = [false, false, false]
     }
     
     var initialState: State
@@ -68,10 +69,13 @@ class GoalReactor: Reactor {
         case .updateDayButton(let day):
             newState.day = day
             newState.isSelectedButtons[day] = !newState.isSelectedButtons[day]
+            newState.isEnabledDoneButton[0] = newState.isSelectedButtons.filter { $0 }.count > 0
         case .updateWalk(let walk):
             newState.walk = walk
+            newState.isEnabledDoneButton[1] = true
         case .updateGoalWalk(let goalWalk):
             newState.goalWalk = goalWalk
+            newState.isEnabledDoneButton[2] = true
         }
         
         return newState

@@ -30,7 +30,6 @@ protocol InfoServiceProtocol {
 }
 
 class InfoService: InfoServiceProtocol {
-    
     let event = PublishSubject<InfoEvent>()
     
     private var userInfo: InfoModel?
@@ -47,12 +46,12 @@ class InfoService: InfoServiceProtocol {
         return .just(birth)
     }
     
-    func updateWalk(to walk: String) -> RxSwift.Observable<String> {
+    func updateWalk(to walk: String) -> Observable<String> {
         event.onNext(.updateInfo(type: .walk, content: walk))
         return .just(walk)
     }
     
-    func updateGoalWalk(to goalWalk: String) -> RxSwift.Observable<String> {
+    func updateGoalWalk(to goalWalk: String) -> Observable<String> {
         event.onNext(.updateInfo(type: .goalWalk, content: goalWalk))
         return .just(goalWalk)
     }

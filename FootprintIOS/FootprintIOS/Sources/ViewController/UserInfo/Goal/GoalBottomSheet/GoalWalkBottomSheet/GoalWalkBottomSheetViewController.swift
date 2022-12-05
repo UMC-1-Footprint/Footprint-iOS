@@ -33,6 +33,8 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
         $0.axis = .vertical
     }
     
+    private var goalWalkLabels = [UILabel]()
+    
     // MARK: - Initializer
     
     init(reactor: Reactor) {
@@ -49,13 +51,6 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
     override func setupProperty() {
         super.setupProperty()
         
-        for idx in 0..<5 {
-            let goalWalkLabel = UILabel().then {
-                $0.text = texts[idx]
-                $0.font = .systemFont(ofSize: 14)
-            }
-            stackView.addArrangedSubview(goalWalkLabel)
-        }
     }
     
     override func setupHierarchy() {
@@ -83,9 +78,40 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
         }
     }
     
+    private func setGoalWalkLabels() {
+        for idx in 0..<5 {
+            let goalWalkLabel = UILabel().then {
+                $0.text = texts[idx]
+                $0.font = .systemFont(ofSize: 14)
+            }
+            stackView.addArrangedSubview(goalWalkLabel)
+            goalWalkLabels.append(goalWalkLabel)
+        }
+    }
+    
     // MARK: - Methods
     
     func bind(reactor: GoalWalkBottomSheetReactor) {
+        setGoalWalkLabels()
         
+        for goalWalk in 0..<5 {
+            goalWalkLabels[goalWalk].rx.tapGesture()
+                .when(.recognized)
+                .withUnretained(self)
+                .map { owner, _ -> String in
+                    return owner.texts[goalWalk]
+                }
+                .map { .tapGoalWalkTime($0) }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        }
+        
+        reactor.state
+            .map(\.dismiss)
+            .withUnretained(self)
+            .bind { owner, _ in
+                owner.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }

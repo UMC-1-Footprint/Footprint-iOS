@@ -67,7 +67,7 @@ class GoalViewController: NavigationBarViewController, View {
     private let goalWalkSelectView = UserInfoSelectBar(type: .goalTime)
     private let walkSelectView  = UserInfoSelectBar(type: .time)
     
-    private lazy var bottomButton: UIButton = FootprintButton.init(type: .complete)
+    private lazy var bottomButton = FootprintButton.init(type: .complete)
 
     // MARK: - Initializer
     
@@ -89,6 +89,8 @@ class GoalViewController: NavigationBarViewController, View {
         
         pageStackView.addArrangedSubview(unSelectedPageCircle)
         pageStackView.addArrangedSubview(selectedPageCircle)
+        
+        bottomButton.setupEnabled(isEnabled: false)
     }
     
     override func setupHierarchy() {
@@ -258,6 +260,15 @@ class GoalViewController: NavigationBarViewController, View {
             .withUnretained(self)
             .bind { owner, walk in
                 owner.walkSelectView.setContentText(text: walk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isEnabledDoneButton)
+            .withUnretained(self)
+            .bind { owner, isEnabled in
+                let isEnabled = isEnabled.allSatisfy { $0 }
+                owner.bottomButton.setupEnabled(isEnabled: isEnabled)
             }
             .disposed(by: disposeBag)
     }

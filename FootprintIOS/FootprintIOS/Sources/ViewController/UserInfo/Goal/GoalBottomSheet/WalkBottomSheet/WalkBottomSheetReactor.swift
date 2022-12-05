@@ -9,9 +9,8 @@
 import ReactorKit
 
 class WalkBottomSheetReactor: Reactor {
-    
     enum Action {
-        case tapWalkButton(String)
+        case tapWalkTime(String)
     }
     
     enum Mutation {
@@ -35,7 +34,7 @@ class WalkBottomSheetReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapWalkButton(let walk):
+        case .tapWalkTime(let walk):
             return .concat([
                 service.updateWalk(to: walk).map { _ in .dismiss },
                 .just(.updateWalkInfo(walk))

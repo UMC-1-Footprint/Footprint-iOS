@@ -102,7 +102,7 @@ final class WalkBottomSheetViewController: BottomSheetViewController,View {
                 .map { owner, _ -> String in
                     return owner.texts[walk]
                 }
-                .map { .tapWalkButton($0) }
+                .map { .tapWalkTime($0) }
                 .bind(to: reactor.action)
                 .disposed(by: disposeBag)
         }
