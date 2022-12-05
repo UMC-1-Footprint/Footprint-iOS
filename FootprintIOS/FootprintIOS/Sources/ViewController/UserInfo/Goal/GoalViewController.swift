@@ -198,7 +198,7 @@ class GoalViewController: NavigationBarViewController, View {
         
         bottomButton.rx.tap
             .withUnretained(self)
-            .map { (this, _) -> GoalModel in
+            .map { owner, _ -> GoalModel in
                 let info = GoalModel(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
                                      walkGoalTime: 0,
                                      walkTimeSlot: 0)
@@ -213,7 +213,7 @@ class GoalViewController: NavigationBarViewController, View {
             .when(.recognized)
             .withUnretained(self)
             .bind { owner, _ in
-                let reactor = WalkBottomSheetReactor.init()
+                let reactor = reactor.reactorForWalk()
                 let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
                 owner.present(walkBottomSheet, animated: true)
             }
@@ -223,7 +223,7 @@ class GoalViewController: NavigationBarViewController, View {
             .when(.recognized)
             .withUnretained(self)
             .bind { owner, _ in
-                let reactor = GoalWalkBottomSheetReactor.init()
+                let reactor = reactor.reactorForGoalWalk()
                 let goalWalkBottomSheet = GoalWalkBottomSheetViewController(reactor: reactor)
                 owner.present(goalWalkBottomSheet, animated: true)
             }
@@ -232,24 +232,32 @@ class GoalViewController: NavigationBarViewController, View {
         reactor.state
             .compactMap(\.day)
             .withUnretained(self)
-            .bind { (this, day) in
-                this.dayButtons[day].isSelected = reactor.currentState.isSelectedButtons[day]
+            .bind { owner, day in
+                owner.dayButtons[day].isSelected = reactor.currentState.isSelectedButtons[day]
                 
                 if reactor.currentState.isSelectedButtons[day] {
-                    this.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
-                    this.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
+                    owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
+                    owner.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
                 } else {
-                    this.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
-                    this.dayButtons[day].backgroundColor = .white
+                    owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+                    owner.dayButtons[day].backgroundColor = .white
                 }
             }
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap(\.goalInfo)
+            .compactMap(\.goalWalk)
             .withUnretained(self)
-            .bind { (this, info) in
-                print(info)
+            .bind { owner, goalWalk in
+                owner.goalWalkSelectView.setContentText(text: goalWalk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.walk)
+            .withUnretained(self)
+            .bind { owner, walk in
+                owner.walkSelectView.setContentText(text: walk)
             }
             .disposed(by: disposeBag)
     }

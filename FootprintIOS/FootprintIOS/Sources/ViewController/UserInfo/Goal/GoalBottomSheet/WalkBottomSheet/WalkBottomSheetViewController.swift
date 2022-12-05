@@ -34,6 +34,8 @@ final class WalkBottomSheetViewController: BottomSheetViewController,View {
         $0.axis = .vertical
     }
     
+    private var walkLabels = [UILabel].init()
+    
     // MARK: - Initializer
     
     init(reactor: Reactor) {
@@ -50,13 +52,6 @@ final class WalkBottomSheetViewController: BottomSheetViewController,View {
     override func setupProperty() {
         super.setupProperty()
         
-        for idx in 0..<7 {
-            let walkLabel = UILabel().then {
-                $0.text = texts[idx]
-                $0.font = .systemFont(ofSize: 14)
-            }
-            stackView.addArrangedSubview(walkLabel)
-        }
     }
     
     override func setupHierarchy() {
@@ -84,9 +79,40 @@ final class WalkBottomSheetViewController: BottomSheetViewController,View {
         }
     }
     
+    private func setWalkLabels() {
+        for idx in 0..<7 {
+            let walkLabel = UILabel().then {
+                $0.text = texts[idx]
+                $0.font = .systemFont(ofSize: 14)
+            }
+            stackView.addArrangedSubview(walkLabel)
+            walkLabels.append(walkLabel)
+        }
+    }
+    
     // MARK: - Methods
     
     func bind(reactor: WalkBottomSheetReactor) {
+        setWalkLabels()
         
+        for walk in 0..<7 {
+            walkLabels[walk].rx.tapGesture()
+                .when(.recognized)
+                .withUnretained(self)
+                .map { owner, _ -> String in
+                    return owner.texts[walk]
+                }
+                .map { .tapWalkButton($0) }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        }
+        
+        reactor.state
+            .map(\.dismiss)
+            .withUnretained(self)
+            .bind { owner, _ in
+                owner.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }

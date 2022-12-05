@@ -16,13 +16,15 @@ class GoalReactor: Reactor {
     
     enum Mutation {
         case updateDayButton(Int)
-        case setInfo(GoalModel)
+        case updateWalk(String)
+        case updateGoalWalk(String)
     }
     
     struct State {
         var day: Int?
         var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
-        var goalInfo: GoalModel?
+        var walk: String?
+        var goalWalk: String?
     }
     
     var initialState: State
@@ -38,8 +40,25 @@ class GoalReactor: Reactor {
         case .tapDayButton(let day):
             return .just(.updateDayButton(day))
         case .tapDoneButton(let info):
-            return .just(.setInfo(info))
+            return updateInfoMutation(info)
         }
+    }
+    
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let event = service.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case .updateInfo(type: let type, content: let content):
+                if type == .walk {
+                    return .just(.updateWalk(content))
+                } else if type == .goalWalk {
+                    return .just(.updateGoalWalk(content))
+                } else {
+                    return .never()
+                }
+            }
+        }
+        
+        return Observable.merge(mutation, event)
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
@@ -49,10 +68,29 @@ class GoalReactor: Reactor {
         case .updateDayButton(let day):
             newState.day = day
             newState.isSelectedButtons[day] = !newState.isSelectedButtons[day]
-        case .setInfo(let info):
-            newState.goalInfo = info
+        case .updateWalk(let walk):
+            newState.walk = walk
+        case .updateGoalWalk(let goalWalk):
+            newState.goalWalk = goalWalk
         }
         
         return newState
+    }
+}
+
+extension GoalReactor {
+    func updateInfoMutation(_ goalInfo: GoalModel) -> Observable<Mutation> {
+        service.updateGoalInfo(goalInfo: goalInfo)
+        service.createInfo()
+        
+        return .empty()
+    }
+    
+    func reactorForWalk() -> WalkBottomSheetReactor {
+        return WalkBottomSheetReactor(service: service)
+    }
+    
+    func reactorForGoalWalk() -> GoalWalkBottomSheetReactor {
+        return GoalWalkBottomSheetReactor(service: service)
     }
 }

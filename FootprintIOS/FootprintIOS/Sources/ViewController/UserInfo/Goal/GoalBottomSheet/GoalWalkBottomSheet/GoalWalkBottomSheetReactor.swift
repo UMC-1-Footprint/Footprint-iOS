@@ -22,8 +22,10 @@ class GoalWalkBottomSheetReactor: Reactor {
     }
     
     var initialState: State
+    var service: InfoServiceProtocol
     
-    init() {
+    init(service: InfoServiceProtocol) {
         self.initialState = State()
+        self.service = service
     }
 }

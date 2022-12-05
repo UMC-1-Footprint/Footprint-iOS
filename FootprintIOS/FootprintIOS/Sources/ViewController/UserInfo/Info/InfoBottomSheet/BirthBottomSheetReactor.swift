@@ -35,10 +35,7 @@ class BirthBottomSheetReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .tapDoneButton(let birth):
-            return .concat([
-                service.updateBirth(to: birth).map { _ in .dismiss } ,
-                .just(.dismiss)
-            ])
+            return service.updateBirth(to: birth).map { _ in .dismiss }
         }
     }
     

@@ -171,6 +171,8 @@ class InfoViewController: NavigationBarViewController, View {
         }
         
         bodyInfoStackView.addArrangedSubviews(heightTextField, heightLabel, weightTextField, weightLabel)
+        
+        bottomButton.setupEnabled(isEnabled: false)
     }
     
     
@@ -309,9 +311,20 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     func bind(reactor: InfoReactor) {
+        Observable.combineLatest(
+            nicknameTextField.rx.text,
+            genderSegmentControl.rx.selectedSegmentIndex
+        )
+        .map { !($0.0 == "") && ($0.1 != -1) }
+        .withUnretained(self)
+        .bind { owner, bool in
+            owner.bottomButton.setupEnabled(isEnabled: bool)
+        }
+        .disposed(by: disposeBag)
+        
         bottomButton.rx.tap
             .withUnretained(self)
-            .map { (owner, _) -> InfoModel in
+            .map { owner, _ -> InfoModel in
                 let idx = owner.genderSegmentControl.selectedSegmentIndex
                 let gender = GenderType(rawValue: idx)?.genderType
                 let info = InfoModel(nickname: owner.nicknameTextField.text ?? "",
@@ -327,30 +340,27 @@ class InfoViewController: NavigationBarViewController, View {
         
         bottomButton.rx.tap
             .withUnretained(self)
-            .bind { this, _ in
-                reactor.service.updateUserInfo(userInfo: reactor.currentState.userInfo)
+            .bind { owner, _ in
                 let vc = GoalViewController(reactor: reactor.reactorForGoal())
-                this.navigationController?.pushViewController(vc, animated: true)
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
         
         birthSelectView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
-            .bind { this, _ in
+            .bind { owner, _ in
                 let reactor = reactor.reactorForBirth()
                 let birthBottomSheet = BirthBottomSheetViewController(reactor: reactor)
-                this.present(birthBottomSheet, animated: true)
+                owner.present(birthBottomSheet, animated: true)
             }
             .disposed(by: disposeBag)
         
         reactor.state
             .compactMap(\.birth)
             .withUnretained(self)
-            .bind { (owner, birth) in
-                print(birth)
-                owner.birthSelectView.selectLabel.text = birth
-                owner.birthSelectView.selectLabel.textColor = FootprintIOSAsset.Colors.blackM.color
+            .bind { owner, birth in
+                owner.birthSelectView.setContentText(text: birth)
             }
             .disposed(by: disposeBag)
     }

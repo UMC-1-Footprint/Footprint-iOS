@@ -9,22 +9,51 @@
 import ReactorKit
 
 class WalkBottomSheetReactor: Reactor {
+    
     enum Action {
-        
+        case tapWalkButton(String)
     }
     
     enum Mutation {
-        
+        case updateWalkInfo(String)
+        case dismiss
     }
     
     struct State {
-        
+        var walk: String?
+        var walkNum: Int?
+        var dismiss: Bool = false
     }
     
     var initialState: State
+    var service: InfoServiceProtocol
     
-    init() {
+    init(service: InfoServiceProtocol) {
         self.initialState = State()
+        self.service = service
+    }
+    
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .tapWalkButton(let walk):
+            return .concat([
+                service.updateWalk(to: walk).map { _ in .dismiss },
+                .just(.updateWalkInfo(walk))
+            ])
+        }
+    }
+    
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+        
+        switch mutation {
+        case .updateWalkInfo(let walk):
+            newState.walk = walk
+        case .dismiss:
+            newState.dismiss = true
+        }
+        
+        return newState
     }
 }
 

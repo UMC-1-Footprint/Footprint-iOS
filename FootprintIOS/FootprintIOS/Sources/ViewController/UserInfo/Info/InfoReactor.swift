@@ -14,12 +14,10 @@ class InfoReactor: Reactor {
     }
 
     enum Mutation {
-        case setUserInfo(InfoModel)
         case updateBirth(String)
     }
 
     struct State {
-        var userInfo: InfoModel = InfoModel(nickname: "", sex: "", birth: "", height: 0, weight: 0)
         var birth: String?
     }
 
@@ -33,8 +31,8 @@ class InfoReactor: Reactor {
 
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapDoneButton(let info):
-            return .just(.setUserInfo(info))
+        case .tapDoneButton(let userInfo):
+            return updateUserInfoMutation(userInfo)
         }
     }
     
@@ -57,8 +55,6 @@ class InfoReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .setUserInfo(let info):
-            newState.userInfo = info
         case .updateBirth(let birth):
             newState.birth = birth
         }
@@ -68,6 +64,12 @@ class InfoReactor: Reactor {
 }
 
 extension InfoReactor {
+    func updateUserInfoMutation(_ userInfo: InfoModel) -> Observable<Mutation> {
+        service.updateUserInfo(userInfo: userInfo)
+        
+        return .empty()
+    }
+    
     func reactorForBirth() -> BirthBottomSheetReactor {
         return BirthBottomSheetReactor(service: service)
     }
