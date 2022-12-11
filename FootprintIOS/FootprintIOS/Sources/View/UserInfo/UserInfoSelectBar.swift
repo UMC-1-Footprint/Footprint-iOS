@@ -96,7 +96,7 @@ class UserInfoSelectBar: BaseView {
 
 
 extension UserInfoSelectBar {
-    func setContentText(text: String) {
+    func update(text: String) {
         selectLabel.text = text
         selectLabel.textColor = FootprintIOSAsset.Colors.blackM.color
     }

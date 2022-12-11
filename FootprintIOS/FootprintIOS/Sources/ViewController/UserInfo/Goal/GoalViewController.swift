@@ -232,17 +232,19 @@ class GoalViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap(\.day)
+            .map(\.isSelectedButtons)
             .withUnretained(self)
-            .bind { owner, day in
-                owner.dayButtons[day].isSelected = reactor.currentState.isSelectedButtons[day]
-                
-                if reactor.currentState.isSelectedButtons[day] {
-                    owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
-                    owner.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
-                } else {
-                    owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
-                    owner.dayButtons[day].backgroundColor = .white
+            .bind { owner, isSelectedDays in
+                for day in 0..<7 {
+                    owner.dayButtons[day].isSelected = isSelectedDays[day]
+                    
+                    if isSelectedDays[day] {
+                        owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
+                        owner.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
+                    } else {
+                        owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+                        owner.dayButtons[day].backgroundColor = .white
+                    }
                 }
             }
             .disposed(by: disposeBag)
@@ -251,7 +253,7 @@ class GoalViewController: NavigationBarViewController, View {
             .compactMap(\.goalWalk)
             .withUnretained(self)
             .bind { owner, goalWalk in
-                owner.goalWalkSelectView.setContentText(text: goalWalk)
+                owner.goalWalkSelectView.update(text: goalWalk)
             }
             .disposed(by: disposeBag)
         
@@ -259,7 +261,7 @@ class GoalViewController: NavigationBarViewController, View {
             .compactMap(\.walk)
             .withUnretained(self)
             .bind { owner, walk in
-                owner.walkSelectView.setContentText(text: walk)
+                owner.walkSelectView.update(text: walk)
             }
             .disposed(by: disposeBag)
         

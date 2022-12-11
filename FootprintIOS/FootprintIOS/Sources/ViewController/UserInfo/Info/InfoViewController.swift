@@ -360,7 +360,7 @@ class InfoViewController: NavigationBarViewController, View {
             .compactMap(\.birth)
             .withUnretained(self)
             .bind { owner, birth in
-                owner.birthSelectView.setContentText(text: birth)
+                owner.birthSelectView.update(text: birth)
             }
             .disposed(by: disposeBag)
     }

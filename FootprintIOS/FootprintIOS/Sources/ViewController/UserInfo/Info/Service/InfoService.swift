@@ -8,14 +8,10 @@
 
 import RxSwift
 
-enum InfoType {
-    case birth
-    case walk
-    case goalWalk
-}
-
 enum InfoEvent {
-    case updateInfo(type: InfoType, content: String)
+    case updateBirth(content: String)
+    case updateWalk(content: String)
+    case updateGoalWalk(content: String)
 }
 
 protocol InfoServiceProtocol {
@@ -42,17 +38,17 @@ class InfoService: InfoServiceProtocol {
     }
     
     func updateBirth(to birth: String) -> Observable<String> {
-        event.onNext(.updateInfo(type: .birth, content: birth))
+        event.onNext(.updateBirth(content: birth))
         return .just(birth)
     }
     
     func updateWalk(to walk: String) -> Observable<String> {
-        event.onNext(.updateInfo(type: .walk, content: walk))
+        event.onNext(.updateWalk(content: walk))
         return .just(walk)
     }
     
     func updateGoalWalk(to goalWalk: String) -> Observable<String> {
-        event.onNext(.updateInfo(type: .goalWalk, content: goalWalk))
+        event.onNext(.updateGoalWalk(content: goalWalk))
         return .just(goalWalk)
     }
     

@@ -21,7 +21,6 @@ class GoalReactor: Reactor {
     }
     
     struct State {
-        var day: Int?
         var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
         var walk: String?
         var goalWalk: String?
@@ -48,14 +47,12 @@ class GoalReactor: Reactor {
     func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
         let event = service.event.flatMap { event -> Observable<Mutation> in
             switch event {
-            case .updateInfo(type: let type, content: let content):
-                if type == .walk {
-                    return .just(.updateWalk(content))
-                } else if type == .goalWalk {
-                    return .just(.updateGoalWalk(content))
-                } else {
-                    return .never()
-                }
+            case .updateWalk(content: let walk):
+                return .just(.updateWalk(walk))
+            case .updateGoalWalk(content: let goalWalk):
+                return .just(.updateGoalWalk(goalWalk))
+            default:
+                return .never()
             }
         }
         
@@ -67,7 +64,6 @@ class GoalReactor: Reactor {
         
         switch mutation {
         case .updateDayButton(let day):
-            newState.day = day
             newState.isSelectedButtons[day] = !newState.isSelectedButtons[day]
             newState.isEnabledDoneButton[0] = newState.isSelectedButtons.filter { $0 }.count > 0
         case .updateWalk(let walk):
