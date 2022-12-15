@@ -11,7 +11,7 @@ import UIKit
 import ReactorKit
 import Then
 
-class GoalViewController: NavigationBarViewController, View {
+class GoalViewController: BaseViewController, View {
     
     // MARK: - Properties
     

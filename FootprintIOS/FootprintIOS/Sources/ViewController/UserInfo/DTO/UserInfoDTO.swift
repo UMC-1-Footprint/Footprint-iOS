@@ -1,5 +1,5 @@
 //
-//  UserInfoRequest.swift
+//  UserInfoDTO.swift
 //  Footprint-iOS
 //
 //  Created by 김영인 on 2022/11/21.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct UserInfoRequest: Codable {
+struct UserInfoDTO: Codable {
     let nickname,sex,birth: String
     let height,weight: Int
     let dayIdx: [Int]
