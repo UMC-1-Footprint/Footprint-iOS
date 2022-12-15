@@ -6,18 +6,25 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+import UIKit
 import ReactorKit
+import PhotosUI
 
 class FootprintWriteReactor: Reactor {
     enum Action {
-        case editText(String)
+        case text(String)
+        case uploadImage([UIImage])
     }
     
     enum Mutation {
-        case updateText(String)
+        case setSections([ImageSectionModel])
+        case setText(String)
+        case setImages([UIImage])
     }
     
     struct State {
+        var sections: [ImageSectionModel] = []
+        var images: [UIImage] = []
         var text: String = ""
     }
     
@@ -31,8 +38,14 @@ class FootprintWriteReactor: Reactor {
 extension FootprintWriteReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .editText(text):
-            return .just(.updateText(text))
+        case let .text(text):
+            return .just(.setText(text))
+            
+        case let .uploadImage(images):
+            return .concat([
+                .just(.setImages(images)),
+                .just(.setSections(makeSections(from: images)))
+            ])
         }
     }
     
@@ -40,10 +53,25 @@ extension FootprintWriteReactor {
         var newState = state
         
         switch mutation {
-        case let .updateText(text):
+        case let .setSections(sections):
+            newState.sections = sections
+            
+        case let .setText(text):
             newState.text = text
+            
+        case let .setImages(images):
+            newState.images = images
         }
         
         return newState
+    }
+    
+    private func makeSections(from images: [UIImage]) -> [ImageSectionModel] {
+        let items: [ImageItem] = images.map({ (image) -> ImageItem in
+            return .image(.init(image: image))
+        })
+        let section: ImageSectionModel = .init(model: .image(items), items: items)
+        
+        return [section]
     }
 }
