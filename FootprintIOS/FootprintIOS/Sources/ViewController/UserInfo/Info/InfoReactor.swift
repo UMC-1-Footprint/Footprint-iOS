@@ -12,37 +12,67 @@ class InfoReactor: Reactor {
     enum Action {
         case tapDoneButton(InfoModel)
     }
-
-    enum Mutation {
-        case setUserInfo(InfoModel)
-    }
-
-    struct State {
-        var userInfo: InfoModel?
-    }
-
-    var initialState: State
     
-
-    init() {
-        self.initialState = State()
+    enum Mutation {
+        case updateBirth(String)
     }
-
+    
+    struct State {
+        var birth: String?
+    }
+    
+    var initialState: State
+    var service: InfoServiceProtocol
+    
+    init(service: InfoServiceProtocol) {
+        self.initialState = State()
+        self.service = service
+    }
+    
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapDoneButton(let info):
-            return .just(.setUserInfo(info))
+        case .tapDoneButton(let userInfo):
+            return updateUserInfoMutation(userInfo)
         }
     }
-
+    
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let event = service.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case .updateBirth(content: let birth):
+                return .just(.updateBirth(birth))
+            default:
+                return .never()
+            }
+        }
+        
+        return Observable.merge(mutation, event)
+    }
+    
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-
+        
         switch mutation {
-        case .setUserInfo(let info):
-            newState.userInfo = info
+        case .updateBirth(let birth):
+            newState.birth = birth
         }
-
+        
         return newState
+    }
+}
+
+extension InfoReactor {
+    func updateUserInfoMutation(_ userInfo: InfoModel) -> Observable<Mutation> {
+        service.updateUserInfo(userInfo: userInfo)
+        
+        return .empty()
+    }
+    
+    func reactorForBirth() -> BirthBottomSheetReactor {
+        return BirthBottomSheetReactor(service: service)
+    }
+    
+    func reactorForGoal() -> GoalReactor {
+        return GoalReactor(service: service)
     }
 }

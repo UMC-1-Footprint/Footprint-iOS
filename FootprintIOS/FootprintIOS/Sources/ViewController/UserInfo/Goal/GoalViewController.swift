@@ -11,7 +11,7 @@ import UIKit
 import ReactorKit
 import Then
 
-class GoalViewController: NavigationBarViewController, View {
+class GoalViewController: BaseViewController, View {
     
     // MARK: - Properties
     
@@ -53,7 +53,7 @@ class GoalViewController: NavigationBarViewController, View {
         $0.textColor = FootprintIOSAsset.Colors.blackL.color
     }
     
-    private var dayButtons: [UIButton] = []
+    private lazy var dayButtons: [UIButton] = []
     
     private let dayButtonStackView = UIStackView().then {
         $0.spacing = 5
@@ -64,16 +64,16 @@ class GoalViewController: NavigationBarViewController, View {
     private let goalTimeLabel = UserInfoLabel(title: "목표 산책 시간")
     private let timeLabel = UserInfoLabel(title: "산책 시간대")
     
-    private let goalTimeSelectView = UserInfoSelectBar(type: .goalTime)
-    private let timeSelectView  = UserInfoSelectBar(type: .time)
+    private let goalWalkSelectView = UserInfoSelectBar(type: .goalTime)
+    private let walkSelectView  = UserInfoSelectBar(type: .time)
     
-    private lazy var bottomButton: UIButton = FootprintButton.init(type: .complete)
+    private lazy var bottomButton = FootprintButton.init(type: .complete)
 
     // MARK: - Initializer
     
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
-        
+    
         self.reactor = reactor
     }
     
@@ -90,22 +90,7 @@ class GoalViewController: NavigationBarViewController, View {
         pageStackView.addArrangedSubview(unSelectedPageCircle)
         pageStackView.addArrangedSubview(selectedPageCircle)
         
-        for day in ["월", "화", "수", "목", "금", "토", "일"] {
-            let dayButton = UIButton().then {
-                $0.layer.cornerRadius = 20
-                $0.setTitleColor(FootprintIOSAsset.Colors.blackD.color, for: .normal)
-                $0.setTitleColor(.white, for: .selected)
-                $0.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
-                $0.layer.borderWidth = 1
-                $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-            }
-            dayButton.snp.makeConstraints {
-                $0.width.height.equalTo(40)
-            }
-            dayButton.setTitle(day, for: .normal)
-            dayButtons.append(dayButton)
-            dayButtonStackView.addArrangedSubview(dayButton)
-        }
+        bottomButton.setupEnabled(isEnabled: false)
     }
     
     override func setupHierarchy() {
@@ -113,8 +98,8 @@ class GoalViewController: NavigationBarViewController, View {
         
         selectedPageCircle.addSubview(pageNumLabel)
         view.addSubviews([pageStackView, titleLabel, subtitleLabel, goalDayLabel,
-                         dayButtonStackView, goalTimeLabel, goalTimeSelectView, timeLabel,
-                          timeSelectView, bottomButton])
+                         dayButtonStackView, goalTimeLabel, goalWalkSelectView, timeLabel,
+                          walkSelectView, bottomButton])
     }
     
     override func setupLayout() {
@@ -162,17 +147,17 @@ class GoalViewController: NavigationBarViewController, View {
             $0.leading.equalTo(goalDayLabel)
         }
         
-        goalTimeSelectView.snp.makeConstraints {
+        goalWalkSelectView.snp.makeConstraints {
             $0.top.equalTo(goalTimeLabel.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(34)
         }
         
         timeLabel.snp.makeConstraints {
-            $0.top.equalTo(goalTimeSelectView.snp.bottom).offset(34)
+            $0.top.equalTo(goalWalkSelectView.snp.bottom).offset(34)
             $0.leading.equalTo(goalDayLabel)
         }
         
-        timeSelectView.snp.makeConstraints {
+        walkSelectView.snp.makeConstraints {
             $0.top.equalTo(timeLabel.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(34)
         }
@@ -184,8 +169,109 @@ class GoalViewController: NavigationBarViewController, View {
         }
     }
     
+    private func setDayButton() {
+        for day in ["월", "화", "수", "목", "금", "토", "일"] {
+            let dayButton = UIButton().then {
+                $0.layer.cornerRadius = 20
+                $0.setTitleColor(FootprintIOSAsset.Colors.blackD.color, for: .normal)
+                $0.setTitleColor(.white, for: .selected)
+                $0.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+                $0.layer.borderWidth = 1
+                $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+            }
+            dayButton.snp.makeConstraints {
+                $0.width.height.equalTo(40)
+            }
+            dayButton.setTitle(day, for: .normal)
+            dayButtons.append(dayButton)
+            dayButtonStackView.addArrangedSubview(dayButton)
+        }
+    }
+    
     func bind(reactor: GoalReactor) {
-        // Action
-        // State
+        setDayButton()
+        
+        for day in 0..<7 {
+            dayButtons[day].rx.tap
+                .map { .tapDayButton(day) }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        }
+        
+        bottomButton.rx.tap
+            .withUnretained(self)
+            .map { owner, _ -> GoalModel in
+                let info = GoalModel(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                                     walkGoalTime: 0,
+                                     walkTimeSlot: 0)
+                
+                return info
+            }
+            .map { .tapDoneButton($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        walkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = reactor.reactorForWalk()
+                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
+                owner.present(walkBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        goalWalkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = reactor.reactorForGoalWalk()
+                let goalWalkBottomSheet = GoalWalkBottomSheetViewController(reactor: reactor)
+                owner.present(goalWalkBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isSelectedButtons)
+            .withUnretained(self)
+            .bind { owner, isSelectedDays in
+                for day in 0..<7 {
+                    owner.dayButtons[day].isSelected = isSelectedDays[day]
+                    
+                    if isSelectedDays[day] {
+                        owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
+                        owner.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
+                    } else {
+                        owner.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+                        owner.dayButtons[day].backgroundColor = .white
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.goalWalk)
+            .withUnretained(self)
+            .bind { owner, goalWalk in
+                owner.goalWalkSelectView.update(text: goalWalk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.walk)
+            .withUnretained(self)
+            .bind { owner, walk in
+                owner.walkSelectView.update(text: walk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isEnabledDoneButton)
+            .withUnretained(self)
+            .bind { owner, isEnabled in
+                let isEnabled = isEnabled.allSatisfy { $0 }
+                owner.bottomButton.setupEnabled(isEnabled: isEnabled)
+            }
+            .disposed(by: disposeBag)
     }
 }

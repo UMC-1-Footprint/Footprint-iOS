@@ -10,38 +10,87 @@ import ReactorKit
 
 class GoalReactor: Reactor {
     enum Action {
-        case tapBottomButton
+        case tapDayButton(Int)
+        case tapDoneButton(GoalModel)
     }
-
+    
     enum Mutation {
-        case updateIsComplete(Bool)
+        case updateDayButton(Int)
+        case updateWalk(String)
+        case updateGoalWalk(String)
     }
-
+    
     struct State {
-        var isComplete: Bool = false
+        var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
+        var walk: String?
+        var goalWalk: String?
+        var isEnabledDoneButton: [Bool] = [false, false, false]
     }
-
+    
     var initialState: State
+    var service: InfoServiceProtocol
 
-    init() {
+    init(service: InfoServiceProtocol) {
         self.initialState = State()
+        self.service = service
     }
-
+    
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapBottomButton:
-            return .just(.updateIsComplete(true))
+        case .tapDayButton(let day):
+            return .just(.updateDayButton(day))
+        case .tapDoneButton(let info):
+            return updateInfoMutation(info)
         }
     }
-
+    
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let event = service.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case .updateWalk(content: let walk):
+                return .just(.updateWalk(walk))
+            case .updateGoalWalk(content: let goalWalk):
+                return .just(.updateGoalWalk(goalWalk))
+            default:
+                return .never()
+            }
+        }
+        
+        return Observable.merge(mutation, event)
+    }
+    
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-
+        
         switch mutation {
-        case .updateIsComplete(let bool):
-            newState.isComplete = bool
+        case .updateDayButton(let day):
+            newState.isSelectedButtons[day] = !newState.isSelectedButtons[day]
+            newState.isEnabledDoneButton[0] = newState.isSelectedButtons.filter { $0 }.count > 0
+        case .updateWalk(let walk):
+            newState.walk = walk
+            newState.isEnabledDoneButton[1] = true
+        case .updateGoalWalk(let goalWalk):
+            newState.goalWalk = goalWalk
+            newState.isEnabledDoneButton[2] = true
         }
-
+        
         return newState
+    }
+}
+
+extension GoalReactor {
+    func updateInfoMutation(_ goalInfo: GoalModel) -> Observable<Mutation> {
+        service.updateGoalInfo(goalInfo: goalInfo)
+        service.createInfo()
+        
+        return .empty()
+    }
+    
+    func reactorForWalk() -> WalkBottomSheetReactor {
+        return WalkBottomSheetReactor(service: service)
+    }
+    
+    func reactorForGoalWalk() -> GoalWalkBottomSheetReactor {
+        return GoalWalkBottomSheetReactor(service: service)
     }
 }
