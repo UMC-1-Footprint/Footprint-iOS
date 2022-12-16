@@ -6,9 +6,12 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+//  마이페이지 - 요일별 달성률 
+
 import UIKit
 
 import SnapKit
+import Then
 
 class DayAchievementViewController: BaseViewController {
     let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20, setPercentage: true)
@@ -21,6 +24,7 @@ class DayAchievementViewController: BaseViewController {
         $0.axis = .horizontal
         $0.distribution = .equalSpacing
     }
+    let summaryLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +32,15 @@ class DayAchievementViewController: BaseViewController {
         setupGraphView(percentages)
     }
     
+    override func setupProperty() {
+        super.setupProperty()
+        
+        setSummaryLabel(changeText: "수요일")
+    }
+    
     override func setupLayout() {
+        super.setupLayout()
+        
         percentageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(10)
             $0.top.equalToSuperview().inset(10)
@@ -61,14 +73,21 @@ class DayAchievementViewController: BaseViewController {
             $0.top.equalTo(barGraphStackView.snp.bottom).offset(17)
             $0.leading.equalTo(percentageView.snp.trailing).offset(30)
         }
+        
+        summaryLabel.snp.makeConstraints {
+            $0.top.equalTo(dateView.snp.bottom).offset(28)
+            $0.centerX.equalToSuperview()
+        }
     }
     
     override func setupHierarchy() {
+        super.setupHierarchy()
+        
         backgroundView.addSubviews([percentageView, lineView])
-        view.addSubviews([backgroundView, barGraphStackView, dateView])
+        view.addSubviews([backgroundView, barGraphStackView, dateView, summaryLabel])
     }
     
-    func setupGraphView(_ percentages: [Int]) {
+    private func setupGraphView(_ percentages: [Int]) {
         for i in 0...6 {
             let graph = BarGraphView(percentage: percentages[i])
             
@@ -86,5 +105,21 @@ class DayAchievementViewController: BaseViewController {
             
             barGraphStackView.addArrangedSubview(graph)
         }
+    }
+    
+    private func setSummaryLabel(changeText: String) {
+        summaryLabel.textColor = FootprintIOSAsset.Colors.blackM.color
+        summaryLabel.text = "주로 \(changeText)에 산책을 가장 많이 나가요"
+        summaryLabel.font = .systemFont(ofSize: 14)
+        
+        guard let text = summaryLabel.text else { return }
+        let attributeString = NSMutableAttributedString(string: text)
+
+        let font = UIFont.boldSystemFont(ofSize: 14)
+
+        attributeString.addAttribute(.foregroundColor, value: FootprintIOSAsset.Colors.yellowM.color, range: (text as NSString).range(of: changeText))
+        attributeString.addAttribute(.font, value: font, range: (text as NSString).range(of: changeText))
+                
+        summaryLabel.attributedText = attributeString
     }
 }

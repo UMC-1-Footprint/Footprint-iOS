@@ -6,6 +6,8 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+//  마이페이지 - 월별 기록 횟수
+
 import UIKit
 
 import SnapKit
@@ -16,14 +18,23 @@ class MonthRecordViewController: BaseViewController {
     lazy var daysList = setMonth()
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: true)
     let backgroundView = UIView()
-    let lineGraphView = LineGraphView(values: [10,50,10,50,10,50,10])
+    let lineGraphView = LineGraphView(values: [0,20,10,50,30,50,10])
+    let summaryLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
     }
     
+    override func setupProperty() {
+        super.setupProperty()
+        
+        setSummaryLabel(changeText: "56%")
+    }
+    
     override func setupLayout() {
+        super.setupLayout()
+        
         percentageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(10)
             $0.top.equalToSuperview().inset(10)
@@ -56,11 +67,34 @@ class MonthRecordViewController: BaseViewController {
             $0.bottom.equalTo(lineView.snp.bottom)
             $0.centerX.equalTo(lineView)
         }
+        
+        summaryLabel.snp.makeConstraints {
+            $0.top.equalTo(dateView.snp.bottom).offset(28)
+            $0.centerX.equalToSuperview()
+        }
     }
     
     override func setupHierarchy() {
+        super.setupHierarchy()
+        
         backgroundView.addSubviews([percentageView, lineView])
-        view.addSubviews([backgroundView, lineGraphView, dateView])
+        view.addSubviews([backgroundView, lineGraphView, dateView, summaryLabel])
+    }
+    
+    private func setSummaryLabel(changeText: String) {
+        summaryLabel.textColor = FootprintIOSAsset.Colors.blackM.color
+        summaryLabel.text = "이번달엔 \(changeText) 기록했어요"
+        summaryLabel.font = .systemFont(ofSize: 14)
+        
+        guard let text = summaryLabel.text else { return }
+        let attributeString = NSMutableAttributedString(string: text)
+
+        let font = UIFont.boldSystemFont(ofSize: 14)
+
+        attributeString.addAttribute(.foregroundColor, value: FootprintIOSAsset.Colors.yellowM.color, range: (text as NSString).range(of: changeText))
+        attributeString.addAttribute(.font, value: font, range: (text as NSString).range(of: changeText))
+                
+        summaryLabel.attributedText = attributeString
     }
     
     func setMonth() -> [String] {

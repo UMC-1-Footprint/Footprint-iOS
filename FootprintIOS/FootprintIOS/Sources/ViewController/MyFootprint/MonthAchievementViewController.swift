@@ -6,6 +6,8 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+//  마이페이지 - 월별 달성률
+
 import UIKit
 
 class MonthAchievementViewController: BaseViewController {
@@ -19,6 +21,7 @@ class MonthAchievementViewController: BaseViewController {
         $0.axis = .horizontal
         $0.distribution = .equalSpacing
     }
+    let summaryLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +29,15 @@ class MonthAchievementViewController: BaseViewController {
         setupGraphView(percentages)
     }
     
+    override func setupProperty() {
+        super.setupProperty()
+        
+        setSummaryLabel(changeText: "20회")
+    }
+    
     override func setupLayout() {
+        super.setupLayout()
+        
         percentageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(10)
             $0.top.equalToSuperview().inset(10)
@@ -56,14 +67,21 @@ class MonthAchievementViewController: BaseViewController {
         
         dateView.snp.makeConstraints {
             $0.width.equalTo(260)
-            $0.bottom.equalTo(barGraphStackView.snp.bottom).offset(17)
+            $0.top.equalTo(barGraphStackView.snp.bottom).offset(17)
             $0.leading.equalTo(percentageView.snp.trailing).offset(30)
+        }
+        
+        summaryLabel.snp.makeConstraints {
+            $0.top.equalTo(dateView.snp.bottom).offset(28)
+            $0.centerX.equalToSuperview()
         }
     }
     
     override func setupHierarchy() {
+        super.setupHierarchy()
+        
         backgroundView.addSubviews([percentageView, lineView])
-        view.addSubviews([backgroundView, barGraphStackView, dateView])
+        view.addSubviews([backgroundView, barGraphStackView, dateView, summaryLabel])
     }
     
     func setupGraphView(_ percentages: [Int]) {
@@ -102,5 +120,21 @@ class MonthAchievementViewController: BaseViewController {
         }
         monthList.append("이번달")
         return monthList
+    }
+    
+    private func setSummaryLabel(changeText: String) {
+        summaryLabel.textColor = FootprintIOSAsset.Colors.blackM.color
+        summaryLabel.text = "이번달엔 \(changeText) 달성했어요"
+        summaryLabel.font = .systemFont(ofSize: 14)
+        
+        guard let text = summaryLabel.text else { return }
+        let attributeString = NSMutableAttributedString(string: text)
+
+        let font = UIFont.boldSystemFont(ofSize: 14)
+
+        attributeString.addAttribute(.foregroundColor, value: FootprintIOSAsset.Colors.yellowM.color, range: (text as NSString).range(of: changeText))
+        attributeString.addAttribute(.font, value: font, range: (text as NSString).range(of: changeText))
+                
+        summaryLabel.attributedText = attributeString
     }
 }
