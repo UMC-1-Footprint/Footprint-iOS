@@ -47,15 +47,18 @@ class AttainmentRateChartView: BaseView {
     override func draw(_ rect: CGRect) {
         self.backgroundColor = .clear
         
+        let width = self.frame.width
+        let height = self.frame.height
+        
         let endAnglePercentage = petcentageAngle *  360 / 100
         let endAngle = ( CGFloat(endAnglePercentage) / 360 ) * (CGFloat.pi * 2)
         
-        let inlinePath = UIBezierPath(ovalIn: CGRect(x: 10, y: 10, width: self.frame.width - 20, height: self.frame.height-20))
-        inlinePath.lineWidth = 8
+        let inlinePath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height/2), radius: 40, startAngle: 0, endAngle: 360, clockwise: true)
         FootprintIOSAsset.Colors.whiteM.color.set()
+        inlinePath.lineWidth = 8
         inlinePath.stroke()
         
-        let outlinePath = UIBezierPath(arcCenter: CGPoint(x: self.frame.width/2, y: self.frame.height/2), radius: 40, startAngle: (-(.pi) / 2), endAngle: (-(.pi) / 2) + endAngle, clockwise: true)
+        let outlinePath = UIBezierPath(arcCenter: CGPoint(x: width/2, y: height/2), radius: 40, startAngle: (-(.pi) / 2), endAngle: (-(.pi) / 2) + endAngle, clockwise: true)
         outlinePath.lineWidth = 8
         outlinePath.lineCapStyle = .round
         keyColor.set()
