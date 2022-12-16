@@ -7,12 +7,14 @@
 //
 
 import UIKit
+import PhotosUI
+import RxSwift
 import ReactorKit
+import RxDataSources
 
 class FootprintWriteViewController: NavigationBarViewController, View {
+
     // MARK: - Constants
-    
-    typealias Reactor = FootprintWriteReactor
     
     fileprivate struct Text {
         static let cancleButton: String = "취소"
@@ -41,6 +43,21 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         static let addPictureButton: UIColor = FootprintIOSAsset.Colors.blackM.color
     }
     
+    // MARK: - Properties
+    
+    typealias Reactor = FootprintWriteReactor
+    
+    typealias DataSource = RxCollectionViewSectionedReloadDataSource<ImageSectionModel>
+    
+    private lazy var dataSource = DataSource { _, collectionView, indexPath, item -> UICollectionViewCell in
+        switch item {
+        case let .image(reactor):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: ImageCollectionViewCell.self), for: indexPath) as? ImageCollectionViewCell else { return .init() }
+            cell.reactor = reactor
+            return cell
+        }
+    }
+    
     // MARK: - UI Components
     
     let cancleButton: UIButton = .init(type: .system)
@@ -51,6 +68,9 @@ class FootprintWriteViewController: NavigationBarViewController, View {
     let divider2: UIView = .init()
     let addPictureView: AddPictureButtonView = .init()
     lazy var accessoryView: AddPictureButtonView = .init(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.width, height: 44))
+    let flowLayout: UICollectionViewFlowLayout = .init()
+    lazy var collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: flowLayout)
+    
     
     // MARK: - Initializer
     
@@ -95,6 +115,16 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         textView.text = Text.textViewPlaceholder
         textView.textColor = Color.textViewPlaceholder
         textView.inputAccessoryView = accessoryView
+        
+        flowLayout.scrollDirection = .horizontal
+        
+        collectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: ImageCollectionViewCell.self))
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.isPagingEnabled = true
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification , object:nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification , object:nil)
     }
     
     override func setupHierarchy() {
@@ -106,7 +136,8 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             saveButton,
             divider,
             textView,
-            addPictureView
+            addPictureView,
+            collectionView
         ])
     }
     
@@ -136,8 +167,14 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             $0.height.equalTo(1)
         }
         
-        textView.snp.makeConstraints {
+        collectionView.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.height.equalTo(0)
+        }
+        
+        textView.snp.makeConstraints {
+            $0.top.equalTo(collectionView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalToSuperview()
         }
@@ -165,7 +202,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
         textView.rx.text
             .compactMap{$0}
             .debounce(.milliseconds(200), scheduler:MainScheduler.instance)
-            .map { .editText($0) }
+            .map { .text($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -178,5 +215,111 @@ class FootprintWriteViewController: NavigationBarViewController, View {
                 }
             }
             .disposed(by: disposeBag)
+        
+        addPictureView.addPictureButton.rx.tap
+            .withUnretained(self)
+            .bind { this, _ in
+                this.goToPickerScreen()
+            }
+            .disposed(by: disposeBag)
+        
+        accessoryView.addPictureButton.rx.tap
+            .withUnretained(self)
+            .bind { this, _ in
+                this.goToPickerScreen()
+            }
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+        
+        reactor.state.map(\.sections)
+            .bind(to: collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        reactor.state.map(\.sections)
+            .bind { [weak self] sections in
+                self?.showCollectionView(sections: sections)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func showCollectionView(sections: [ImageSectionModel]) {
+        if !sections.isEmpty {
+            self.collectionView.snp.remakeConstraints {
+                $0.top.equalTo(self.divider.snp.bottom).offset(16)
+                $0.leading.trailing.equalToSuperview().inset(24)
+                $0.height.equalTo(self.collectionView.frame.width)
+            }
+        }
+        collectionView.performBatchUpdates(nil)
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        textView.inputAccessoryView?.isHidden = false
+        addPictureView.isHidden = true
+    }
+
+    @objc func keyboardWillHide(notification: NSNotification) {
+        textView.inputAccessoryView?.isHidden = true
+        addPictureView.isHidden = false
+    }
+}
+
+extension FootprintWriteViewController {
+    private func goToPickerScreen() {
+        var configure = PHPickerConfiguration()
+        configure.selectionLimit = 10
+        configure.filter = .images
+        let picker = PHPickerViewController(configuration: configure)
+        picker.delegate = self
+        present(picker, animated: true)
+        view.endEditing(false)
+    }
+}
+
+extension FootprintWriteViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        var images: [UIImage] = []
+        
+        for result in results {
+            let itemProvider = result.itemProvider
+            if itemProvider.canLoadObject(ofClass: UIImage.self) {
+                itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                    DispatchQueue.main.async {
+                        if let image = image as? UIImage {
+                            images.append(image)
+                            if result.hashValue == results.last?.hashValue {
+                                self?.reactor?.action.onNext(.uploadImage(images))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+extension FootprintWriteViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width
+        let height = collectionView.bounds.height
+        
+        return .init(width: width, height: height)
+    }
+}
+
+extension Reactive where Base: FootprintWriteViewController {
+    var show: Binder<[ImageSectionModel]> {
+        return Binder(self.base) { (viewController, sections) in
+            if !sections.isEmpty {
+                viewController.collectionView.snp.remakeConstraints {
+                    $0.top.equalTo(viewController.divider.snp.bottom).offset(16)
+                    $0.leading.trailing.equalToSuperview().inset(24)
+                    $0.height.equalTo(viewController.collectionView.frame.width)
+                }
+            }
+            viewController.collectionView.performBatchUpdates(nil)
+        }
     }
 }

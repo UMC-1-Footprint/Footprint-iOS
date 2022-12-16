@@ -9,6 +9,8 @@
 import UIKit
 
 import ReactorKit
+import RxGesture
+import RxCocoa
 import Then
 
 enum GenderType: Int {
@@ -35,7 +37,6 @@ class InfoViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     var pushGoalScreen: () -> GoalViewController
-    
     
     // MARK: - UI Components
     
@@ -131,8 +132,7 @@ class InfoViewController: NavigationBarViewController, View {
         $0.text = "kg"
     }
     
-    
-    private lazy var bottomButton: UIButton = FootprintButton.init(type: .next)
+    private lazy var bottomButton = FootprintButton.init(type: .next)
     
     // MARK: - Initializer
     
@@ -171,6 +171,8 @@ class InfoViewController: NavigationBarViewController, View {
         }
         
         bodyInfoStackView.addArrangedSubviews(heightTextField, heightLabel, weightTextField, weightLabel)
+        
+        bottomButton.setupEnabled(isEnabled: false)
     }
     
     
@@ -309,29 +311,56 @@ class InfoViewController: NavigationBarViewController, View {
     }
     
     func bind(reactor: InfoReactor) {
+        Observable.combineLatest(
+            nicknameTextField.rx.text,
+            genderSegmentControl.rx.selectedSegmentIndex
+        )
+        .map { !($0.0 == "") && ($0.1 != -1) }
+        .withUnretained(self)
+        .bind { owner, bool in
+            owner.bottomButton.setupEnabled(isEnabled: bool)
+        }
+        .disposed(by: disposeBag)
+        
         bottomButton.rx.tap
             .withUnretained(self)
-            .map { (this, _) -> InfoModel in
-                let idx = this.genderSegmentControl.selectedSegmentIndex
+            .map { owner, _ -> InfoModel in
+                let idx = owner.genderSegmentControl.selectedSegmentIndex
                 let gender = GenderType(rawValue: idx)?.genderType
-                let info = InfoModel(nickname: this.nicknameTextField.text ?? "",
+                let info = InfoModel(nickname: owner.nicknameTextField.text ?? "",
                                      sex: gender ?? "none",
-                                     birth: "1999-12-20",
-                                     height: Int(this.heightTextField.text ?? "0") ?? 0,
-                                     weight: Int(this.weightTextField.text ?? "0") ?? 0)
+                                     birth: owner.birthSelectView.selectLabel.text ?? "",
+                                     height: Int(owner.heightTextField.text ?? "0") ?? 0,
+                                     weight: Int(owner.weightTextField.text ?? "0") ?? 0)
                 return info
             }
             .map { .tapDoneButton($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .map(\.userInfo)
+        bottomButton.rx.tap
             .withUnretained(self)
-            .bind { (this, info) in
-                this.goToGoalScreen()
-                // infoModel을 goalVC.~ 프로퍼티로 넘겨줌
-                print(reactor.currentState)
+            .bind { owner, _ in
+                let vc = GoalViewController(reactor: reactor.reactorForGoal())
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        birthSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = reactor.reactorForBirth()
+                let birthBottomSheet = BirthBottomSheetViewController(reactor: reactor)
+                owner.present(birthBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.birth)
+            .withUnretained(self)
+            .bind { owner, birth in
+                owner.birthSelectView.update(text: birth)
             }
             .disposed(by: disposeBag)
     }

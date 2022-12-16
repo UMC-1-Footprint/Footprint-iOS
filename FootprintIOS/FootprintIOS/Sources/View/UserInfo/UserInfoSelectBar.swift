@@ -8,6 +8,8 @@
 
 import UIKit
 
+import ReactorKit
+
 enum UserInfoSelectBarType {
     case birth
     case goalTime
@@ -89,5 +91,13 @@ class UserInfoSelectBar: BaseView {
             $0.centerY.equalTo(selectBarView)
             $0.width.height.equalTo(20)
         }
+    }
+}
+
+
+extension UserInfoSelectBar {
+    func update(text: String) {
+        selectLabel.text = text
+        selectLabel.textColor = FootprintIOSAsset.Colors.blackM.color
     }
 }
