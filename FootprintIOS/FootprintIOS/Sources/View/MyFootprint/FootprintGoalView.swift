@@ -5,7 +5,8 @@
 //  Created by Sojin Lee on 2022/11/07.
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
-
+//  마이페이지 - 산책 목표
+ 
 import UIKit
 
 import SnapKit

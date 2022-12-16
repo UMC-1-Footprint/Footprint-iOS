@@ -6,6 +6,8 @@
 //  Copyright © 2022 Footprint-iOS. All rights reserved.
 //
 
+//  마이페이지 - 월별 기록 횟수에 들어갈 그래프
+
 import UIKit
 
 import SnapKit
@@ -21,7 +23,6 @@ class LineGraphView: BaseView {
     
     init(values: [CGFloat]) {
         self.pointValues = values
-        
         super.init(frame: .zero)
     }
     
