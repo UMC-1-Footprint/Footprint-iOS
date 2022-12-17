@@ -56,8 +56,8 @@ class MyFootprintViewController: BaseViewController {
     let moreButton: UIButton = .init()
     
     // MARK: - middleSummary
-    lazy var todayChartView =  AttainmentRateChartView(keyColor: FootprintIOSAsset.Colors.blueM.color, petcentageAngle: 90)
-    lazy var monthChartView = AttainmentRateChartView(keyColor: FootprintIOSAsset.Colors.yellowM.color, petcentageAngle: 56)
+    lazy var todayChartView =  AttainmentRateChartView(keyColor: FootprintIOSAsset.Colors.blueM.color, percentageAngle: 90)
+    lazy var monthChartView = AttainmentRateChartView(keyColor: FootprintIOSAsset.Colors.yellowM.color, percentageAngle: 56)
     let monthFootprintView: UIView = .init()
     let monthFootprintCountLabel: UILabel = .init()
     

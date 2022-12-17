@@ -15,16 +15,22 @@ class UnderLineView: BaseView {
     let view: UIView = .init()
     
     override func setupProperty() {
+        super.setupProperty()
+        
         view.backgroundColor = FootprintIOSAsset.Colors.white4.color
     }
     
     override func setupLayout() {
+        super.setupLayout()
+        
         view.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
     
     override func setupHierarchy() {
+        super.setupHierarchy()
+        
         addSubview(view)
     }
 }

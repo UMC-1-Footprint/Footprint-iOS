@@ -12,11 +12,11 @@ class AttainmentRateChartView: BaseView {
     let percentageLabel: UILabel = .init()
     var percentage: String = .init()
     var keyColor: UIColor
-    var petcentageAngle: Int
+    var percentageAngle: Int
     
-    init(keyColor: UIColor, petcentageAngle: Int) {
+    init(keyColor: UIColor, percentageAngle: Int) {
         self.keyColor = keyColor
-        self.petcentageAngle = petcentageAngle
+        self.percentageAngle = percentageAngle
         
         super.init(frame: .zero)
     }
@@ -25,7 +25,7 @@ class AttainmentRateChartView: BaseView {
         super.setupProperty()
         
         self.backgroundColor = .white
-        percentageLabel.text = String(petcentageAngle) + "%"
+        percentageLabel.text = String(percentageAngle) + "%"
         percentageLabel.font = .systemFont(ofSize: 18, weight: UIFont.Weight(rawValue: 800))
         percentageLabel.textColor = keyColor
     }
@@ -50,7 +50,7 @@ class AttainmentRateChartView: BaseView {
         let width = self.frame.width
         let height = self.frame.height
         
-        let endAnglePercentage = petcentageAngle *  360 / 100
+        let endAnglePercentage = percentageAngle *  360 / 100
         let endAngle = ( CGFloat(endAnglePercentage) / 360 ) * (CGFloat.pi * 2)
         
         let inlinePath = UIBezierPath(arcCenter: CGPoint(x: width / 2, y: height/2), radius: 40, startAngle: 0, endAngle: 360, clockwise: true)

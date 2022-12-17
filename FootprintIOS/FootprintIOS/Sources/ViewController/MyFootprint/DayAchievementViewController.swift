@@ -19,7 +19,7 @@ class DayAchievementViewController: BaseViewController {
     let daysList = ["일","월","화","수","목","금","토"]
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: false)
     let backgroundView = UIView()
-    let percentages = [60,70,80,80,90,50,60] // 수정
+    let percentages = [60,70,80,80,90,50,60] // TODO
     lazy var barGraphStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .equalSpacing
@@ -88,8 +88,8 @@ class DayAchievementViewController: BaseViewController {
     }
     
     private func setupGraphView(_ percentages: [Int]) {
-        for i in 0...6 {
-            let graph = BarGraphView(percentage: percentages[i])
+        for item in percentages {
+            let graph = BarGraphView(percentage: item)
             
             let gradientLayer = CAGradientLayer()
             gradientLayer.frame = view.bounds

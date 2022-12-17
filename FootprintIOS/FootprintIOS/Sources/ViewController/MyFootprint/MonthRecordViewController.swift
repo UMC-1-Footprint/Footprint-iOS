@@ -18,17 +18,15 @@ class MonthRecordViewController: BaseViewController {
     lazy var daysList = setMonth()
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: true)
     let backgroundView = UIView()
-    let lineGraphView = LineGraphView(values: [0,20,10,50,30,50,10])
+    let lineGraphView = LineGraphView(values: [0,20,10,50,30,40,10]) // TODO
     let summaryLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
     
     override func setupProperty() {
         super.setupProperty()
-        
         setSummaryLabel(changeText: "56%")
     }
     

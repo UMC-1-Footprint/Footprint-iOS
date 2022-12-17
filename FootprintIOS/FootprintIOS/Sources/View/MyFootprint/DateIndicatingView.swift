@@ -27,16 +27,20 @@ class DateIndicatingView: BaseView {
     }
     
     override func setupLayout() {
+        super.setupLayout()
+        
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
     
     override func setupHierarchy() {
-        for i in 0...6 {
-            let label = PercentageLable("\(dateList[i])")
+        super.setupHierarchy()
+        
+        for (index, date) in dateList.enumerated() {
+            let label = PercentageLabel("\(date)")
             label.font = .systemFont(ofSize: 12, weight: .light)
-            if i == 6 && beThick {
+            if index == dateList.count - 1 && beThick {
                 label.font = .systemFont(ofSize: 12, weight: .bold)
             }
             stackView.addArrangedSubview(label)

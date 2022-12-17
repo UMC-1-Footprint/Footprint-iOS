@@ -23,6 +23,8 @@ class BarGraphView: BaseView {
     }
     
     override func setupLayout() {
+        super.setupLayout()
+        
         let parentHeight: Int = 125
         let childHeight: CGFloat = CGFloat(parentHeight * percentage / 100)
         
@@ -39,6 +41,8 @@ class BarGraphView: BaseView {
     }
     
     override func setupProperty() {
+        super.setupProperty()
+        
         mainGraphView.do {
             $0.clipsToBounds = true
             $0.layer.cornerRadius = 5

@@ -15,6 +15,28 @@ enum GoalCase {
     case date
     case time
     case timeZone
+    
+    var image: UIImage {
+        switch self {
+        case .date:
+            return FootprintIOSAsset.Images.myFootprintCalendarIcon.image
+        case .time:
+            return FootprintIOSAsset.Images.myFootprintTimeIcon.image
+        case .timeZone:
+            return FootprintIOSAsset.Images.myFootprintSunIcon.image
+        }
+    }
+    
+    var text: String {
+        switch self {
+        case .date:
+            return "목표 요일"
+        case .time:
+            return "목표 산책시간"
+        case .timeZone:
+            return "산책 시간대"
+        }
+    }
 }
 
 class FootprintGoalView: BaseView {
@@ -23,6 +45,8 @@ class FootprintGoalView: BaseView {
     let icon: UIImageView = .init()
     let noticeLable: UILabel = .init()
     let goalLabel: UILabel = .init()
+    lazy var goalIcon: UIImage = goalType.image
+    lazy var goalText: String = goalType.text
     
     init(goalType: GoalCase, userGoal: String) {
         self.goalType = goalType
@@ -60,18 +84,8 @@ class FootprintGoalView: BaseView {
     override func setupProperty() {
         super.setupProperty()
         
-        switch goalType {
-        case .date:
-            icon.image = FootprintIOSAsset.Images.myFootprintCalendarIcon.image
-            noticeLable.text = "목표 요일"
-        case .time:
-            icon.image = FootprintIOSAsset.Images.myFootprintTimeIcon.image
-            noticeLable.text = "목표 산책시간"
-        case .timeZone:
-            icon.image = FootprintIOSAsset.Images.myFootprintSunIcon.image
-            noticeLable.text = "산책 시간대"
-        }
-        
+        icon.image = goalIcon
+        noticeLable.text = goalText
         noticeLable.textColor = FootprintIOSAsset.Colors.blackM.color
         noticeLable.font = .systemFont(ofSize: 14, weight: UIFont.Weight(rawValue: 300))
         

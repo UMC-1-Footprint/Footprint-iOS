@@ -31,24 +31,28 @@ class AttainmentPercentageView: BaseView {
     }
     
     override func setupLayout() {
+        super.setupLayout()
+        
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
     
     override func setupHierarchy() {
+        super.setupHierarchy()
+        
         for i in stride(from: endPoint, to: -increasementPoint, by: -increasementPoint) {
-            let label = PercentageLable("\(i)")
+            let label = PercentageLabel("\(i)")
             stackView.addArrangedSubview(label)
         }
-        let label = setPercentage ? PercentageLable("(%)") : PercentageLable("(회)")
+        let label = setPercentage ? PercentageLabel("(%)") : PercentageLabel("(회)")
         stackView.addArrangedSubview(label)
 
         addSubview(stackView)
     }
 }
 
-class PercentageLable: UILabel {
+class PercentageLabel: UILabel {
     init(_ labelText: String) {
         super.init(frame: .zero)
         self.text = labelText
