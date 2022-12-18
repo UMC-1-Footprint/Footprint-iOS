@@ -119,7 +119,14 @@ extension CompositionRoot {
     }
     
     static func makeMyPageScreen() -> MyPageViewController {
-        let controller = MyPageViewController()
+        var pushMyFootprintScreen: () -> MyFootprintViewController
+        pushMyFootprintScreen = {
+            let controller = MyFootprintViewController()
+            
+            return controller
+        }
+        
+        let controller = MyPageViewController(pushMyFootprintScreen: pushMyFootprintScreen)
         
         controller.title = "마이 페이지"
         controller.tabBarItem.image = nil
