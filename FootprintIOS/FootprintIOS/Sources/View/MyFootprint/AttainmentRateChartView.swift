@@ -34,7 +34,7 @@ class AttainmentRateChartView: BaseView {
         super.setupLayout()
         
         percentageLabel.snp.makeConstraints {
-            $0.centerY.centerX.equalToSuperview()
+            $0.center.equalToSuperview()
         }
     }
     

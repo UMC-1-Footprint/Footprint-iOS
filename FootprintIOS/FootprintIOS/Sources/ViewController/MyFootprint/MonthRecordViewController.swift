@@ -15,7 +15,7 @@ import SnapKit
 class MonthRecordViewController: BaseViewController {
     let percentageView = AttainmentPercentageView(endPoint: 50, increasementPoint: 10, setPercentage: false)
     let lineView = PercentageLineView()
-    lazy var daysList = setMonth()
+    lazy var daysList = Date().getStringMonthList()
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: true)
     let backgroundView = UIView()
     let lineGraphView = LineGraphView(values: [0,20,10,50,30,40,10]) // TODO
@@ -93,23 +93,5 @@ class MonthRecordViewController: BaseViewController {
         attributeString.addAttribute(.font, value: font, range: (text as NSString).range(of: changeText))
                 
         summaryLabel.attributedText = attributeString
-    }
-    
-    func setMonth() -> [String] {
-        let date = Date()
-        let calendar = Calendar.current
-        let month = calendar.component(.month, from: date)
-        var monthList: [String] = .init()
-        
-        for i in 0...5 {
-            let newMonth = month - (6-i)
-            if newMonth <= 0 {
-                monthList.append("\(newMonth + 12)월")
-            } else {
-                monthList.append("\(newMonth)월")
-            }
-        }
-        monthList.append("이번달")
-        return monthList
     }
 }

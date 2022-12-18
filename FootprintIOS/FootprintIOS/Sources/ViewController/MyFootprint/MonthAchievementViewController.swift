@@ -13,7 +13,7 @@ import UIKit
 class MonthAchievementViewController: BaseViewController {
     let percentageView = AttainmentPercentageView(endPoint: 100, increasementPoint: 20, setPercentage: true)
     let lineView = PercentageLineView()
-    lazy var daysList = setMonth()
+    let daysList = Date().getStringMonthList()
     lazy var dateView = DateIndicatingView(dateList: daysList, beThick: true)
     let backgroundView = UIView()
     let percentages = [60,70,80,80,90,50,60] // TODO
@@ -102,24 +102,6 @@ class MonthAchievementViewController: BaseViewController {
             
             barGraphStackView.addArrangedSubview(graph)
         }
-    }
-    
-    func setMonth() -> [String] {
-        let date = Date()
-        let calendar = Calendar.current
-        let month = calendar.component(.month, from: date)
-        var monthList: [String] = .init()
-        
-        for i in 0...5 {
-            let newMonth = month - (6-i)
-            if newMonth <= 0 {
-                monthList.append("\(newMonth + 12)월")
-            } else {
-                monthList.append("\(newMonth)월")
-            }
-        }
-        monthList.append("이번달")
-        return monthList
     }
     
     private func setSummaryLabel(changeText: String) {

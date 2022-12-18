@@ -26,4 +26,22 @@ extension Date {
         let days = ["", "일", "월", "화", "수", "목", "금", "토"]
         return days[today]
     }
+    
+    func getStringMonthList() -> [String] {
+        let date = self
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: date)
+        var monthList: [String] = .init()
+        
+        for i in 0...5 {
+            let newMonth = month - (6-i)
+            if newMonth <= 0 {
+                monthList.append("\(newMonth + 12)월")
+            } else {
+                monthList.append("\(newMonth)월")
+            }
+        }
+        monthList.append("이번달")
+        return monthList
+    }
 }

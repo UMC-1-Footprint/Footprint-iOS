@@ -36,11 +36,7 @@ class LineGraphView: BaseView {
         self.path.move(to: startPosition)
         
         for i in 0..<pointValues.count {
-            if i == 0 {
-                currentX = 0
-            } else {
-                currentX += xOffset
-            }
+            currentX = (i==0) ? 0: currentX + xOffset
             
             let newPosition = CGPoint(x: currentX,
                                       y: getHeight(point: i))
