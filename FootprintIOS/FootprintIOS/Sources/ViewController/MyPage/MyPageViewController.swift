@@ -43,6 +43,7 @@ class MyPageViewController: NavigationBarViewController {
         $0.setTitle("내 발자국 페이지로 이동", for: .normal)
         $0.setTitleColor(.black, for: .normal)
     }
+    var pushMyFootprintScreen: () -> MyFootprintViewController
     
     override func setupHierarchy() {
         super.setupHierarchy()
@@ -76,6 +77,18 @@ class MyPageViewController: NavigationBarViewController {
             $0.top.equalTo(testPageButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
+    }
+    
+    // MARK: - Initializer
+    init(pushMyFootprintScreen: @escaping () -> MyFootprintViewController) {
+        self.pushMyFootprintScreen = pushMyFootprintScreen
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func setupBind() {
@@ -120,11 +133,13 @@ class MyPageViewController: NavigationBarViewController {
         myFootprintButton.rx
             .tap
             .bind { [weak self] _ in
-                let myFootprintVC = MyFootprintViewController()
-                myFootprintVC.hidesBottomBarWhenPushed = true
-                self?.navigationController?.pushViewController(myFootprintVC, animated: true)
+                self?.goToMyFootprintScreen()
             }
             .disposed(by: disposeBag)
     }
     
+    private func goToMyFootprintScreen() {
+        let controller = self.pushMyFootprintScreen()
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
 }
