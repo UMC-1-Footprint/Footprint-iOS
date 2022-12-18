@@ -17,7 +17,8 @@ let dependencies = Dependencies(
         .remote(url: "https://github.com/RxSwiftCommunity/RxDataSources", requirement: .upToNextMinor(from: "5.0.0")),
         .remote(url: "https://github.com/RxSwiftCommunity/RxGesture.git", requirement: .upToNextMinor(from: "4.0.0")),
         .remote(url: "https://github.com/kakao/kakao-ios-sdk", requirement: .upToNextMinor(from: "2.11.0")),
-        .remote(url: "https://github.com/jaemyeong/NMapsMap-SPM.git", requirement: .upToNextMajor(from: "3.16.0"))
+        .remote(url: "https://github.com/jaemyeong/NMapsMap-SPM.git", requirement: .upToNextMajor(from: "3.16.0")),
+        .remote(url: "https://github.com/jrendel/SwiftKeychainWrapper", requirement: .upToNextMajor(from: "4.0.0"))
     ],
     baseSettings: Settings.settings(
         configurations: [

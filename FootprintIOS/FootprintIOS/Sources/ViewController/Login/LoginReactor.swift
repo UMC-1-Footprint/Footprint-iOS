@@ -69,9 +69,8 @@ extension LoginReactor {
                             print(error)
                         } else {
                             guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
-                            let keyChain = KeyChain()
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            KeychainHandler.shared.accessToken = token.accessToken
+                            KeychainHandler.shared.refreshToken = token.refreshToken
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
@@ -93,9 +92,8 @@ extension LoginReactor {
                             print(error)
                         } else {
                             guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
-                            let keyChain = KeyChain()
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            KeychainHandler.shared.accessToken = token.accessToken
+                            KeychainHandler.shared.refreshToken = token.refreshToken
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
