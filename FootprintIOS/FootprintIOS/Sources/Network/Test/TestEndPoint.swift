@@ -13,6 +13,7 @@ enum TestEndPoint {
 }
 
 extension TestEndPoint: EndPoint {
+    
     var method: HTTPMethod{
         switch self {
         case .testAPI:
@@ -27,10 +28,24 @@ extension TestEndPoint: EndPoint {
         }
     }
     
+    func getURL() -> String {
+        let apiEnvironment = APIEnvironment.test
+        return apiEnvironment.baseURL
+    }
+    
     func getURL(environment: APIEnvironment) -> String {
         switch self {
         case .testAPI:
             return "\(environment.baseURL)"
         }
+    }
+    
+    func createRequest() -> NetworkRequest {
+        var headers: [String: String] = [:]
+        headers["Content-Type"] = "application/json"
+        return NetworkRequest(url: getURL(),
+                              httpMethod: method,
+                              body: body,
+                              headers: headers)
     }
 }

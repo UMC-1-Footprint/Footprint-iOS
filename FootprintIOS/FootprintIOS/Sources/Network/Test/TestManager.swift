@@ -21,7 +21,7 @@ struct TestManager {
     func getTestAPI() -> Observable<[TestModel]?> {
         let request = TestEndPoint
             .testAPI
-            .createRequest(environment: .test)
+            .createRequest()
         return self.apiService.request(request)
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 final class APIManager {
-    func request<T: Decodable>(_ request: NetworkRequest) -> Observable<T?> {
+    func request<T: Decodable>(_ request: NetworkRequest) -> Observable<T> {
         return Observable.create { observable in
             guard let encodedURL = request.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                   let url = URL(string: encodedURL) else {
@@ -29,7 +29,7 @@ final class APIManager {
                     observable.onCompleted()
                     return
                 }
-                observable.onNext(responseData as? T)
+                observable.onNext(responseData as! T)
                 observable.onCompleted()
             }
             task.resume()

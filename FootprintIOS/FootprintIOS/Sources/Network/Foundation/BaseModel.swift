@@ -12,5 +12,5 @@ struct BaseModel<T: Decodable>: Decodable {
     var isSuccess: Bool
     var code: Int
     var message: String
-    var result: T?
+    var result: T
 }
