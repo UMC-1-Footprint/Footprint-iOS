@@ -12,6 +12,7 @@ protocol EndPoint {
     var method: HTTPMethod { get }
     var body: Data? { get }
     
+    func getURL() -> String
     func createRequest() -> NetworkRequest
 }
 
@@ -20,7 +21,7 @@ extension EndPoint {
         var headers: [String: String] = [:]
         headers["X-ACCESS-TOKEN"] = KeychainHandler.shared.accessToken
         headers["Content-Type"] = "application/json"
-        return NetworkRequest(url: Enviroment.apiBaseURL,
+        return NetworkRequest(url: getURL(),
                               httpMethod: method,
                               body: body,
                               headers: headers)
