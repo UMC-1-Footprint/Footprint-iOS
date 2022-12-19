@@ -91,9 +91,22 @@ extension LoginReactor {
                         if let error = error {
                             print(error)
                         } else {
-                            guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
+                            let apiManager = LoginManager(apiService: APIManager())
+                            
+                            guard let userEmail = user?.kakaoAccount?.email,
+                                  let userId = user?.id,
+                                  let userName = user?.properties?["nickname"]
+                                else { return observable.onNext(.doKakaoLogin(false)) }
+                       
+                            print(userName)
                             KeychainHandler.shared.accessToken = token.accessToken
                             KeychainHandler.shared.refreshToken = token.refreshToken
+                            
+                            apiManager.loginAPI(userId: String(userId), userName: userName, userEmail: userEmail, providerType: .kakao)
+                                .bind { data in
+                                    print("성공")
+                                }
+                            
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
