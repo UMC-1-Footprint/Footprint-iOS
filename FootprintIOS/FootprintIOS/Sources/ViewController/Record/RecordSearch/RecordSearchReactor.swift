@@ -22,9 +22,12 @@ class RecordSearchReactor: Reactor {
     }
     
     var initialState: State
+    let walkService: WalkServiceType
     
-    init(id: Int) {
+    init(id: Int, walkService: WalkServiceType) {
         self.initialState = State()
+        
+        self.walkService = walkService
     }
 }
 

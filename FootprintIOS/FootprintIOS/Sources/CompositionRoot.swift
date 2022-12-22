@@ -35,14 +35,12 @@ class CompositionRoot {
 extension CompositionRoot {
     static func makeTabBarScreen() -> TabBarViewController {
         
+        let walkService: WalkServiceType = WalkService()
+        
         let tabBarViewController = TabBarViewController()
-        
-        let footprintRootViewController = makeFootprintRootScreen()
-        
+        let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
         let calendarViewController = makeCalendarScreen()
-        
         let recommendViewController = makeRecommendScreen()
-        
         let myPageViewController = makeMyPageScreen()
         
         tabBarViewController.viewControllers = [
@@ -55,7 +53,7 @@ extension CompositionRoot {
         return tabBarViewController
     }
     
-    static func makeFootprintRootScreen() -> FootprintRootViewController {
+    static func makeFootprintRootScreen(walkService: WalkServiceType) -> FootprintRootViewController {
         var pushFootprintWriteScreen: () -> FootprintWriteViewController
         pushFootprintWriteScreen = {
             let reactor = FootprintWriteReactor(state: .init())
@@ -72,7 +70,7 @@ extension CompositionRoot {
         }
         
         let pushRecordSearchScreen: (Int) -> RecordSearchViewController = { (id) in
-            let reactor: RecordSearchReactor = .init(id: id)
+            let reactor: RecordSearchReactor = .init(id: id, walkService: walkService)
             return .init(reactor: reactor)
         }
 
@@ -115,9 +113,9 @@ extension CompositionRoot {
         return controller
     }
     
-    static func makeRecordCalendarScreen() -> RecordCalendarViewController {
+    static func makeRecordCalendarScreen(walkService: WalkServiceType) -> RecordCalendarViewController {
         let pushRecordSearchScreen: (Int) -> RecordSearchViewController = { (id) in
-            let reactor: RecordSearchReactor = .init(id: id)
+            let reactor: RecordSearchReactor = .init(id: id, walkService: walkService)
             return .init(reactor: reactor)
         }
         

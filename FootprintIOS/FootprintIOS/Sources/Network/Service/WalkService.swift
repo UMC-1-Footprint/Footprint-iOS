@@ -7,3 +7,11 @@
 //
 
 import Foundation
+
+protocol WalkServiceType {
+    
+}
+
+class WalkService: WalkServiceType {
+    
+}
