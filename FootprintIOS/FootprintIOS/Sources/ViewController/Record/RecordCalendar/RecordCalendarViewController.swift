@@ -12,10 +12,10 @@ import ReactorKit
 class RecordCalendarViewController: NavigationBarViewController, View {
     typealias Reactor = RecordCalendarReactor
     
-    var pushRecordSearchScreen: () -> RecordSearchViewController
+    var pushRecordSearchScreen: (Int) -> RecordSearchViewController
     
     init(reactor: Reactor,
-         pushRecordSearchScreen: @escaping () -> RecordSearchViewController) {
+         pushRecordSearchScreen: @escaping (Int) -> RecordSearchViewController) {
         self.pushRecordSearchScreen = pushRecordSearchScreen
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -32,8 +32,8 @@ class RecordCalendarViewController: NavigationBarViewController, View {
 }
 
 extension RecordCalendarViewController {
-    func goToRecordSearchScreen() {
-        let controller = pushRecordSearchScreen()
+    func goToRecordSearchScreen(id: Int) {
+        let controller = pushRecordSearchScreen(id)
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }

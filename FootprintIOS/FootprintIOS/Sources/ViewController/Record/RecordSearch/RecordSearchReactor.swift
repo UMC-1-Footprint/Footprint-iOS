@@ -23,7 +23,7 @@ class RecordSearchReactor: Reactor {
     
     var initialState: State
     
-    init() {
+    init(id: Int) {
         self.initialState = State()
     }
 }

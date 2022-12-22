@@ -15,7 +15,6 @@ class RecordSearchViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     typealias Reactor = RecordSearchReactor
-    
     typealias DataSource = RxCollectionViewSectionedReloadDataSource<RecordSearchSectionModel>
     
     private lazy var dataSource = DataSource { _, collectionView, indexPath, item -> UICollectionViewCell in
@@ -36,7 +35,8 @@ class RecordSearchViewController: NavigationBarViewController, View {
     
     let searchView: UIView = .init()
     let searchTextField: UITextField = .init()
-    let imageView: UIImageView = .init()
+    let searchImageView: UIImageView = .init()
+    let cancleButton: UIButton = .init()
     let collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     init(reactor: Reactor) {
@@ -57,6 +57,12 @@ class RecordSearchViewController: NavigationBarViewController, View {
     
     override func setupProperty() {
         super.setupProperty()
+        
+        
+        
+        cancleButton.setTitle("취소", for: .normal)
+        cancleButton.setTitleColor(FootprintIOSAsset.Colors.blackL.color, for: .normal)
+        
         collectionView.backgroundColor = FootprintIOSAsset.Colors.whiteBG.color
         collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
     }
@@ -64,14 +70,39 @@ class RecordSearchViewController: NavigationBarViewController, View {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        contentView.addSubviews([collectionView])
+        contentView.addSubviews([searchView, cancleButton, collectionView])
+        searchView.addSubviews([searchTextField, searchImageView])
     }
     
     override func setupLayout() {
         super.setupLayout()
         
+        searchView.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.leading.equalToSuperview().inset(16)
+            $0.trailing.equalTo(cancleButton.snp.leading).offset(16)
+            $0.height.equalTo(36)
+        }
+        
+        searchImageView.snp.makeConstraints {
+            $0.width.height.equalTo(16)
+            $0.leading.equalToSuperview().inset(19)
+            $0.centerY.equalToSuperview()
+        }
+        
+        searchTextField.snp.makeConstraints {
+            $0.leading.equalTo(searchImageView.snp.trailing).offset(11)
+            $0.centerY.equalToSuperview()
+        }
+        
+        cancleButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalTo(searchView)
+        }
+        
         collectionView.snp.makeConstraints {
-            $0.top.leading.trailing.bottom.equalToSuperview()
+            $0.top.equalTo(searchView.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
     

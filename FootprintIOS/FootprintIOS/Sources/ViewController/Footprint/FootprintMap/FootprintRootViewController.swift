@@ -17,7 +17,7 @@ class FootprintRootViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     var pushFootprintMapScreen: () -> FootprintMapViewController
-    var pushRecordSearchScreen: () -> RecordSearchViewController
+    var pushRecordSearchScreen: (Int) -> RecordSearchViewController
     
     // MARK: - UI Components
     
@@ -28,7 +28,7 @@ class FootprintRootViewController: NavigationBarViewController, View {
     
     init(reactor: Reactor,
          pushFootprintMapScreen: @escaping () -> FootprintMapViewController,
-         pushRecordSearchScreen: @escaping () -> RecordSearchViewController) {
+         pushRecordSearchScreen: @escaping (Int) -> RecordSearchViewController) {
         self.pushFootprintMapScreen = pushFootprintMapScreen
         self.pushRecordSearchScreen = pushRecordSearchScreen
         super.init(nibName: nil, bundle: nil)
@@ -130,7 +130,7 @@ class FootprintRootViewController: NavigationBarViewController, View {
         
         recordSearchButton.rx.tap
             .bind { [weak self] in
-                self?.goToRecordSearchScreen()
+                self?.goToRecordSearchScreen(id: 1)
             }
             .disposed(by: disposeBag)
     }
@@ -140,8 +140,8 @@ class FootprintRootViewController: NavigationBarViewController, View {
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
-    private func goToRecordSearchScreen() {
-        let controller = self.pushRecordSearchScreen()
+    private func goToRecordSearchScreen(id: Int) {
+        let controller = self.pushRecordSearchScreen(id)
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }

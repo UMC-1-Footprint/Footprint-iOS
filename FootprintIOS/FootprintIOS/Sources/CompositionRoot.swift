@@ -71,8 +71,8 @@ extension CompositionRoot {
             return controller
         }
         
-        let pushRecordSearchScreen: () -> RecordSearchViewController = {
-            let reactor: RecordSearchReactor = .init()
+        let pushRecordSearchScreen: (Int) -> RecordSearchViewController = { (id) in
+            let reactor: RecordSearchReactor = .init(id: id)
             return .init(reactor: reactor)
         }
 
@@ -116,8 +116,8 @@ extension CompositionRoot {
     }
     
     static func makeRecordCalendarScreen() -> RecordCalendarViewController {
-        let pushRecordSearchScreen: () -> RecordSearchViewController = {
-            let reactor: RecordSearchReactor = .init()
+        let pushRecordSearchScreen: (Int) -> RecordSearchViewController = { (id) in
+            let reactor: RecordSearchReactor = .init(id: id)
             return .init(reactor: reactor)
         }
         
