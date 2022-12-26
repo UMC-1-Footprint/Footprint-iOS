@@ -19,7 +19,7 @@ protocol EndPoint {
 extension EndPoint {
     func createRequest() -> NetworkRequest {
         var headers: [String: String] = [:]
-        headers["X-ACCESS-TOKEN"] = KeychainHandler.shared.accessToken
+        headers["X-ACCESS-TOKEN"] = KeychainService.shared.accessToken
         headers["Content-Type"] = "application/json"
         return NetworkRequest(url: getURL(),
                               httpMethod: method,

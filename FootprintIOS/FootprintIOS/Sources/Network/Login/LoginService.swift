@@ -9,12 +9,19 @@
 import Foundation
 import RxSwift
 
-struct LoginManager {
-    let apiService: APIManager
-    
-    init(apiService: APIManager) {
-        self.apiService = apiService
-    }
+enum LoginEvent {
+    case login(LoginResponseModel)
+}
+
+protocol LoginServiceType {
+    var disposedBag: DisposeBag { get }
+    var event: PublishSubject<LoginEvent> { get }
+    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>>
+}
+
+class LoginService: NetworkService, LoginServiceType {
+    var disposedBag = DisposeBag()
+    var event = PublishSubject<LoginEvent>()
     
     func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>> {
         let request = LoginEndPoint
@@ -23,3 +30,4 @@ struct LoginManager {
         return self.apiService.request(request: request)
     }
 }
+

@@ -8,8 +8,8 @@
 
 import SwiftKeychainWrapper
 
-struct KeychainHandler {
-    static var shared = KeychainHandler()
+class KeychainService {
+    static var shared = KeychainService()
 
     private init() {}
 
@@ -35,7 +35,7 @@ struct KeychainHandler {
         }
     }
 
-    mutating func removeAll() {
+    func removeAll() {
         accessToken = ""
         refreshToken = ""
     }
