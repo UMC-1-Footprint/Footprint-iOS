@@ -54,15 +54,13 @@ extension CompositionRoot {
     }
     
     static func makeFootprintRootScreen(walkService: WalkServiceType) -> FootprintRootViewController {
-        var pushFootprintWriteScreen: () -> FootprintWriteViewController
-        pushFootprintWriteScreen = {
+        let pushFootprintWriteScreen: () -> FootprintWriteViewController = {
             let reactor = FootprintWriteReactor(state: .init())
             let controller = FootprintWriteViewController(reactor: reactor)
             return controller
         }
         
-        var pushFootprintMapScreen: () -> FootprintMapViewController
-        pushFootprintMapScreen = {
+        let pushFootprintMapScreen: () -> FootprintMapViewController = {
             let reactor = FootprintMapReactor(state: .init())
             let controller = FootprintMapViewController(reactor: reactor,
                                                         pushFootprintWriteScreen: pushFootprintWriteScreen)
@@ -86,16 +84,14 @@ extension CompositionRoot {
     }
     
     static func makeCalendarScreen() -> CalendarViewController {
-        var pushGoalScreen: () -> GoalViewController
-        pushGoalScreen = {
+        let pushGoalScreen: () -> GoalViewController = {
             let reactor = GoalReactor.init()
             let controller = GoalViewController(reactor: reactor)
             
             return controller
         }
     
-        var pushInfoScreen: () -> InfoViewController
-        pushInfoScreen = {
+        let pushInfoScreen: () -> InfoViewController = {
             let reactor = InfoReactor.init()
             let controller = InfoViewController(reactor: reactor,
                                                 pushGoalScreen: pushGoalScreen)
