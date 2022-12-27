@@ -90,6 +90,7 @@ class AlertViewController: NavigationBarViewController, View {
     
     private let type: AlertType
     typealias Reactor = AlertReactor
+    var alertAction: (() -> Void)?
     
     // MARK: - UI Components
     
@@ -118,7 +119,7 @@ class AlertViewController: NavigationBarViewController, View {
     override func setupProperty() {
         super.setupProperty()
         
-        view.backgroundColor = .white.withAlphaComponent(0.4)
+        view.backgroundColor = .black.withAlphaComponent(0.25)
     }
     
     override func setupHierarchy() {
@@ -160,43 +161,44 @@ class AlertViewController: NavigationBarViewController, View {
     }
     
     func bind(reactor: AlertReactor) {
-        // Action
-        oneButtonAlertView.confirmButton
-            .rx
-            .tap
+        oneButtonAlertView.confirmButton.rx.tap
             .map{ .tapCancelButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        twoButtonAlertView.cancelButton
-            .rx
-            .tap
+        twoButtonAlertView.cancelButton.rx.tap
             .map{ .tapCancelButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        twoButtonAlertView.rightButton
-            .rx
-            .tap
-            .map{ .tapAlertButton(.delete) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        badgeAlertView.confirmButton
-            .rx
-            .tap
+        badgeAlertView.confirmButton.rx.tap
             .map{ .tapCancelButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        customAlertView.cancelButton
-            .rx
-            .tap
+        customAlertView.cancelButton.rx.tap
             .map{ .tapCancelButton }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        // State
+        twoButtonAlertView.rightButton.rx.tap
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { owner, _ in
+                owner.alertAction?()
+                owner.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        customAlertView.rightButton.rx.tap
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { owner, _ in
+                owner.alertAction?()
+                owner.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map(\.isDismiss)
             .bind { [weak self] _ in
@@ -207,10 +209,11 @@ class AlertViewController: NavigationBarViewController, View {
 }
 
 extension UIViewController {
-    func makeAlert(type: AlertType) {
+    func makeAlert(type: AlertType, alertAction: (() -> Void)? = nil) {
         let alertVC = AlertViewController(type: type, reator: .init())
         alertVC.modalTransitionStyle = .crossDissolve
         alertVC.modalPresentationStyle = .fullScreen
+        alertVC.alertAction = alertAction
         self.present(alertVC, animated: true)
     }
 }
