@@ -8,11 +8,11 @@
 
 import Foundation
 
-class Enviroment {
+class Environment {
     static var version: String {
         FootprintIOSResources.bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     }
-    static var apiBaseURL: String {
+    static var url: String {
         FootprintIOSResources.bundle.object(forInfoDictionaryKey: "API_BASE_URL") as! String
     }
     static var kakaoAppKey: String {

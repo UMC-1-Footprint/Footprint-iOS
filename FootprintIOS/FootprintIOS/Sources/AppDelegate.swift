@@ -11,7 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
-        KakaoSDK.initSDK(appKey: Enviroment.kakaoAppKey)
+        KakaoSDK.initSDK(appKey: Environment.kakaoAppKey)
         return true
     }
 
