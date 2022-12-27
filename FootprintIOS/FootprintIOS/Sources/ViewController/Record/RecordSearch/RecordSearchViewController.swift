@@ -29,6 +29,16 @@ class RecordSearchViewController: NavigationBarViewController, View {
             cell.reactor = reactor
             return cell
         }
+    } configureSupplementaryView: { [weak self] dataSource, collectionView, _, indexPath -> UICollectionReusableView in
+        switch dataSource[indexPath.section].model {
+        case .record:
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: RecordHeaderView.self), for: indexPath) as? RecordHeaderView else { return .init() }
+            
+            return header
+            
+        case .search:
+            return .init()
+        }
     }
     
     // MARK: - UI Components
@@ -55,16 +65,20 @@ class RecordSearchViewController: NavigationBarViewController, View {
         setNavigationBarHidden(true)
     }
     
+    override func setupDelegate() {
+        super.setupDelegate()
+        
+        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
+        collectionView.register(RecordHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: RecordHeaderView.self))
+    }
+    
     override func setupProperty() {
         super.setupProperty()
-        
-        
         
         cancleButton.setTitle("취소", for: .normal)
         cancleButton.setTitleColor(FootprintIOSAsset.Colors.blackL.color, for: .normal)
         
         collectionView.backgroundColor = FootprintIOSAsset.Colors.whiteBG.color
-        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
     }
     
     override func setupHierarchy() {
@@ -136,6 +150,7 @@ extension RecordSearchViewController {
                 return self?.makeRecordLayoutSection(from: items)
             }
         }
+        
         return layout
     }
     
@@ -145,6 +160,7 @@ extension RecordSearchViewController {
         }
         let layoutGroup: NSCollectionLayoutGroup = .vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)), subitems: layoutItems)
         let layoutSection: NSCollectionLayoutSection = .init(group: layoutGroup)
+        
         return layoutSection
     }
     
@@ -156,7 +172,12 @@ extension RecordSearchViewController {
         }
         let layoutGroup: NSCollectionLayoutGroup = .vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)), subitems: layoutItems)
         layoutGroup.interItemSpacing = .fixed(12)
+        
+        let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(30)), elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
         let layoutSection: NSCollectionLayoutSection = .init(group: layoutGroup)
+        
+        layoutSection.boundarySupplementaryItems = [header]
+        
         return layoutSection
     }
 }
