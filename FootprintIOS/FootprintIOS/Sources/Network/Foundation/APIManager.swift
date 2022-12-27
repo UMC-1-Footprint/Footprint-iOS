@@ -10,7 +10,9 @@ import Foundation
 import RxSwift
 
 final class APIManager {
-    func request<T: Decodable>(_ request: NetworkRequest) -> Observable<T?> {
+    static let shared = APIManager()
+    
+    func request<T: Decodable>(request: NetworkRequest) -> Observable<T> {
         return Observable.create { observable in
             guard let encodedURL = request.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                   let url = URL(string: encodedURL) else {
@@ -18,18 +20,24 @@ final class APIManager {
                     observable.onError(APIError.urlEncodingError)
                 }
             }
+            print("-------------- \(encodedURL) --------------")
             
             let task = URLSession.shared.dataTask(with: request.createNetworkRequest(with: url)) { data, response, error in
+               
                 if let error = error {
+                    print("-------------- \(error) --------------")
                     observable.onError(error)
                     return
                 }
+                
                 guard let data = data,
-                      let responseData = try? JSONDecoder().decode(BaseModel<T>.self, from: data) else {
+                      let responseData = try? JSONDecoder().decode(T.self, from: data) else {
+                    print("-------------- decode fail --------------")
                     observable.onCompleted()
                     return
                 }
-                observable.onNext(responseData as? T)
+                
+                observable.onNext(responseData as T)
                 observable.onCompleted()
             }
             task.resume()

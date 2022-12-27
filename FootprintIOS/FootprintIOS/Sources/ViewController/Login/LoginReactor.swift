@@ -69,9 +69,8 @@ extension LoginReactor {
                             print(error)
                         } else {
                             guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
-                            let keyChain = KeyChain()
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            KeychainService.shared.accessToken = token.accessToken
+                            KeychainService.shared.refreshToken = token.refreshToken
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
@@ -92,10 +91,24 @@ extension LoginReactor {
                         if let error = error {
                             print(error)
                         } else {
-                            guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
-                            let keyChain = KeyChain()
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            let apiManager = LoginService(apiService: APIManager())
+                            
+                            guard let userEmail = user?.kakaoAccount?.email,
+                                  let userId = user?.id,
+                                  let userName = user?.properties?["nickname"]
+                                else { return observable.onNext(.doKakaoLogin(false)) }
+                       
+                            print(userName)
+                            KeychainService.shared.accessToken = token.accessToken
+                            KeychainService.shared.refreshToken = token.refreshToken
+                            
+                            apiManager.loginAPI(userId: String(userId), userName: userName, userEmail: userEmail, providerType: .kakao)
+                                .bind { data in
+                                    print("성공")
+                                    print(data.code)
+                                    print(data.result)
+                                }
+                            
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
