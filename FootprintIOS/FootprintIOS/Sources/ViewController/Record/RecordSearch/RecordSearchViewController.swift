@@ -75,7 +75,36 @@ class RecordSearchViewController: NavigationBarViewController, View {
     override func setupProperty() {
         super.setupProperty()
         
+        let leftView: UIView = .init(frame: .init(x: 0, y: 0, width: 36, height: 36))
+        let imgView: UIImageView = .init(frame: .init(x: 0, y: 0, width: 16, height: 16))
+    
+        imgView.image = FootprintIOSAsset.Images.iconSearch.image
+        imgView.tintColor = FootprintIOSAsset.Colors.blackL.color
+        
+        leftView.addSubview(imgView)
+        
+        leftView.snp.makeConstraints {
+            $0.width.height.equalTo(36)
+        }
+        
+        imgView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.height.equalTo(16)
+        }
+        
+        contentView.backgroundColor = FootprintIOSAsset.Colors.whiteBG.color
+        
+        searchView.backgroundColor = .white
+        
+        searchTextField.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
+        searchTextField.leftView = leftView
+        searchTextField.leftViewMode = .always
+        searchTextField.cornerRound(radius: 12)
+        
+        searchTextField.placeholder = "산책 제목, #태그 검색"
+        
         cancleButton.setTitle("취소", for: .normal)
+        cancleButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         cancleButton.setTitleColor(FootprintIOSAsset.Colors.blackL.color, for: .normal)
         
         collectionView.backgroundColor = FootprintIOSAsset.Colors.whiteBG.color
@@ -84,8 +113,8 @@ class RecordSearchViewController: NavigationBarViewController, View {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        contentView.addSubviews([searchView, cancleButton, collectionView])
-        searchView.addSubviews([searchTextField, searchImageView])
+        contentView.addSubviews([searchView, collectionView])
+        searchView.addSubviews([searchTextField, cancleButton])
     }
     
     override func setupLayout() {
@@ -93,29 +122,26 @@ class RecordSearchViewController: NavigationBarViewController, View {
         
         searchView.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.leading.equalToSuperview().inset(16)
-            $0.trailing.equalTo(cancleButton.snp.leading).offset(16)
-            $0.height.equalTo(36)
-        }
-        
-        searchImageView.snp.makeConstraints {
-            $0.width.height.equalTo(16)
-            $0.leading.equalToSuperview().inset(19)
-            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.height.equalTo(60)
         }
         
         searchTextField.snp.makeConstraints {
-            $0.leading.equalTo(searchImageView.snp.trailing).offset(11)
+            $0.leading.equalToSuperview().inset(19)
+            $0.trailing.equalTo(cancleButton.snp.leading).inset(-16)
             $0.centerY.equalToSuperview()
+            $0.height.equalTo(36)
         }
         
         cancleButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalTo(searchView)
+            $0.centerY.equalToSuperview()
+            $0.width.equalTo(30)
         }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(searchView.snp.bottom)
+            $0.top.equalTo(searchView.snp.bottom).offset(16)
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
