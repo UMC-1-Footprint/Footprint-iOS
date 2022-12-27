@@ -85,14 +85,14 @@ extension CompositionRoot {
     
     static func makeCalendarScreen() -> CalendarViewController {
         let pushGoalScreen: () -> GoalViewController = {
-            let reactor = GoalReactor.init()
+            let reactor = GoalReactor.init(service: InfoService())
             let controller = GoalViewController(reactor: reactor)
             
             return controller
         }
     
         let pushInfoScreen: () -> InfoViewController = {
-            let reactor = InfoReactor.init()
+            let reactor = InfoReactor.init(service: InfoService())
             let controller = InfoViewController(reactor: reactor,
                                                 pushGoalScreen: pushGoalScreen)
             
@@ -132,7 +132,14 @@ extension CompositionRoot {
     }
     
     static func makeMyPageScreen() -> MyPageViewController {
-        let controller = MyPageViewController()
+        var pushMyFootprintScreen: () -> MyFootprintViewController
+        pushMyFootprintScreen = {
+            let controller = MyFootprintViewController()
+            
+            return controller
+        }
+        
+        let controller = MyPageViewController(pushMyFootprintScreen: pushMyFootprintScreen)
         
         controller.title = "마이 페이지"
         controller.tabBarItem.image = nil

@@ -39,10 +39,16 @@ class MyPageViewController: NavigationBarViewController {
         $0.setTitleColor(.black, for: .normal)
     }
     
+    let myFootprintButton = UIButton().then {
+        $0.setTitle("내 발자국 페이지로 이동", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+    }
+    var pushMyFootprintScreen: () -> MyFootprintViewController
+    
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, testPageButton])
+        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, testPageButton, myFootprintButton])
     }
     
     override func setupLayout() {
@@ -66,6 +72,23 @@ class MyPageViewController: NavigationBarViewController {
             $0.top.equalTo(agreementPageButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
+        
+        myFootprintButton.snp.makeConstraints {
+            $0.top.equalTo(testPageButton.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Initializer
+    init(pushMyFootprintScreen: @escaping () -> MyFootprintViewController) {
+        self.pushMyFootprintScreen = pushMyFootprintScreen
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func setupBind() {
@@ -106,6 +129,17 @@ class MyPageViewController: NavigationBarViewController {
                 self?.navigationController?.pushViewController(testVC, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        myFootprintButton.rx
+            .tap
+            .bind { [weak self] _ in
+                self?.goToMyFootprintScreen()
+            }
+            .disposed(by: disposeBag)
     }
     
+    private func goToMyFootprintScreen() {
+        let controller = self.pushMyFootprintScreen()
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
 }

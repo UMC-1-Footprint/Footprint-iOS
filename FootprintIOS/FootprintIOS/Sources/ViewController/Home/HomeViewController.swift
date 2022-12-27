@@ -104,7 +104,6 @@ class HomeViewController: NavigationBarViewController, View {
     
     private let todayView = TodayView()
     private let monthView = MonthView()
-    private let startWalkButton = FootprintButton(type: .startWalk)
     
     // MARK: - Initializer
     
