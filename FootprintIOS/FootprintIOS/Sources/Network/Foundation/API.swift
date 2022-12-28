@@ -9,9 +9,8 @@
 import Foundation
 import RxSwift
 
-final class APIManager {
-    static let shared = APIManager()
-    
+final class API {
+//    static let shared = APIManager()
     func request<T: Decodable>(request: NetworkRequest) -> Observable<T> {
         return Observable.create { observable in
             guard let encodedURL = request.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),

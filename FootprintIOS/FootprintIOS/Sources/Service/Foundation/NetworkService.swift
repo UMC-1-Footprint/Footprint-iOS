@@ -9,9 +9,13 @@
 import Foundation
 
 protocol NetworkServiceType {
-    var apiService: APIManager { get }
+    var API: API { get }
 }
 
 class NetworkService: NetworkServiceType {
-    let apiService: APIManager = APIManager.shared
+    let API: API
+    
+    init(API: API) {
+        self.API = API
+    }
 }
