@@ -8,7 +8,6 @@
 
 import Foundation
 
-// MARK: - LoginRequestDTO
 struct LoginRequestDTO: Codable {
     let userID, username, email: String
     let providerType: LoginProviderType
