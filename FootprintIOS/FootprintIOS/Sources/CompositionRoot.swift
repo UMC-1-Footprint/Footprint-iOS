@@ -35,7 +35,7 @@ class CompositionRoot {
 extension CompositionRoot {
     static func makeTabBarScreen() -> TabBarViewController {
         
-        let walkService: WalkServiceType = WalkService()
+        let walkService: WalkServiceType = WalkService(API: <#API#>)
         
         let tabBarViewController = TabBarViewController()
         let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)

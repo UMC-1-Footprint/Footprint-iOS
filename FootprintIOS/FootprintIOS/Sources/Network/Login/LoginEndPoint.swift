@@ -22,7 +22,7 @@ extension LoginEndPoint: EndPoint {
     func getURL() -> String {
         switch self {
         case .login:
-            return Enviroment.apiBaseURL + "/users/auth/login"
+            return Environment.apiBaseURL + "/users/auth/login"
         }
     }
     

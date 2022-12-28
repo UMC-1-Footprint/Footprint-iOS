@@ -8,10 +8,17 @@
 
 import Foundation
 
+import Foundation
+import RxSwift
+
+enum WalkEvent {
+    case login(LoginResponseModel)
+}
+
 protocol WalkServiceType {
     
 }
 
-class WalkService: WalkServiceType {
+class WalkService: NetworkService, WalkServiceType {
     
 }

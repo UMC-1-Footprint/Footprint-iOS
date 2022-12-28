@@ -7,3 +7,14 @@
 //
 
 import Foundation
+import RxSwift
+
+protocol LocalServiceType {
+    var disposeBag: DisposeBag { get }
+}
+
+class LocalService: LocalServiceType {
+    let disposeBag: DisposeBag = .init()
+    
+    init() { }
+}

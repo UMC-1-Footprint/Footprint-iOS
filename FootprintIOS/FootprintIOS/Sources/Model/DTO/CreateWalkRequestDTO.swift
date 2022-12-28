@@ -7,3 +7,18 @@
 //
 
 import Foundation
+
+// MARK: - Welcome
+struct CreateWalkRequestDTO: Codable {
+    let walk: Walk
+    let footprintList: [FootprintList]
+}
+
+// MARK: - FootprintList
+struct FootprintList: Codable {
+    let coordinates: [Double]
+    let recordAt, write: String
+    let hashtagList: [String]
+    let onWalk: Int
+    let photos: [String]
+}

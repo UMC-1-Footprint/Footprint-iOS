@@ -7,3 +7,9 @@
 //
 
 import Foundation
+
+struct CreateWalkResponseDTO: Codable {
+    let badgeIdx: Int
+    let badgeName: String
+    let badgeUrl: String
+}

@@ -7,12 +7,15 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol NetworkServiceType {
+    var disposeBag: DisposeBag { get }
     var API: API { get }
 }
 
 class NetworkService: NetworkServiceType {
+    let disposeBag: DisposeBag = .init()
     let API: API
     
     init(API: API) {

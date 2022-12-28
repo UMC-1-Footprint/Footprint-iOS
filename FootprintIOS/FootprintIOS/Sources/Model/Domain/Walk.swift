@@ -7,3 +7,11 @@
 //
 
 import Foundation
+
+struct Walk: Codable {
+    let startAt, endAt: String
+    let distance: Int
+    let coordinates: [[Double]]
+    let calorie: Int
+    let thumbnail: String
+}

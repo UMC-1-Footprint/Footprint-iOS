@@ -8,13 +8,13 @@
 
 import Foundation
 
-enum WalkAPI {
+enum WalkEndPoint {
     case fetch
     case create
     case delete
 }
 
-extension WalkAPI: EndPoint {
+extension WalkEndPoint: EndPoint {
     var method: HTTPMethod{
         switch self {
         case .fetch:
@@ -41,7 +41,7 @@ extension WalkAPI: EndPoint {
         }
     }
     
-    func getURL(environment: APIEnvironment) -> String {
+    func getURL() -> String {
         switch self {
         case .fetch:
             return ""
