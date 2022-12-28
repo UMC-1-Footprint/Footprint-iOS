@@ -104,11 +104,6 @@ extension LoginReactor {
                             self?.keychainService.updateTokens(accessToken: token.accessToken, refreshToken: token.refreshToken)
                             
                             self?.loginService.login(userId: String(userId), userName: userName, userEmail: userEmail, providerType: .kakao)
-                                .bind { data in
-                                    print("성공")
-                                    print(data.code)
-                                    print(data.result)
-                                }
                             
                             observable.onNext(.doKakaoLogin(true))
                         }

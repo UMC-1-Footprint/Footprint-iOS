@@ -10,38 +10,58 @@ import Foundation
 import RxSwift
 
 protocol APIProviderType {
-    func request<T: Decodable>(request: NetworkRequest) -> Observable<T>
+    func request<T: Decodable>(request: NetworkRequest) -> Single<T>
 }
 
 class APIProvider: BaseProvider, APIProviderType {
-    func request<T: Decodable>(request: NetworkRequest) -> Observable<T> {
-        return Observable.create { observable in
+    func request<T: Decodable>(request: NetworkRequest) -> Single<T> {
+        return Single<T>.create { single in
+            print("==============[willSend]==============")
             guard let encodedURL = request.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                   let url = URL(string: encodedURL) else {
                 return Disposables.create {
-                    observable.onError(APIError.urlEncodingError)
+                    print("[Logger - ✅ result] ❌ url encoding error")
+                    
+                    single(.failure(APIError.urlEncodingError))
                 }
             }
-            print("-------------- \(encodedURL) --------------")
+            
+            print("[Logger - ✅ Header] \(String(describing: request.headers))")
+            print("[Logger - ✅ Body] \(String(describing: String(data: request.body ?? Data(), encoding: .utf8)))")
+            print("[Logger - ✅ Endpoint] [\(String(describing: request.httpMethod.rawValue))] - \(String(describing: request.url))")
             
             let task = URLSession.shared.dataTask(with: request.createNetworkRequest(with: url)) { data, response, error in
                
                 if let error = error {
-                    print("-------------- \(error) --------------")
-                    observable.onError(error)
+                    
+                    single(.failure(error))
                     return
                 }
                 
-                guard let data = data,
-                      let responseData = try? JSONDecoder().decode(T.self, from: data) else {
-                    print("-------------- decode fail --------------")
-                    observable.onCompleted()
+                print("==============[didReceive]==============")
+                print("[Logger - ✅ request] \(request.url)")
+                guard let data = data else {
+                    print("[Logger - ✅ result] ❌ FAILURE")
+                    
+                    single(.failure(APIError.jsonParsingError))
                     return
                 }
                 
-                observable.onNext(responseData as T)
-                observable.onCompleted()
+                do {
+                    let responseData = try JSONDecoder().decode(T.self, from: data)
+                    print("[Logger - ✅ result] ⭕️ SUCCESS")
+                    print(responseData)
+                    
+                    single(.success(responseData))
+                } catch {
+                    print("[Logger - ✅ result] ❌ FAILURE")
+                    print(error)
+                    
+                    single(.failure(APIError.jsonParsingError))
+                    return
+                }
             }
+            
             task.resume()
             
             return Disposables.create {
@@ -50,4 +70,3 @@ class APIProvider: BaseProvider, APIProviderType {
         }
     }
 }
-

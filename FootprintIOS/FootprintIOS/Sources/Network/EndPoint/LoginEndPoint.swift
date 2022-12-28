@@ -13,7 +13,7 @@ enum LoginEndPoint {
 }
 
 extension LoginEndPoint: EndPoint {
-    func getURL() -> String {
+    var url: String {
         switch self {
         case .login:
             return Provider.shared.Enviroment.url + "/users/auth/login"

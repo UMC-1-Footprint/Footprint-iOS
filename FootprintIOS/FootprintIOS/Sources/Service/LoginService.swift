@@ -16,42 +16,25 @@ enum LoginEvent {
 protocol LoginServiceType {
     var event: PublishSubject<LoginEvent> { get }
     
-    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType) -> Observable<BaseModel<LoginResponseDTO>>
+    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType)
 }
 
 class LoginService: NetworkService, LoginServiceType {
     var event = PublishSubject<LoginEvent>()
     
-    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType) -> Observable<BaseModel<LoginResponseDTO>> {
-//        let target = JourneyAPI.updatePikis(journeyId: journeyId, request: request)
-//
-//        let request = APIService.request(target: target)
-//            .map(BaseModel<UpdatePikisResponse>.self)
-//            .map(\.data.ids)
-//            .asObservable()
-//
-//        request.bind { [weak self] ids in
-//            self?.event.onNext(.updatePikis(ids: ids))
-//        }
-//        .disposed(by: disposeBag)
-        
-        
+    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType) {
         let request = LoginEndPoint
             .login(userId: userId, userName: userName, userEmail: userEmail, providerType: providerType)
             .createRequest()
         
-        return API.request(request: request)
+        let response: Single<BaseModel<LoginResponseDTO>> = API.request(request: request)
         
-//        API.request(request: request)
-//            .map(BaseModel<LoginResponseDTO>.self)
-        
-//        return API.request(request: request)
+        response.asObservable()
+            .map(\.result)
+            .bind { [weak self] data in
+                self?.event.onNext(.login(data))
+            }
+            .disposed(by: disposeBag)
     }
-    
-//    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>> {
-//
-//
-//        return API.request(request: request)
-//    }
 }
 

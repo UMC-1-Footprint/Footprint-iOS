@@ -96,9 +96,9 @@ class MyPageViewController: NavigationBarViewController {
         loginPageButton.rx
             .tap
             .bind { [weak self] _ in
-//                let loginViewController = LoginViewController(reactor: .init())
-//                loginViewController.hidesBottomBarWhenPushed = true
-//                self?.navigationController?.pushViewController(loginViewController, animated: true)
+                let loginViewController = LoginViewController(reactor: .init(loginService: LoginService(), keychainService: KeychainService()))
+                loginViewController.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(loginViewController, animated: true)
             }
             .disposed(by: disposeBag)
         
