@@ -11,16 +11,12 @@ import RxSwift
 
 protocol BaseServiceType {
     var disposeBag: DisposeBag { get }
-    
-    var provider: ProviderType { get }
 }
 
 class BaseService: BaseServiceType {
     var disposeBag: DisposeBag = .init()
     
-    unowned let provider: ProviderType
-    
-    init(provider: ProviderType) {
-        self.provider = provider
+    init() {
+        
     }
 }

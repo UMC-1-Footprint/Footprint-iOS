@@ -35,40 +35,42 @@ protocol KeychainServiceType {
 }
 
 class KeychainService: LocalService, KeychainServiceType {
+    unowned let keyChain: KeychainProviderType = Provider.shared.Keychain
+    
     var event = PublishSubject<KeychainEvent>()
     
     func updateTokens(accessToken: String, refreshToken: String) {
-        provider.Keychain.updateTokens(accessToken: accessToken, refreshToken: refreshToken)
+        keyChain.updateTokens(accessToken: accessToken, refreshToken: refreshToken)
         
         event.onNext(.updateTokens)
     }
     
     func updateAccessToken(token: String) {
-        provider.Keychain.updateAccessToken(token)
+        keyChain.updateAccessToken(token)
         
         event.onNext(.updateAccessToken)
     }
     
     func updateRefreshToken(token: String) {
-        provider.Keychain.updateRefreshToken(token)
+        keyChain.updateRefreshToken(token)
         
         event.onNext(.updateRefreshToken)
     }
     
     func deleteTokens() {
-        provider.Keychain.deleteTokens()
+        keyChain.deleteTokens()
         
         event.onNext(.deleteTokens)
     }
     
     func deleteAccessToken() {
-        provider.Keychain.deleteAccessToken()
+        keyChain.deleteAccessToken()
         
         event.onNext(.deleteAccessToken)
     }
     
     func deleteRefreshToken() {
-        provider.Keychain.deleteRefreshToken()
+        keyChain.deleteRefreshToken()
         
         event.onNext(.deleteRefreshToken)
     }

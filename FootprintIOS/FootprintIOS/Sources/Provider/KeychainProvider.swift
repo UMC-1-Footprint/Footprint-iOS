@@ -8,7 +8,7 @@
 
 import SwiftKeychainWrapper
 
-protocol KeychainProviderType {
+protocol KeychainProviderType: AnyObject {
     func getAccessToken() -> String
     func getRefreshToken() -> String
     

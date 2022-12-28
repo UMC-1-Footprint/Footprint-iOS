@@ -10,9 +10,9 @@ import Foundation
 import RxSwift
 
 protocol NetworkServiceType {
-    
+    var API: APIProviderType { get }
 }
 
 class NetworkService: BaseService, NetworkServiceType {
-    
+    let API = Provider.shared.API
 }

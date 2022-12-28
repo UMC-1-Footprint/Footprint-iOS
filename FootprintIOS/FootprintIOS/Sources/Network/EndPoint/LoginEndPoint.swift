@@ -8,21 +8,15 @@
 
 import Foundation
 
-enum ProviderTypeT: String {
-    case kakao = "kakao"
-    case google = "google"
-    case apple = "apple"
-}
-
 enum LoginEndPoint {
-    case login(userId: String, userName: String, userEmail: String, providerType: ProviderType)
+    case login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType)
 }
 
 extension LoginEndPoint: EndPoint {
     func getURL() -> String {
         switch self {
         case .login:
-            return Environment.apiBaseURL + "/users/auth/login"
+            return Provider.shared.Enviroment.url + "/users/auth/login"
         }
     }
     
@@ -36,7 +30,7 @@ extension LoginEndPoint: EndPoint {
     var body: Data? {
         switch self {
         case let .login(userId, userName, userEmail, providerType):
-            let parameters = LoginRequestModel(userID: userId, username: userName, email: userEmail, providerType: providerType.rawValue)
+            let parameters = LoginRequestDTO(userID: userId, username: userName, email: userEmail, providerType: providerType)
             guard let body = try? JSONEncoder().encode(parameters) else { return nil }
                 
             return body

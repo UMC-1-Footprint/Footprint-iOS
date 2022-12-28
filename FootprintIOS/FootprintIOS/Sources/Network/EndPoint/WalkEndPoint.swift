@@ -16,7 +16,7 @@ extension WalkEndPoint: EndPoint {
     func getURL() -> String {
         switch self {
         case .login:
-            return Environment.url + "/users/auth/login"
+            return Provider.shared.Enviroment.url + "/users/auth/login"
         }
     }
     
@@ -28,12 +28,6 @@ extension WalkEndPoint: EndPoint {
     }
     
     var body: Data? {
-        switch self {
-        case let .login(userId, userName, userEmail, providerType):
-            let parameters = LoginRequestModel(userID: userId, username: userName, email: userEmail, providerType: providerType.rawValue)
-            guard let body = try? JSONEncoder().encode(parameters) else { return nil }
-                
-            return body
-        }
+        return nil
     }
 }

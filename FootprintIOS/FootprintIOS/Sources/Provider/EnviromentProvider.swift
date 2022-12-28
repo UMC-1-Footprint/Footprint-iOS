@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol EnvironmentProviderType {
+protocol EnvironmentProviderType: AnyObject {
     var version: String { get }
     var url: String { get }
     var kakaoAppKey: String { get }

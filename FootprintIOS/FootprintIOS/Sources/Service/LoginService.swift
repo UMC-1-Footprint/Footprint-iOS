@@ -10,24 +10,48 @@ import Foundation
 import RxSwift
 
 enum LoginEvent {
-    case login(LoginResponseModel)
+    case login(LoginResponseDTO)
 }
 
 protocol LoginServiceType {
     var event: PublishSubject<LoginEvent> { get }
     
-    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>>
+    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType) -> Observable<BaseModel<LoginResponseDTO>>
 }
 
 class LoginService: NetworkService, LoginServiceType {
     var event = PublishSubject<LoginEvent>()
     
-    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>> {
+    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType) -> Observable<BaseModel<LoginResponseDTO>> {
+//        let target = JourneyAPI.updatePikis(journeyId: journeyId, request: request)
+//
+//        let request = APIService.request(target: target)
+//            .map(BaseModel<UpdatePikisResponse>.self)
+//            .map(\.data.ids)
+//            .asObservable()
+//
+//        request.bind { [weak self] ids in
+//            self?.event.onNext(.updatePikis(ids: ids))
+//        }
+//        .disposed(by: disposeBag)
+        
+        
         let request = LoginEndPoint
             .login(userId: userId, userName: userName, userEmail: userEmail, providerType: providerType)
             .createRequest()
-
+        
         return API.request(request: request)
+        
+//        API.request(request: request)
+//            .map(BaseModel<LoginResponseDTO>.self)
+        
+//        return API.request(request: request)
     }
+    
+//    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>> {
+//
+//
+//        return API.request(request: request)
+//    }
 }
 

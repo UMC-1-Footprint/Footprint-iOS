@@ -15,7 +15,11 @@ protocol ProviderType: AnyObject {
 }
 
 class Provider: ProviderType {
+    static let shared: ProviderType = Provider()
+    
     lazy var API: APIProviderType = APIProvider(provider: self)
     lazy var Enviroment: EnvironmentProviderType = EnvironmentProvider(provider: self)
     lazy var Keychain: KeychainProviderType = KeychainProvider(provider: self)
+    
+    private init() {}
 }
