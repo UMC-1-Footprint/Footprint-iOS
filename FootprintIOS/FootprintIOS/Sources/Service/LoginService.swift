@@ -37,4 +37,3 @@ class LoginService: NetworkService, LoginServiceType {
             .disposed(by: disposeBag)
     }
 }
-

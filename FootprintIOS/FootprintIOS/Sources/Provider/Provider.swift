@@ -11,7 +11,7 @@ import Foundation
 protocol ProviderType: AnyObject {
     var API: APIProviderType { get }
     var Enviroment: EnvironmentProviderType { get }
-    var Keychain: KeychainProviderType { get set }
+    var Keychain: KeychainProviderType { get }
 }
 
 class Provider: ProviderType {
