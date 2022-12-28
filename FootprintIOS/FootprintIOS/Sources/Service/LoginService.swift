@@ -14,20 +14,20 @@ enum LoginEvent {
 }
 
 protocol LoginServiceType {
-    var disposedBag: DisposeBag { get }
     var event: PublishSubject<LoginEvent> { get }
+    
     func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>>
 }
 
 class LoginService: NetworkService, LoginServiceType {
-    var disposedBag = DisposeBag()
     var event = PublishSubject<LoginEvent>()
     
     func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>> {
         let request = LoginEndPoint
             .login(userId: userId, userName: userName, userEmail: userEmail, providerType: providerType)
             .createRequest()
-        return self.apiService.request(request: request)
+
+        return API.request(request: request)
     }
 }
 

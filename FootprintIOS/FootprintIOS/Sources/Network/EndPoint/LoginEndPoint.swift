@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ProviderType: String {
+enum ProviderTypeT: String {
     case kakao = "kakao"
     case google = "google"
     case apple = "apple"

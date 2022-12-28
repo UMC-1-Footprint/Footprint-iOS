@@ -12,7 +12,7 @@ import Foundation
 import RxSwift
 
 enum WalkEvent {
-    case login(LoginResponseModel)
+    case create(Walk)
 }
 
 protocol WalkServiceType {
