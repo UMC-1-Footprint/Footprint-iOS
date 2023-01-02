@@ -22,10 +22,10 @@ protocol KeychainProviderType: AnyObject {
 }
 
 class KeychainProvider: BaseProvider, KeychainProviderType {
-    private let keychain = KeychainWrapper.standard
+    let keychain = KeychainWrapper.standard
     
-    private let accessTokenKey = "accessToken"
-    private let refreshTokenKey = "refreshToken"
+    let accessTokenKey = "accessToken"
+    let refreshTokenKey = "refreshToken"
     
     func getAccessToken() -> String {
         return keychain.string(forKey: accessTokenKey) ?? ""

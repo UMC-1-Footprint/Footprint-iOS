@@ -27,13 +27,11 @@ class LoginService: NetworkService, LoginServiceType {
             .login(userId: userId, userName: userName, userEmail: userEmail, providerType: providerType)
             .createRequest()
         
-        let response: Single<BaseModel<LoginResponseDTO>> = API.request(request: request)
-        
-        response.asObservable()
-            .map(\.result)
-            .bind { [weak self] data in
-                self?.event.onNext(.login(data))
-            }
-            .disposed(by: disposeBag)
+        API.request(request: request).asObservable()
+                    .map(\BaseModel.result)
+                    .bind { [weak self] data in
+                        self?.event.onNext(.login(data))
+                    }
+                    .disposed(by: disposeBag)
     }
 }
