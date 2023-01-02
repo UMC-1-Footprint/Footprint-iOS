@@ -24,7 +24,6 @@ class WalkRecordCalendarHeader: BaseCollectionReusableView {
     
     let monthLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .medium)
-        $0.text = "2022년 12월"
     }
     
     let monthControlStackView = UIStackView().then {

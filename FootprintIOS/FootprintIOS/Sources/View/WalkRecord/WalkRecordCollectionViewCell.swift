@@ -19,10 +19,8 @@ class WalkRecordCollectionViewCell: BaseCollectionViewCell {
         
         footprintImage.image = UIImage(named: FootprintIOSAsset.Images.iconFootprint.name)
         
-        dateLabel.do {
-            $0.text = "2"
-            $0.font = .systemFont(ofSize: 10)
-        }
+        dateLabel.font = .systemFont(ofSize: 10)
+        
     }
     
     override func setupHierarchy() {
@@ -44,5 +42,9 @@ class WalkRecordCollectionViewCell: BaseCollectionViewCell {
             $0.centerX.equalToSuperview()
             $0.top.equalToSuperview().offset(19)
         }
+    }
+    
+    func setData(day: String) {
+        dateLabel.text = day
     }
 }

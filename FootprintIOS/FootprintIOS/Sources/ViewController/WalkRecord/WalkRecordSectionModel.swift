@@ -18,7 +18,7 @@ enum WalkRecordSection {
 }
 
 enum WalkRecordItem {
-    case calendar
+    case calendar(String)
     case walkSummary
 //    case emptyWalkSummary
 }

@@ -104,30 +104,46 @@ class WalkRecordViewController: BaseViewController, View {
         
         reactor.state
             .map(\.walkRecordSection)
-            .bind(to: collectionView.rx.items(dataSource: WalkRecordViewController.createDataSource()))
+            .bind(to: collectionView.rx.items(dataSource: createDataSource()))
             .disposed(by: disposeBag)
         
         collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
-}
-
-extension WalkRecordViewController {
-    static func createDataSource() -> WalkRecordDataSource {
+    
+    func createDataSource() -> WalkRecordDataSource {
         return RxCollectionViewSectionedReloadDataSource(
             configureCell: { _, collectionView, indexPath, item in
                 switch item {
-                case .calendar:
-                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self), for: indexPath)
+                case let .calendar(day):
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self), for: indexPath) as? WalkRecordCollectionViewCell else { return .init() }
+                    cell.setData(day: day)
                     return cell
                 case .walkSummary:
                     return .init()
                 }
             },
-            configureSupplementaryView: { (dataSource, collectionView, kind, indexPath) -> UICollectionReusableView in
+            configureSupplementaryView: { [self] (dataSource, collectionView, kind, indexPath) -> UICollectionReusableView in
                 switch dataSource[indexPath.section].model {
                 case .calendar:
                    guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordCalendarHeader.self), for: indexPath) as? WalkRecordCalendarHeader else { return .init() }
-                            
+                    
+                    header.prevMonthButton.rx.tap
+                        .map { _ in .prevMonth }
+                        .bind(to: reactor!.action)
+                        .disposed(by: header.disposeBag)
+                
+                    self.reactor?.state
+                        .map(\.monthTitle)
+                        .bind(to: header.monthLabel.rx.text)
+                        .disposed(by: header.disposeBag)
+                    
+                    self.reactor?.state
+                        .map(\.isUpdated)
+                        .filter { $0 }
+                        .map { _ in .update }
+                        .bind(to: reactor!.action)
+                        .disposed(by: header.disposeBag)
+                        
                     return header
                 case .walkSummary:
                     return .init()
@@ -137,11 +153,15 @@ extension WalkRecordViewController {
     }
 }
 
+extension WalkRecordViewController {
+    
+}
+
 extension WalkRecordViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = self.view.frame.width
 
-        let cellWidth = width / 7.0
+        let cellWidth = ( width - 24.0 ) / 7.0
         let cellHeight = 60.0
         
         return CGSize(width: cellWidth, height: cellHeight)
