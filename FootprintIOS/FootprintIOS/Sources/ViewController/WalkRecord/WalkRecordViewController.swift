@@ -32,9 +32,7 @@ class WalkRecordViewController: BaseViewController, View {
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
     }
     let collectionViewFlowLayout = UICollectionViewFlowLayout().then {
-        $0.minimumLineSpacing = 0
         $0.minimumInteritemSpacing = 0
-        $0.sectionInset = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
     }
     lazy var collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: collectionViewFlowLayout)
     
@@ -94,6 +92,8 @@ class WalkRecordViewController: BaseViewController, View {
         
         collectionView.register(WalkRecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self))
         collectionView.register(WalkRecordCalendarHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordCalendarHeader.self))
+        collectionView.register(WalkRecordSummaryHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self))
+        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
     }
     
     func bind(reactor: WalkRecordReactor) {
@@ -119,7 +119,9 @@ class WalkRecordViewController: BaseViewController, View {
                     cell.setData(day: day)
                     return cell
                 case .walkSummary:
-                    return .init()
+                    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: RecordCollectionViewCell.self), for: indexPath) as? RecordCollectionViewCell else { return .init() }
+                   
+                    return cell
                 }
             },
             configureSupplementaryView: { [self] (dataSource, collectionView, kind, indexPath) -> UICollectionReusableView in
@@ -131,6 +133,11 @@ class WalkRecordViewController: BaseViewController, View {
                         .map { _ in .prevMonth }
                         .bind(to: reactor!.action)
                         .disposed(by: header.disposeBag)
+                    
+                    header.nextMonthButton.rx.tap
+                        .map { _ in .nextMonth }
+                        .bind(to: reactor!.action)
+                        .disposed(by: header.disposeBag)
                 
                     self.reactor?.state
                         .map(\.monthTitle)
@@ -140,34 +147,78 @@ class WalkRecordViewController: BaseViewController, View {
                     self.reactor?.state
                         .map(\.isUpdated)
                         .filter { $0 }
-                        .map { _ in .update }
+                        .map { _ in .updateCalendar }
                         .bind(to: reactor!.action)
                         .disposed(by: header.disposeBag)
+                    // TODO: - .observeOn(MainScheduler.asyncInstance) 이 코드 쓰면 문제 해결됨 왜 ?? 스레드 공부 ㄲ
                         
                     return header
                 case .walkSummary:
-                    return .init()
+                    guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self), for: indexPath) as? WalkRecordSummaryHeader else { return .init() }
+                    
+                    return header
                 }
             }
         )
     }
 }
 
-extension WalkRecordViewController {
-    
-}
-
 extension WalkRecordViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = self.view.frame.width
+        switch indexPath.section {
+        case 0:
+            let width = self.view.frame.width
 
-        let cellWidth = ( width - 24.0 ) / 7.0
-        let cellHeight = 60.0
-        
-        return CGSize(width: cellWidth, height: cellHeight)
+            let cellWidth = ( width - 24.0 ) / 7.0
+            let cellHeight = 60.0
+            
+            return CGSize(width: cellWidth, height: cellHeight)
+        case 1:
+            let width = self.view.frame.width
+
+            let cellWidth = width - 24.0
+            let cellHeight = 104.0
+            
+            return CGSize(width: cellWidth, height: cellHeight)
+        default:
+            return CGSize()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: self.view.frame.width, height: 80.0)
+        switch section {
+        case 0:
+            return CGSize(width: self.view.frame.width, height: 80.0)
+        case 1:
+            return CGSize(width: self.view.frame.width, height: 40.0)
+        default:
+            return CGSize()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        switch section {
+        case 0:
+            return 0
+        case 1:
+            return 10
+        default:
+            return 0
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        var edgeInset = UIEdgeInsets()
+        
+        switch section {
+        case 0:
+            edgeInset = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
+        case 1:
+            edgeInset = UIEdgeInsets(top: 16, left: 0, bottom: 12, right: 0)
+        default:
+            edgeInset = UIEdgeInsets()
+        }
+
+        return edgeInset;
     }
 }
