@@ -15,7 +15,7 @@ class WalkRecordReactor: Reactor {
         case refresh
         case prevMonth
         case nextMonth
-        case update
+        case updateCalendar
     }
     
     enum Mutation {
@@ -42,9 +42,9 @@ class WalkRecordReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .refresh, .update:
+        case .refresh, .updateCalendar:
             return Observable.concat([
-                .just(.setWalkRecordSection(createSection(days: getDays()))),
+                .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
                 .just(.setCalendarMonthTitle(updateMonthTitle()))
             ])
         case .prevMonth:
@@ -54,7 +54,11 @@ class WalkRecordReactor: Reactor {
                  .just(.setUpdateStatus(false))
                 ])
         case .nextMonth:
-            return .empty()
+            return Observable.concat(
+                [.just(.setCalendarDate(setNextMonth())),
+                 .just(.setUpdateStatus(true)),
+                 .just(.setUpdateStatus(false))
+                ])
         }
     }
     
@@ -76,14 +80,19 @@ class WalkRecordReactor: Reactor {
 }
 
 extension WalkRecordReactor {
-    func createSection(days: [String]) -> [WalkRecordSectionModel] {
-        let items = days.map { day -> WalkRecordItem in
+    func createCalendarSection(days: [String]) -> [WalkRecordSectionModel] {
+        let calendarItems = days.map { day -> WalkRecordItem in
             return .calendar(day)
         }
+        var recordItems:[WalkRecordItem] = []
+        recordItems.append(.walkSummary)
+        recordItems.append(.walkSummary)
+        recordItems.append(.walkSummary)
         
-        let section = WalkRecordSectionModel.init(model: .calendar(items), items: items)
+        let calendarSection = WalkRecordSectionModel.init(model: .calendar(calendarItems), items: calendarItems)
+        let recordSection = WalkRecordSectionModel.init(model: .walkSummary(recordItems), items: recordItems)
         
-        return [section]
+        return [calendarSection, recordSection]
     }
     
     func getDays() -> [String] {
@@ -103,7 +112,6 @@ extension WalkRecordReactor {
         
         for day in 0..<totalDays {
             if day < startDay {
-                print(day, startDay)
                 days.append(String())
                 continue
             }
@@ -125,6 +133,12 @@ extension WalkRecordReactor {
     func setPrevMonth() -> Date {
         var state = currentState
         let calendarDate = state.calendar.date(byAdding: DateComponents(month: -1), to: state.calendarDate) ?? Date()
+        return calendarDate
+    }
+    
+    func setNextMonth() -> Date {
+        var state = currentState
+        let calendarDate = state.calendar.date(byAdding: DateComponents(month: +1), to: state.calendarDate) ?? Date()
         return calendarDate
     }
 }
