@@ -38,12 +38,17 @@ class MyPageViewController: NavigationBarViewController {
         $0.setTitle("내 발자국 페이지로 이동", for: .normal)
         $0.setTitleColor(.black, for: .normal)
     }
+    let walkScreenButton = UIButton().then {
+        $0.setTitle("산책 기록 페이지로 이동", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+    }
     var pushMyFootprintScreen: () -> MyFootprintViewController
+    var pushWalkRecordScreen: () -> WalkRecordViewController
     
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, myFootprintButton])
+        view.addSubviews([badgePageButton, loginPageButton, agreementPageButton, myFootprintButton, walkScreenButton])
     }
     
     override func setupLayout() {
@@ -67,11 +72,17 @@ class MyPageViewController: NavigationBarViewController {
             $0.top.equalTo(agreementPageButton.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
         }
+        
+        walkScreenButton.snp.makeConstraints {
+            $0.top.equalTo(myFootprintButton.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
     }
     
     // MARK: - Initializer
-    init(pushMyFootprintScreen: @escaping () -> MyFootprintViewController) {
+    init(pushMyFootprintScreen: @escaping () -> MyFootprintViewController, pushWalkRecordScreen: @escaping () -> WalkRecordViewController) {
         self.pushMyFootprintScreen = pushMyFootprintScreen
+        self.pushWalkRecordScreen = pushWalkRecordScreen
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -117,10 +128,22 @@ class MyPageViewController: NavigationBarViewController {
                 self?.goToMyFootprintScreen()
             }
             .disposed(by: disposeBag)
+        
+        walkScreenButton.rx
+            .tap
+            .bind { [weak self] _ in
+                self?.goToWalkRecordScreen()
+            }
+            .disposed(by: disposeBag)
     }
     
     private func goToMyFootprintScreen() {
         let controller = self.pushMyFootprintScreen()
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    private func goToWalkRecordScreen() {
+        let controller = self.pushWalkRecordScreen()
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }
