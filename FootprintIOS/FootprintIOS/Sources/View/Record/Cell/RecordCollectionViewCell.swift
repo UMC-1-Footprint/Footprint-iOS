@@ -21,6 +21,7 @@ class RecordCollectionViewCell: BaseCollectionViewCell, View {
     let timeImageView: UIImageView = .init()
     let timeLabel: UILabel = .init()
     let deleteButton: UIButton = .init()
+    let hashTagStackView: HashTagStackView = .init()
     
     // MARK: - Setup Methods
     
@@ -42,12 +43,14 @@ class RecordCollectionViewCell: BaseCollectionViewCell, View {
         timeLabel.textColor = FootprintIOSAsset.Colors.blackL.color
         
         deleteButton.setImage(FootprintIOSAsset.Images.iconTrash.image, for: .normal)
+        
+        hashTagStackView.update(texts: ["테스트1", "테스트2"])
     }
     
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        contentView.addSubviews([imageView, titleLabel, timeImageView, timeLabel, deleteButton])
+        contentView.addSubviews([imageView, titleLabel, timeImageView, timeLabel, deleteButton, hashTagStackView])
     }
     
     override func setupLayout() {
@@ -56,7 +59,8 @@ class RecordCollectionViewCell: BaseCollectionViewCell, View {
         imageView.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(10)
             $0.leading.equalToSuperview().inset(10)
-            $0.width.equalTo(imageView.snp.height)
+            $0.width.equalTo(100)
+            $0.height.equalTo(100)
         }
         
         titleLabel.snp.makeConstraints {
@@ -78,6 +82,12 @@ class RecordCollectionViewCell: BaseCollectionViewCell, View {
         deleteButton.snp.makeConstraints {
             $0.trailing.top.equalToSuperview().inset(15)
             $0.width.height.equalTo(12)
+        }
+        
+        hashTagStackView.snp.makeConstraints {
+            $0.height.equalTo(24)
+            $0.leading.equalTo(imageView.snp.trailing).offset(10)
+            $0.bottom.equalTo(imageView.snp.bottom)
         }
     }
     
