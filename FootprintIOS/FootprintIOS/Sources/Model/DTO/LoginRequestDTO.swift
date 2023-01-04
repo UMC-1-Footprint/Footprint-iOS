@@ -8,9 +8,9 @@
 
 import Foundation
 
-// MARK: - LoginRequestDTO
-struct LoginRequestModel: Codable {
-    let userID, username, email, providerType: String
+struct LoginRequestDTO: Codable {
+    let userID, username, email: String
+    let providerType: LoginProviderType
 
     enum CodingKeys: String, CodingKey {
         case userID = "userId"

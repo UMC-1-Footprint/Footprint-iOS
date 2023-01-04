@@ -61,7 +61,7 @@ class SettingViewController: NavigationBarViewController {
         stackView.distribution = .fillEqually
         stackView.alignment = .center
         
-        versionLabel.text = "버전 \(Environment.version)\n ⓒ 2022 발자국 all rights reserved."
+        versionLabel.text = "버전 \(Provider.shared.Enviroment.version)\n ⓒ 2022 발자국 all rights reserved."
         versionLabel.numberOfLines = 2
         versionLabel.font = .systemFont(ofSize: 10)
         versionLabel.textColor = UIColor(hex: 0xC3C3C3)

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct LoginResponseModel: Codable {
+struct LoginResponseDTO: Decodable {
     let jwtID: String
     let status: String
     let checkMonthChanged: Bool

@@ -10,24 +10,28 @@ import Foundation
 import RxSwift
 
 enum LoginEvent {
-    case login(LoginResponseModel)
+    case login(LoginResponseDTO)
 }
 
 protocol LoginServiceType {
-    var disposedBag: DisposeBag { get }
     var event: PublishSubject<LoginEvent> { get }
-    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>>
+    
+    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType)
 }
 
 class LoginService: NetworkService, LoginServiceType {
-    var disposedBag = DisposeBag()
     var event = PublishSubject<LoginEvent>()
     
-    func loginAPI(userId: String, userName: String, userEmail: String, providerType: ProviderType) -> Observable<BaseModel<LoginResponseModel>> {
+    func login(userId: String, userName: String, userEmail: String, providerType: LoginProviderType) {
         let request = LoginEndPoint
             .login(userId: userId, userName: userName, userEmail: userEmail, providerType: providerType)
             .createRequest()
-        return self.apiService.request(request: request)
+        
+        API.request(request: request).asObservable()
+                    .map(\BaseModel.result)
+                    .bind { [weak self] data in
+                        self?.event.onNext(.login(data))
+                    }
+                    .disposed(by: disposeBag)
     }
 }
-
