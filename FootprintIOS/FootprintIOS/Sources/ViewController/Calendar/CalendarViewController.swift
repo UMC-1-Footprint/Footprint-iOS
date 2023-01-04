@@ -97,9 +97,18 @@ class CalendarViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         alertButton.rx.tap
-            .bind { [weak self] in
-                self?.makeAlert(type: .delete)
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                let delete: PublishSubject<Bool> = .init()
+                
+                owner.makeAlert(type: .delete, alertAction: {
+                    delete.onNext(true)
+                })
+                
+                return delete
             }
+            .map { _ in .delete }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         homeButton.rx.tap
@@ -107,6 +116,14 @@ class CalendarViewController: NavigationBarViewController, View {
                 let homeVC = HomeViewController(reactor: .init())
                 self?.tabBarController?.tabBar.backgroundColor = .white
                 self?.navigationController?.pushViewController(homeVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map(\.isDeleted)
+            .withUnretained(self)
+            .bind { owner, isDeleted in
+                print("\(isDeleted)")
             }
             .disposed(by: disposeBag)
     }

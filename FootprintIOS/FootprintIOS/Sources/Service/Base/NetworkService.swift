@@ -7,11 +7,12 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol NetworkServiceType {
-    var apiService: APIManager { get }
+    var API: APIProviderType { get }
 }
 
-class NetworkService: NetworkServiceType {
-    let apiService: APIManager = APIManager.shared
+class NetworkService: BaseService, NetworkServiceType {
+    let API = Provider.shared.API
 }
