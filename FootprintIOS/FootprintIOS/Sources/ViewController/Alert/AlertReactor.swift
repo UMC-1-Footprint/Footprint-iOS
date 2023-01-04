@@ -11,7 +11,6 @@ import ReactorKit
 class AlertReactor: Reactor {
     enum Action {
         case tapCancelButton
-        case tapAlertButton(AlertType)
     }
 
     enum Mutation {
@@ -31,36 +30,6 @@ class AlertReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .tapCancelButton:
-            return .just(.updateIsDismiss)
-        case .tapAlertButton(let alertType):
-            switch alertType {
-            case .noGoal, .changeGoal, .badge(_):
-                break
-            case .delete:
-                // 서버 통신
-                break
-            case .save(let i):
-                //
-                break
-            case .cancel(let i):
-                //
-                break
-            case .setBadge:
-                //
-                break
-            case .logout:
-                //
-                break
-            case .withdrawal:
-                //
-                break
-            case .deleteAll(let i):
-                //
-                break
-            case .custom:
-                //
-                break
-            }
             return .just(.updateIsDismiss)
         }
     }
