@@ -16,7 +16,6 @@ import ReactorKit
 
 class WalkRecordViewController: BaseViewController, View {
     typealias Reactor = WalkRecordReactor
-    
     typealias WalkRecordDataSource = RxCollectionViewSectionedReloadDataSource<WalkRecordSectionModel>
     
     let walkRecordTitleLabel = UILabel().then {
@@ -80,7 +79,7 @@ class WalkRecordViewController: BaseViewController, View {
         collectionView.snp.makeConstraints {
             $0.top.equalTo(underlineView).offset(1)
             $0.leading.trailing.equalTo(self.view)
-            $0.height.equalTo(800)
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -118,9 +117,9 @@ class WalkRecordViewController: BaseViewController, View {
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self), for: indexPath) as? WalkRecordCollectionViewCell else { return .init() }
                     cell.setData(day: day)
                     return cell
-                case .walkSummary:
+                case let .walkSummary(reactor):
                     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: RecordCollectionViewCell.self), for: indexPath) as? RecordCollectionViewCell else { return .init() }
-                   
+                    cell.reactor = reactor
                     return cell
                 }
             },
@@ -130,11 +129,13 @@ class WalkRecordViewController: BaseViewController, View {
                    guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordCalendarHeader.self), for: indexPath) as? WalkRecordCalendarHeader else { return .init() }
                     
                     header.prevMonthButton.rx.tap
+                        .map { _ in self.reactor?.setPrevMonth() }
                         .map { _ in .prevMonth }
                         .bind(to: reactor!.action)
                         .disposed(by: header.disposeBag)
                     
                     header.nextMonthButton.rx.tap
+                        .map { _ in self.reactor?.setNextMonth() }
                         .map { _ in .nextMonth }
                         .bind(to: reactor!.action)
                         .disposed(by: header.disposeBag)
@@ -144,14 +145,6 @@ class WalkRecordViewController: BaseViewController, View {
                         .bind(to: header.monthLabel.rx.text)
                         .disposed(by: header.disposeBag)
                     
-                    self.reactor?.state
-                        .map(\.isUpdated)
-                        .filter { $0 }
-                        .map { _ in .updateCalendar }
-                        .bind(to: reactor!.action)
-                        .disposed(by: header.disposeBag)
-                    // TODO: - .observeOn(MainScheduler.asyncInstance) 이 코드 쓰면 문제 해결됨 왜 ?? 스레드 공부 ㄲ
-                        
                     return header
                 case .walkSummary:
                     guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self), for: indexPath) as? WalkRecordSummaryHeader else { return .init() }

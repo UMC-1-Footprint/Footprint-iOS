@@ -10,26 +10,29 @@ import UIKit
 
 import ReactorKit
 
+class CalendarInfo {
+    static let shared = CalendarInfo()
+    
+    let calendar = Calendar.current
+    lazy var components = calendar.dateComponents([.year, .month], from: Date())
+    lazy var calendarDate = calendar.date(from: components) ?? Date()
+}
+
 class WalkRecordReactor: Reactor {
     enum Action {
         case refresh
         case prevMonth
         case nextMonth
-        case updateCalendar
     }
     
     enum Mutation {
         case setWalkRecordSection([WalkRecordSectionModel])
-        case setCalendarDate(Date)
         case setCalendarMonthTitle(String)
         case setUpdateStatus(Bool)
     }
     
     struct State {
         var walkRecordSection: [WalkRecordSectionModel] = []
-        let calendar = Calendar.current
-        lazy var components = calendar.dateComponents([.year, .month], from: Date())
-        lazy var calendarDate = calendar.date(from: components) ?? Date()
         var monthTitle: String = .init()
         var isUpdated: Bool = false
     }
@@ -42,22 +45,22 @@ class WalkRecordReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .refresh, .updateCalendar:
+        case .refresh:
             return Observable.concat([
                 .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
                 .just(.setCalendarMonthTitle(updateMonthTitle()))
             ])
         case .prevMonth:
             return Observable.concat(
-                [.just(.setCalendarDate(setPrevMonth())),
-                 .just(.setUpdateStatus(true)),
-                 .just(.setUpdateStatus(false))
+                [
+                 .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
+                 .just(.setCalendarMonthTitle(updateMonthTitle()))
                 ])
         case .nextMonth:
             return Observable.concat(
-                [.just(.setCalendarDate(setNextMonth())),
-                 .just(.setUpdateStatus(true)),
-                 .just(.setUpdateStatus(false))
+                [
+                 .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
+                 .just(.setCalendarMonthTitle(updateMonthTitle()))
                 ])
         }
     }
@@ -68,8 +71,6 @@ class WalkRecordReactor: Reactor {
         switch mutation {
         case let .setWalkRecordSection(section):
             newState.walkRecordSection = section
-        case let .setCalendarDate(date):
-            newState.calendarDate = date
         case let .setCalendarMonthTitle(month):
             newState.monthTitle = month
         case let .setUpdateStatus(status):
@@ -85,9 +86,9 @@ extension WalkRecordReactor {
             return .calendar(day)
         }
         var recordItems:[WalkRecordItem] = []
-        recordItems.append(.walkSummary)
-        recordItems.append(.walkSummary)
-        recordItems.append(.walkSummary)
+        recordItems.append(.walkSummary(.init()))
+        recordItems.append(.walkSummary(.init()))
+        recordItems.append(.walkSummary(.init()))
         
         let calendarSection = WalkRecordSectionModel.init(model: .calendar(calendarItems), items: calendarItems)
         let recordSection = WalkRecordSectionModel.init(model: .walkSummary(recordItems), items: recordItems)
@@ -96,19 +97,10 @@ extension WalkRecordReactor {
     }
     
     func getDays() -> [String] {
-        var state = currentState
-        lazy var startDay = state.calendar.component(.weekday, from: state.calendarDate) - 1
-        let totalDays = startDay + state.calendar.range(of: .day, in: .month, for: state.calendarDate)!.count
+        let calendarInfo = CalendarInfo.shared
+        let startDay = calendarInfo.calendar.component(.weekday, from: calendarInfo.calendarDate) - 1
+        let totalDays = startDay + calendarInfo.calendar.range(of: .day, in: .month, for: calendarInfo.calendarDate)!.count
         var days: [String] = []
-        
-//        let prevMonthEndDay: Date? = Date()
-//
-//        if startDay > 0 {
-//            // 이전 달 날짜를 보여줘야 하는 경우
-//            prevMonthEndDay = calendar.date(byAdding: .month, value: -1, to: calendarDate)
-//            print("지난달")
-//            print(prevMonthEndDay)
-//        }
         
         for day in 0..<totalDays {
             if day < startDay {
@@ -122,23 +114,23 @@ extension WalkRecordReactor {
     }
     
     func updateMonthTitle() -> String {
-        var state = currentState
+        let calendarInfo = CalendarInfo.shared
         let dateFormatter = DateFormatter()
         
         dateFormatter.dateFormat = "yyyy년 MM월"
-        let dateToString = dateFormatter.string(from: state.calendarDate)
+        let dateToString = dateFormatter.string(from: calendarInfo.calendarDate)
         return dateToString
     }
     
-    func setPrevMonth() -> Date {
-        var state = currentState
-        let calendarDate = state.calendar.date(byAdding: DateComponents(month: -1), to: state.calendarDate) ?? Date()
-        return calendarDate
+    func setPrevMonth(){
+        let calendarInfo = CalendarInfo.shared
+        let calendarDate = calendarInfo.calendar.date(byAdding: DateComponents(month: -1), to: calendarInfo.calendarDate) ?? Date()
+        calendarInfo.calendarDate = calendarDate
     }
     
-    func setNextMonth() -> Date {
-        var state = currentState
-        let calendarDate = state.calendar.date(byAdding: DateComponents(month: +1), to: state.calendarDate) ?? Date()
-        return calendarDate
+    func setNextMonth() {
+        let calendarInfo = CalendarInfo.shared
+        let calendarDate = calendarInfo.calendar.date(byAdding: DateComponents(month: +1), to: calendarInfo.calendarDate) ?? Date()
+        calendarInfo.calendarDate = calendarDate
     }
 }
