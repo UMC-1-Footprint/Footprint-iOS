@@ -14,11 +14,6 @@ class GoalView: BaseView {
     
     lazy var dayButtons: [UIButton] = []
     
-    let button = UIButton().then {
-        $0.setTitle("버튼", for: .normal)
-        $0.setTitleColor(FootprintIOSAsset.Colors.blackM.color, for: .normal)
-    }
-    
     private let dayButtonStackView = UIStackView().then {
         $0.spacing = 5
         $0.alignment = .center
@@ -57,19 +52,15 @@ class GoalView: BaseView {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        addSubviews([button, goalDayLabel, dayButtonStackView, goalTimeLabel, goalWalkSelectView, timeLabel, walkSelectView])
+        addSubviews([goalDayLabel, dayButtonStackView, goalTimeLabel, goalWalkSelectView, timeLabel, walkSelectView])
     }
     
     override func setupLayout() {
         super.setupLayout()
         
-        button.snp.makeConstraints() {
-            $0.top.centerX.equalToSuperview()
-        }
-        
         goalDayLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(24)
-            $0.top.equalTo(button.snp.bottom)
+            $0.top.equalToSuperview()
         }
         
         dayButtonStackView.snp.makeConstraints {
