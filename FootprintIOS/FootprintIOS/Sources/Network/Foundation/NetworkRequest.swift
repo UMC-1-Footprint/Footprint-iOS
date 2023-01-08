@@ -29,6 +29,7 @@ struct NetworkRequest {
         urlRequest.httpMethod = httpMethod.rawValue
         urlRequest.httpBody = body
         urlRequest.allHTTPHeaderFields = headers ?? [:]
+        
         return urlRequest
     }
 }

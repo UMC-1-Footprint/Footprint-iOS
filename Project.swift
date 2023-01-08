@@ -25,6 +25,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "KakaoSDKAuth"),
         .external(name: "KakaoSDKUser"),
         .external(name: "NMapsMap"),
+        .external(name: "SwiftKeychainWrapper")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [

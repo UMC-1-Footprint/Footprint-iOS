@@ -9,18 +9,24 @@
 import Foundation
 
 protocol EndPoint {
+    var url: String { get }
     var method: HTTPMethod { get }
+    var headers: [String: String] { get }
     var body: Data? { get }
     
-    func getURL(environment: APIEnvironment) -> String
-    func createRequest(environment: APIEnvironment) -> NetworkRequest
+    func createRequest() -> NetworkRequest
 }
 
 extension EndPoint {
-    func createRequest(environment: APIEnvironment) -> NetworkRequest {
+    var headers: [String: String] {
         var headers: [String: String] = [:]
+        headers["X-ACCESS-TOKEN"] = Provider.shared.Keychain.getAccessToken()
         headers["Content-Type"] = "application/json"
-        return NetworkRequest(url: getURL(environment: environment),
+        return headers
+    }
+    
+    func createRequest() -> NetworkRequest {
+        return NetworkRequest(url: url,
                               httpMethod: method,
                               body: body,
                               headers: headers)

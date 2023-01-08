@@ -35,14 +35,12 @@ class CompositionRoot {
 extension CompositionRoot {
     static func makeTabBarScreen() -> TabBarViewController {
         
+        let walkService: WalkServiceType = WalkService()
+        
         let tabBarViewController = TabBarViewController()
-        
-        let footprintRootViewController = makeFootprintRootScreen()
-        
+        let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
         let calendarViewController = makeCalendarScreen()
-        
         let recommendViewController = makeRecommendScreen()
-        
         let myPageViewController = makeMyPageScreen()
         
         tabBarViewController.viewControllers = [
@@ -55,25 +53,29 @@ extension CompositionRoot {
         return tabBarViewController
     }
     
-    static func makeFootprintRootScreen() -> FootprintRootViewController {
-        var pushFootprintWriteScreen: () -> FootprintWriteViewController
-        pushFootprintWriteScreen = {
+    static func makeFootprintRootScreen(walkService: WalkServiceType) -> FootprintRootViewController {
+        let pushFootprintWriteScreen: () -> FootprintWriteViewController = {
             let reactor = FootprintWriteReactor(state: .init())
             let controller = FootprintWriteViewController(reactor: reactor)
             return controller
         }
         
-        var pushFootprintMapScreen: () -> FootprintMapViewController
-        pushFootprintMapScreen = {
+        let pushFootprintMapScreen: () -> FootprintMapViewController = {
             let reactor = FootprintMapReactor(state: .init())
             let controller = FootprintMapViewController(reactor: reactor,
                                                         pushFootprintWriteScreen: pushFootprintWriteScreen)
             return controller
         }
+        
+        let pushRecordSearchScreen: (Int) -> RecordSearchViewController = { (id) in
+            let reactor: RecordSearchReactor = .init(id: id, walkService: walkService)
+            return .init(reactor: reactor)
+        }
 
         let reactor = FootprintRootReactor(state: .init())
         let controller = FootprintRootViewController(reactor: reactor,
-                                                     pushFootprintMapScreen: pushFootprintMapScreen)
+                                                     pushFootprintMapScreen: pushFootprintMapScreen,
+                                                     pushRecordSearchScreen: pushRecordSearchScreen)
         
         controller.title = "홈"
         controller.tabBarItem.image = nil
@@ -82,16 +84,14 @@ extension CompositionRoot {
     }
     
     static func makeCalendarScreen() -> CalendarViewController {
-        var pushGoalScreen: () -> GoalViewController
-        pushGoalScreen = {
+        let pushGoalScreen: () -> GoalViewController = {
             let reactor = GoalReactor.init(service: InfoService())
             let controller = GoalViewController(reactor: reactor)
             
             return controller
         }
     
-        var pushInfoScreen: () -> InfoViewController
-        pushInfoScreen = {
+        let pushInfoScreen: () -> InfoViewController = {
             let reactor = InfoReactor.init(service: InfoService())
             let controller = InfoViewController(reactor: reactor,
                                                 pushGoalScreen: pushGoalScreen)
@@ -106,6 +106,19 @@ extension CompositionRoot {
         controller.title = "캘린더"
         controller.tabBarItem.image = nil
         controller.tabBarItem.selectedImage = nil
+        return controller
+    }
+    
+    static func makeRecordCalendarScreen(walkService: WalkServiceType) -> RecordCalendarViewController {
+        let pushRecordSearchScreen: (Int) -> RecordSearchViewController = { (id) in
+            let reactor: RecordSearchReactor = .init(id: id, walkService: walkService)
+            return .init(reactor: reactor)
+        }
+        
+        let reactor: RecordCalendarReactor = .init()
+        let controller: RecordCalendarViewController = .init(reactor: reactor, pushRecordSearchScreen: pushRecordSearchScreen)
+        
+        controller.title = "산책기록"
         return controller
     }
     

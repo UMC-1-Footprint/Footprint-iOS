@@ -26,8 +26,13 @@ class LoginReactor: Reactor {
     
     var initialState: State
     
-    init() {
+    let loginService: LoginServiceType
+    let keychainService: KeychainServiceType
+    
+    init(loginService: LoginServiceType, keychainService: KeychainServiceType) {
         self.initialState = State()
+        self.loginService = loginService
+        self.keychainService = keychainService
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -64,14 +69,12 @@ extension LoginReactor {
                     print(error)
                 }
                 else {
-                    UserApi.shared.me {(user, error) in
+                    UserApi.shared.me { [weak self] (user, error) in
                         if let error = error {
                             print(error)
                         } else {
                             guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
-                            let keyChain = KeyChain()
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            self?.keychainService.updateTokens(accessToken: token.accessToken, refreshToken: token.refreshToken)
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
@@ -88,14 +91,20 @@ extension LoginReactor {
                 if let error = error {
                     print(error)
                 } else {
-                    UserApi.shared.me {(user, error) in
+                    UserApi.shared.me { [weak self] (user, error) in
                         if let error = error {
                             print(error)
                         } else {
-                            guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
-                            let keyChain = KeyChain()
-                            keyChain.createKeyChain(key: userEmail, token: token.accessToken)
-                            keyChain.createKeyChain(key: userEmail, token: token.refreshToken)
+                            guard let userEmail = user?.kakaoAccount?.email,
+                                  let userId = user?.id,
+                                  let userName = user?.properties?["nickname"]
+                                else { return observable.onNext(.doKakaoLogin(false)) }
+                       
+                            print(userName)
+                            self?.keychainService.updateTokens(accessToken: token.accessToken, refreshToken: token.refreshToken)
+                            
+                            self?.loginService.login(userId: String(userId), userName: userName, userEmail: userEmail, providerType: .kakao)
+                            
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }
