@@ -120,6 +120,7 @@ class GoalViewController: BaseViewController, View {
         goalView.snp.makeConstraints() {
             $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(subtitleLabel.snp.bottom).offset(40)
+            $0.bottom.equalTo(bottomButton.snp.top)
         }
         
         bottomButton.snp.makeConstraints {
