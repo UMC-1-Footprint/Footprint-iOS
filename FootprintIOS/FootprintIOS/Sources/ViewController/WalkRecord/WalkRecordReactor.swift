@@ -10,14 +10,6 @@ import UIKit
 
 import ReactorKit
 
-class CalendarInfo {
-    static let shared = CalendarInfo()
-    
-    let calendar = Calendar.current
-    lazy var components = calendar.dateComponents([.year, .month], from: Date())
-    lazy var calendarDate = calendar.date(from: components) ?? Date()
-}
-
 class WalkRecordReactor: Reactor {
     enum Action {
         case refresh
@@ -38,6 +30,9 @@ class WalkRecordReactor: Reactor {
     }
     
     let initialState: State
+    let calendar = Calendar.current
+    lazy var components = calendar.dateComponents([.year, .month], from: Date())
+    lazy var calendarDate = calendar.date(from: components) ?? Date()
     
     init() {
         self.initialState = State()
@@ -51,12 +46,14 @@ class WalkRecordReactor: Reactor {
                 .just(.setCalendarMonthTitle(updateMonthTitle()))
             ])
         case .prevMonth:
+            setPrevMonth()
             return Observable.concat(
                 [
                  .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
                  .just(.setCalendarMonthTitle(updateMonthTitle()))
                 ])
         case .nextMonth:
+            setNextMonth()
             return Observable.concat(
                 [
                  .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
@@ -97,9 +94,8 @@ extension WalkRecordReactor {
     }
     
     func getDays() -> [String] {
-        let calendarInfo = CalendarInfo.shared
-        let startDay = calendarInfo.calendar.component(.weekday, from: calendarInfo.calendarDate) - 1
-        let totalDays = startDay + calendarInfo.calendar.range(of: .day, in: .month, for: calendarInfo.calendarDate)!.count
+        let startDay = calendar.component(.weekday, from: calendarDate) - 1
+        let totalDays = startDay + calendar.range(of: .day, in: .month, for: calendarDate)!.count
         var days: [String] = []
         
         for day in 0..<totalDays {
@@ -114,23 +110,20 @@ extension WalkRecordReactor {
     }
     
     func updateMonthTitle() -> String {
-        let calendarInfo = CalendarInfo.shared
         let dateFormatter = DateFormatter()
         
         dateFormatter.dateFormat = "yyyy년 MM월"
-        let dateToString = dateFormatter.string(from: calendarInfo.calendarDate)
+        let dateToString = dateFormatter.string(from: calendarDate)
         return dateToString
     }
     
     func setPrevMonth(){
-        let calendarInfo = CalendarInfo.shared
-        let calendarDate = calendarInfo.calendar.date(byAdding: DateComponents(month: -1), to: calendarInfo.calendarDate) ?? Date()
-        calendarInfo.calendarDate = calendarDate
+        let calendarDate = calendar.date(byAdding: DateComponents(month: -1), to: calendarDate) ?? Date()
+        self.calendarDate = calendarDate
     }
     
     func setNextMonth() {
-        let calendarInfo = CalendarInfo.shared
-        let calendarDate = calendarInfo.calendar.date(byAdding: DateComponents(month: +1), to: calendarInfo.calendarDate) ?? Date()
-        calendarInfo.calendarDate = calendarDate
+        let calendarDate = calendar.date(byAdding: DateComponents(month: +1), to: calendarDate) ?? Date()
+        self.calendarDate = calendarDate
     }
 }

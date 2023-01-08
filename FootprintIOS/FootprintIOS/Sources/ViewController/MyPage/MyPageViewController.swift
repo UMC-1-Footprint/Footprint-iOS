@@ -125,24 +125,26 @@ class MyPageViewController: NavigationBarViewController {
         myFootprintButton.rx
             .tap
             .bind { [weak self] _ in
-                self?.goToMyFootprintScreen()
+                self?.willPushMyFootprintScreen()
             }
             .disposed(by: disposeBag)
         
         walkScreenButton.rx
             .tap
             .bind { [weak self] _ in
-                self?.goToWalkRecordScreen()
+                self?.willPushWalkRecordScreen()
             }
             .disposed(by: disposeBag)
     }
-    
-    private func goToMyFootprintScreen() {
+}
+
+extension MyPageViewController {
+    private func willPushMyFootprintScreen() {
         let controller = self.pushMyFootprintScreen()
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
-    private func goToWalkRecordScreen() {
+    private func willPushWalkRecordScreen() {
         let controller = self.pushWalkRecordScreen()
         self.navigationController?.pushViewController(controller, animated: true)
     }

@@ -40,7 +40,31 @@ class WalkRecordCalendarHeader: BaseCollectionReusableView {
     
     let topLineView = UIView()
     let bottomLineView = UIView()
-
+    
+    override func setupProperty() {
+        super.setupProperty()
+        
+        for date in dateList {
+            let dateLabel = UILabel().then {
+                $0.text = date
+                $0.font = .systemFont(ofSize: 12)
+            }
+            
+            dateStackView.addArrangedSubview(dateLabel)
+        }
+        
+        [topLineView, bottomLineView].forEach {
+            $0.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
+        }
+    }
+    
+    override func setupHierarchy() {
+        super.setupHierarchy()
+        
+        monthControlStackView.addArrangedSubviews(prevMonthButton, monthLabel, nextMonthButton)
+        addSubviews([monthControlStackView, topLineView, dateStackView, bottomLineView])
+    }
+    
     override func setupLayout() {
         super.setupLayout()
         
@@ -74,30 +98,6 @@ class WalkRecordCalendarHeader: BaseCollectionReusableView {
             $0.width.equalToSuperview()
             $0.height.equalTo(1)
             $0.bottom.equalToSuperview()
-        }
-    }
-    
-    override func setupHierarchy() {
-        super.setupHierarchy()
-        
-        monthControlStackView.addArrangedSubviews(prevMonthButton, monthLabel, nextMonthButton)
-        addSubviews([monthControlStackView, topLineView, dateStackView, bottomLineView])
-    }
-    
-    override func setupProperty() {
-        super.setupProperty()
-        
-        for date in dateList {
-            let dateLabel = UILabel().then {
-                $0.text = date
-                $0.font = .systemFont(ofSize: 12)
-            }
-            
-            dateStackView.addArrangedSubview(dateLabel)
-        }
-        
-        [topLineView, bottomLineView].forEach {
-            $0.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
         }
     }
 }

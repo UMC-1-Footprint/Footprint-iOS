@@ -9,6 +9,7 @@
 import UIKit
 
 import SnapKit
+import RxSwift
 
 class WalkRecordCollectionViewCell: BaseCollectionViewCell {
     let dateLabel: UILabel = .init()

@@ -28,6 +28,12 @@ class WalkRecordSummaryHeader: BaseCollectionReusableView {
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteD.color
     }
     
+    override func setupHierarchy() {
+        super.setupHierarchy()
+        
+        addSubviews([topLineView, dateLabel, summaryLabel, bottomLineView])
+    }
+    
     override func setupLayout() {
         super.setupLayout()
         
@@ -52,12 +58,6 @@ class WalkRecordSummaryHeader: BaseCollectionReusableView {
             $0.height.equalTo(1)
             $0.bottom.equalToSuperview()
         }
-    }
-    
-    override func setupHierarchy() {
-        super.setupHierarchy()
-        
-        addSubviews([topLineView, dateLabel, summaryLabel, bottomLineView])
     }
 }
 
