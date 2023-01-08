@@ -89,7 +89,6 @@ class GoalViewController: BaseViewController, View {
     
     override func setupLayout() {
         super.setupLayout()
-        print(#function)
         
         selectedPageCircle.snp.makeConstraints {
             $0.height.width.equalTo(14)
@@ -131,7 +130,6 @@ class GoalViewController: BaseViewController, View {
     }
     
     func bind(reactor: Reactor) {
-        print(#function)
         
         for day in 0..<7 {
             goalView.dayButtons[day].rx.tap
@@ -157,7 +155,6 @@ class GoalViewController: BaseViewController, View {
             .when(.recognized)
             .withUnretained(self)
             .bind { owner, _ in
-                print("here")
                 let reactor = reactor.reactorForWalk()
                 let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
                 owner.present(walkBottomSheet, animated: true)
