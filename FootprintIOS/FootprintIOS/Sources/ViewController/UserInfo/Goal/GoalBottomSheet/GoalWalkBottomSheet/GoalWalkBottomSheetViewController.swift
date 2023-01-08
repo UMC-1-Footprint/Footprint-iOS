@@ -16,7 +16,7 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
     
     // MARK: - Properties
     
-    private let texts = ["15분", "30분", "1시간", "1시간 30분", "직접 설정"]
+    private let texts = GoalTexts.goalWalkTexts
     
     // MARK: - UI Components
     

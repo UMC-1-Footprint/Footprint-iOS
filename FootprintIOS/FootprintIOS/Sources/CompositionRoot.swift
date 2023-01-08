@@ -84,7 +84,6 @@ extension CompositionRoot {
     }
     
     static func makeCalendarScreen() -> CalendarViewController {
-        
         let infoService: InfoServiceProtocol = InfoService()
         
         let pushGoalScreen: () -> GoalViewController = {
@@ -102,9 +101,25 @@ extension CompositionRoot {
             return controller
         }
         
+        let editInfoService: InfoServiceProtocol = InfoService()
+        
+        let pushGoalEditNextMonthScreen: () -> GoalEditNextMonthViewController = {
+            let reactor = GoalEditNextMonthReactor.init(service: editInfoService)
+            let controller = GoalEditNextMonthViewController(reactor: reactor)
+            
+            return controller
+        }
+        
+        let pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController = {
+            let reactor = GoalEditThisMonthReactor.init()
+            let controller = GoalEditThisMonthViewController(reactor: reactor, pushGoalEditNextMonthScreen: pushGoalEditNextMonthScreen)
+            
+            return controller
+        }
+        
         let reactor = CalendarReactor(state: .init())
         let controller = CalendarViewController(reactor: reactor,
-                                                pushInfoScreen: pushInfoScreen)
+                                                pushInfoScreen: pushInfoScreen, pushGoalEditThisMonthScreen: pushGoalEditThisMonthScreen)
         
         controller.title = "캘린더"
         controller.tabBarItem.image = nil

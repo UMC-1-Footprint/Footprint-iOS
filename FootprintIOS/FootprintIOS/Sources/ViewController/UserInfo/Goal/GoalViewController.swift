@@ -55,12 +55,12 @@ class GoalViewController: BaseViewController, View {
     private let goalView: GoalView = .init(frame: .zero)
     
     private lazy var bottomButton = FootprintButton.init(type: .complete)
-
+    
     // MARK: - Initializer
     
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
-    
+        
         self.reactor = reactor
     }
     
@@ -77,7 +77,7 @@ class GoalViewController: BaseViewController, View {
         pageStackView.addArrangedSubview(unSelectedPageCircle)
         pageStackView.addArrangedSubview(selectedPageCircle)
         
-        bottomButton.setupEnabled(isEnabled: true)
+        bottomButton.setupEnabled(isEnabled: false)
     }
     
     override func setupHierarchy() {
@@ -141,10 +141,10 @@ class GoalViewController: BaseViewController, View {
         
         bottomButton.rx.tap
             .withUnretained(self)
-            .map { owner, _ -> GoalModel in
-                let info = GoalModel(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
-                                     walkGoalTime: 0,
-                                     walkTimeSlot: 0)
+            .map { owner, _ -> GoalInfoDTO in
+                let info = GoalInfoDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                                       walkGoalTime: 0,
+                                       walkTimeSlot: 0)
                 
                 return info
             }
@@ -177,15 +177,7 @@ class GoalViewController: BaseViewController, View {
             .withUnretained(self)
             .bind { owner, isSelectedDays in
                 for day in 0..<7 {
-                    owner.goalView.dayButtons[day].isSelected = isSelectedDays[day]
-                    
-                    if isSelectedDays[day] {
-                        owner.goalView.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
-                        owner.goalView.dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
-                    } else {
-                        owner.goalView.dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
-                        owner.goalView.dayButtons[day].backgroundColor = .white
-                    }
+                    isSelectedDays[day] ? owner.goalView.updateDayButtonIsSelected(day: day) : owner.goalView.updateDayButtonIsUnSelected(day: day)
                 }
             }
             .disposed(by: disposeBag)

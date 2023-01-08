@@ -26,11 +26,11 @@ class GoalView: BaseView {
     let goalWalkSelectView = UserInfoSelectBar(type: .goalTime)
     let walkSelectView  = UserInfoSelectBar(type: .time)
     
-    // MARK: - Methods
+    // MARK: - Setup Methods
     
     override func setupProperty() {
         super.setupProperty()
-    
+        
         for day in ["월", "화", "수", "목", "금", "토", "일"] {
             let dayButton = UIButton().then {
                 $0.layer.cornerRadius = 20
@@ -86,6 +86,28 @@ class GoalView: BaseView {
         walkSelectView.snp.makeConstraints {
             $0.top.equalTo(timeLabel.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(34)
+        }
+    }
+    
+    // MARK: - Update Methods
+    
+    func updateDayButtonIsSelected(day: Int) {
+        dayButtons[day].isSelected = true
+        dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
+        dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
+    }
+    
+    func updateDayButtonIsUnSelected(day: Int) {
+        dayButtons[day].isSelected = false
+        dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+        dayButtons[day].backgroundColor = .white
+    }
+    
+    func updateDayButtons(days: [Int]) {
+        for (index, _) in dayButtons.enumerated() {
+            if days.contains(index) {
+                updateDayButtonIsSelected(day: index)
+            }
         }
     }
 }

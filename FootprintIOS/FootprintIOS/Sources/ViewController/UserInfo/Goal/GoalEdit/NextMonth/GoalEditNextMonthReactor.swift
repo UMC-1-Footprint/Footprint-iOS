@@ -1,17 +1,17 @@
 //
-//  GoalReactor.swift
-//  Footprint-iOSTests
+//  GoalEditNextMonthReactor.swift
+//  Footprint-iOS
 //
-//  Created by 김영인 on 2022/08/30.
-//  Copyright © 2022 Footprint-iOS. All rights reserved.
+//  Created by 김영인 on 2023/01/08.
+//  Copyright © 2023 Footprint-iOS. All rights reserved.
 //
 
 import ReactorKit
 
-class GoalReactor: Reactor {
+class GoalEditNextMonthReactor: Reactor {
     enum Action {
         case tapDayButton(Int)
-        case tapDoneButton(GoalInfoDTO)
+        case tapSaveButton(GoalInfoDTO)
     }
     
     enum Mutation {
@@ -39,7 +39,7 @@ class GoalReactor: Reactor {
         switch action {
         case .tapDayButton(let day):
             return .just(.updateDayButton(day))
-        case .tapDoneButton(let info):
+        case .tapSaveButton(let info):
             return updateInfoMutation(info)
         }
     }
@@ -78,10 +78,10 @@ class GoalReactor: Reactor {
     }
 }
 
-extension GoalReactor {
+extension GoalEditNextMonthReactor {
     func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
         service.updateGoalInfo(goalInfo: goalInfo)
-        service.createInfo()
+        service.editGoalInfo()
         
         return .empty()
     }

@@ -18,6 +18,7 @@ class CalendarViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     var pushInfoScreen: () -> InfoViewController
+    var pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController
     
     // MARK: - UI Components
     
@@ -39,10 +40,14 @@ class CalendarViewController: NavigationBarViewController, View {
         $0.titleLabel?.font = .systemFont(ofSize: 20)
     }
     
+    private lazy var goalEditButton = UIButton().then {
+        $0.setTitle("목표 수정", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 20)
+    }
+    
     private lazy var stackView = UIStackView().then {
-        $0.addArrangedSubview(infoButton)
-        $0.addArrangedSubview(alertButton)
-        $0.addArrangedSubview(homeButton)
+        $0.addArrangedSubviews(infoButton, alertButton, homeButton, goalEditButton)
         $0.spacing = 10
         $0.axis = .vertical
     }
@@ -50,8 +55,10 @@ class CalendarViewController: NavigationBarViewController, View {
     // MARK: - Initializer
     
     init(reactor: Reactor,
-         pushInfoScreen: @escaping () -> InfoViewController) {
+         pushInfoScreen: @escaping () -> InfoViewController,
+         pushGoalEditThisMonthScreen: @escaping () -> GoalEditThisMonthViewController) {
         self.pushInfoScreen = pushInfoScreen
+        self.pushGoalEditThisMonthScreen = pushGoalEditThisMonthScreen
         
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -119,6 +126,12 @@ class CalendarViewController: NavigationBarViewController, View {
             }
             .disposed(by: disposeBag)
         
+        goalEditButton.rx.tap
+            .bind { [weak self] in
+                self?.willPushGoalEditThisMonthScreen()
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .map(\.isDeleted)
             .withUnretained(self)
@@ -127,10 +140,17 @@ class CalendarViewController: NavigationBarViewController, View {
             }
             .disposed(by: disposeBag)
     }
-    
+}
+
+extension CalendarViewController {
     private func goToInfoScreen() {
         let controller = self.pushInfoScreen()
         controller.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    private func willPushGoalEditThisMonthScreen() {
+        let controller = self.pushGoalEditThisMonthScreen()
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }
