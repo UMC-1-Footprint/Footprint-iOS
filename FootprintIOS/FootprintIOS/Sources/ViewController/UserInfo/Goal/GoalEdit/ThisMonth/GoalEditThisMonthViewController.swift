@@ -17,7 +17,7 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
     
     // MARK: - Properties
     
-    private var pushGoalEditNextMonthScreen: () -> GoalEditNextMonthViewController
+    private var pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController
     
     // MARK: - UI Components
     
@@ -47,7 +47,7 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
     
     // MARK: - Initiailzer
     
-    init(reactor: Reactor, pushGoalEditNextMonthScreen: @escaping () -> GoalEditNextMonthViewController) {
+    init(reactor: Reactor, pushGoalEditNextMonthScreen: @escaping (GoalModel) -> GoalEditNextMonthViewController) {
         self.pushGoalEditNextMonthScreen = pushGoalEditNextMonthScreen
         
         super.init(nibName: nil, bundle: nil)
@@ -117,7 +117,8 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
         goalEditNextMonthButton.rx.tap
             .withUnretained(self)
             .bind { owner, _ in
-                owner.willPushGoalEditNextMonthScreen()
+                guard let goalInfo = reactor.currentState.goalInfo else { return }
+                owner.willPushGoalEditNextMonthScreen(goalInfo: goalInfo)
             }
             .disposed(by: disposeBag)
         
@@ -137,8 +138,8 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
 }
 
 extension GoalEditThisMonthViewController {
-    private func willPushGoalEditNextMonthScreen() {
-        let controller = self.pushGoalEditNextMonthScreen()
+    private func willPushGoalEditNextMonthScreen(goalInfo: GoalModel) {
+        let controller = self.pushGoalEditNextMonthScreen(goalInfo)
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }

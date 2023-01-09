@@ -14,7 +14,7 @@ class GoalEditThisMonthReactor: Reactor {
     }
     
     enum Mutation {
-        case updateGoalInfo(GoalModel)
+        case setGoalInfo(GoalModel)
     }
     
     struct State {
@@ -30,7 +30,7 @@ class GoalEditThisMonthReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .refresh:
-            return .just(.updateGoalInfo(
+            return .just(.setGoalInfo(
                 GoalInfoDTO(dayIdx: [2, 3],
                             walkGoalTime: 1,
                             walkTimeSlot: 1).toDomain()))
@@ -41,7 +41,7 @@ class GoalEditThisMonthReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case let .updateGoalInfo(goalInfo):
+        case let .setGoalInfo(goalInfo):
             newState.goalInfo = goalInfo
         }
         

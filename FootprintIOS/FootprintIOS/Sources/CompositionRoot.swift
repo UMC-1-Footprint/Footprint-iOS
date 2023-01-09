@@ -103,8 +103,8 @@ extension CompositionRoot {
         
         let editInfoService: InfoServiceProtocol = InfoService()
         
-        let pushGoalEditNextMonthScreen: () -> GoalEditNextMonthViewController = {
-            let reactor = GoalEditNextMonthReactor.init(service: editInfoService)
+        let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController = { (goalInfo) in
+            let reactor = GoalEditNextMonthReactor.init(service: editInfoService, goalInfo: goalInfo)
             let controller = GoalEditNextMonthViewController(reactor: reactor)
             
             return controller

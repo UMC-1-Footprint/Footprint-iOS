@@ -131,7 +131,6 @@ class GoalViewController: BaseViewController, View {
     }
     
     func bind(reactor: Reactor) {
-        
         for day in 0..<7 {
             goalView.dayButtons[day].rx.tap
                 .map { .tapDayButton(day) }
