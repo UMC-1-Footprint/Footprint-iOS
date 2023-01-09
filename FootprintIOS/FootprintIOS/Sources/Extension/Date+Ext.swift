@@ -44,4 +44,13 @@ extension Date {
         monthList.append("이번달")
         return monthList
     }
+    
+    func getNextMonth() -> String {
+        let calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YYYY년 M월"
+        let nextMonth = dateFormatter.string(from: calendar.date(byAdding: .month, value: 1, to: self) ?? Date())
+        
+        return nextMonth
+    }
 }
