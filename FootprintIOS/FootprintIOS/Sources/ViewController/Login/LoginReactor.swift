@@ -95,6 +95,8 @@ extension LoginReactor {
                         if let error = error {
                             print(error)
                         } else {
+                            let apiManager = LoginService()
+                            
                             guard let userEmail = user?.kakaoAccount?.email,
                                   let userId = user?.id,
                                   let userName = user?.properties?["nickname"]

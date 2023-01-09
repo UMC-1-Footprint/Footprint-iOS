@@ -57,10 +57,9 @@ class RecordCollectionViewCell: BaseCollectionViewCell, View {
         super.setupLayout()
         
         imageView.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(10)
-            $0.leading.equalToSuperview().inset(10)
-            $0.width.equalTo(100)
-            $0.height.equalTo(100)
+            $0.width.height.equalTo(80)
+            $0.leading.equalToSuperview().offset(12)
+            $0.centerY.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints {

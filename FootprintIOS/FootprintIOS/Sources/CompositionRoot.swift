@@ -139,7 +139,14 @@ extension CompositionRoot {
             return controller
         }
         
-        let controller = MyPageViewController(pushMyFootprintScreen: pushMyFootprintScreen)
+        var pushWalkRecordScreen: () -> WalkRecordViewController
+        pushWalkRecordScreen = {
+            let reactor = WalkRecordReactor()
+            let controller = WalkRecordViewController(reactor: reactor)
+            return controller
+        }
+        
+        let controller = MyPageViewController(pushMyFootprintScreen: pushMyFootprintScreen, pushWalkRecordScreen: pushWalkRecordScreen)
         
         controller.title = "마이 페이지"
         controller.tabBarItem.image = nil
