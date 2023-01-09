@@ -12,6 +12,7 @@ class NavigationBar: UIView {
     var backButton = UIButton()
     var title = UILabel()
     var subTitle = UILabel()
+    var rightButton = UIButton()
 }
 
 protocol BaseNavigationBarViewControllerProtocol: AnyObject {
@@ -31,6 +32,9 @@ protocol BaseNavigationBarViewControllerProtocol: AnyObject {
     func setNavigationBarSubTitleFont(_ font: UIFont?)
     func setNavigationBarSubTitleTextColor(_ color: UIColor?)
     func setNavigationBarBackButtonImage(_ image: UIImage?)
+    func setNavigationRightButtonTitle(_ text: String?)
+    func setNavigationBarRightButtonTitleColor(_ color: UIColor?)
+    func setNavigationBarRightButtonTitleFont(_ font: UIFont?)
 }
 
 class NavigationBarViewController: BaseViewController, BaseNavigationBarViewControllerProtocol {
@@ -64,7 +68,7 @@ class NavigationBarViewController: BaseViewController, BaseNavigationBarViewCont
         
         view.addSubviews([statusBar, navigationBar, contentView])
       
-        navigationBar.addSubviews([navigationBar.title, navigationBar.backButton, navigationBar.subTitle])
+        navigationBar.addSubviews([navigationBar.title, navigationBar.backButton, navigationBar.subTitle, navigationBar.rightButton])
     }
     
     override func setupLayout() {
@@ -94,6 +98,11 @@ class NavigationBarViewController: BaseViewController, BaseNavigationBarViewCont
         
         navigationBar.subTitle.snp.makeConstraints {
             $0.leading.equalTo(navigationBar.title.snp.trailing).offset(12)
+            $0.centerY.equalToSuperview()
+        }
+        
+        navigationBar.rightButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(20)
             $0.centerY.equalToSuperview()
         }
         
@@ -167,5 +176,17 @@ class NavigationBarViewController: BaseViewController, BaseNavigationBarViewCont
     
     func setNavigationBarSubTitleTextColor(_ color: UIColor?) {
         navigationBar.subTitle.textColor = color
+    }
+    
+    func setNavigationRightButtonTitle(_ text: String?) {
+        navigationBar.rightButton.setTitle(text, for: .normal)
+    }
+    
+    func setNavigationBarRightButtonTitleColor(_ color: UIColor?) {
+        navigationBar.rightButton.setTitleColor(color, for: .normal)
+    }
+    
+    func setNavigationBarRightButtonTitleFont(_ font: UIFont?) {
+        navigationBar.rightButton.titleLabel?.font = font
     }
 }
