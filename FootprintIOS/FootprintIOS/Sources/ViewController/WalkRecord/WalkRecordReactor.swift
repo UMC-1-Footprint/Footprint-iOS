@@ -34,17 +34,17 @@ class WalkRecordReactor: Reactor {
     lazy var components = calendar.dateComponents([.year, .month], from: Date())
     lazy var calendarDate = calendar.date(from: components) ?? Date()
     
-    init() {
+    let walkRecordService: WalkRecordServiceType
+    
+    init(walkRecordService: WalkRecordServiceType) {
         self.initialState = State()
+        self.walkRecordService = walkRecordService
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .refresh:
-            return Observable.concat([
-                .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
-                .just(.setCalendarMonthTitle(updateMonthTitle()))
-            ])
+            return refreshMutation()
         case .prevMonth:
             setPrevMonth()
             return Observable.concat(
@@ -78,6 +78,24 @@ class WalkRecordReactor: Reactor {
 }
 
 extension WalkRecordReactor {
+    func refreshMutation() -> Observable<Mutation> {
+        walkRecordService.getNumber(year: 2023, month: 1)
+        
+        walkRecordService.event
+            .subscribe(onNext: { event in
+                switch event {
+                case let .getNumber(data):
+                    print("number data")
+                    print(data)
+                }
+            })
+        
+        return Observable.concat([
+            .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
+            .just(.setCalendarMonthTitle(updateMonthTitle()))
+        ])
+    }
+    
     func createCalendarSection(days: [String]) -> [WalkRecordSectionModel] {
         let calendarItems = days.map { day -> WalkRecordItem in
             return .calendar(day)
