@@ -17,7 +17,7 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
     // MARK: - UI Components
     
     private let dateLabel = UILabel().then {
-        $0.text = "\(Date().getNextMonth())"
+        $0.text = Date().calculateDate(type: .month, value: 1).toString(dateFormat: "YYYY년 M월")
         $0.font = .systemFont(ofSize: 24, weight: .bold)
         $0.textColor = FootprintIOSAsset.Colors.blackD.color
     }
@@ -131,7 +131,7 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap(\.goalInfo)
+            .map(\.goalInfo)
             .withUnretained(self)
             .bind { owner, goalInfo in
                 owner.goalView.updateDayButtons(days: goalInfo.dayIdx)

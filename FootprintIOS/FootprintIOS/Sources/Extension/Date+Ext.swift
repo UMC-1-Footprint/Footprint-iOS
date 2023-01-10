@@ -45,12 +45,16 @@ extension Date {
         return monthList
     }
     
-    func getNextMonth() -> String {
+    func calculateDate(type: Calendar.Component, value: Int) -> Date {
         let calendar = Calendar.current
+        let date = calendar.date(byAdding: type, value: value, to: self) ?? Date()
+        return date
+    }
+    
+    func toString(dateFormat: String) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY년 M월"
-        let nextMonth = dateFormatter.string(from: calendar.date(byAdding: .month, value: 1, to: self) ?? Date())
-        
-        return nextMonth
+        dateFormatter.dateFormat = dateFormat
+        let string = dateFormatter.string(from: self)
+        return string
     }
 }

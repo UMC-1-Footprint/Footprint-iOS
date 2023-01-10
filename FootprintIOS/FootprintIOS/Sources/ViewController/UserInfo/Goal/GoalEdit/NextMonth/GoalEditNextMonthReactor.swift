@@ -24,7 +24,7 @@ class GoalEditNextMonthReactor: Reactor {
     }
     
     struct State {
-        var goalInfo: GoalModel?
+        var goalInfo: GoalModel
         var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
         var walk: String?
         var goalWalk: String?
@@ -32,20 +32,18 @@ class GoalEditNextMonthReactor: Reactor {
     
     var initialState: State
     var service: InfoServiceProtocol
-    var goalInfo: GoalModel
 
     init(service: InfoServiceProtocol, goalInfo: GoalModel) {
-        self.initialState = State()
+        self.initialState = State(goalInfo: goalInfo)
         self.service = service
-        self.goalInfo = goalInfo
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .refresh:
             return .concat(
-                .just(.setGoalInfo(goalInfo)),
-                setDayButtons(days: goalInfo.dayIdx)
+                .just(.setGoalInfo(initialState.goalInfo)),
+                setDayButtons(days: initialState.goalInfo.dayIdx)
             )
         case .tapDayButton(let day):
             return .just(.updateDayButton(day))
