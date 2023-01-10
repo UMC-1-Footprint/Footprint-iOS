@@ -11,7 +11,7 @@ import UIKit
 import ReactorKit
 
 struct WalkRecordModel {
-    let days: String
+    let day: String
     let footprintNumber: Int
 }
 
@@ -54,19 +54,9 @@ class WalkRecordReactor: Reactor {
         case .refresh:
             return refreshMutation()
         case .prevMonth:
-            setPrevMonth()
-            return Observable.concat(
-                [
-                 .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
-                 .just(.setCalendarMonthTitle(updateMonthTitle()))
-                ])
+            return getPrevMonthMutation()
         case .nextMonth:
-            setNextMonth()
-            return Observable.concat(
-                [
-                 .just(.setWalkRecordSection(createCalendarSection(days: getDays()))),
-                 .just(.setCalendarMonthTitle(updateMonthTitle()))
-                ])
+            return getNextMonthMutation()
         }
     }
     
@@ -92,7 +82,7 @@ class WalkRecordReactor: Reactor {
                 case let .getNumber(data):
                     let walkRecordNumberOfMonth = self.getWalkRecordOfMonth(date: data)
                     
-                    return .just(.setWalkRecordSection(self.createCalendarSection(days: self.getDays())))
+                    return .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays(walkRecordNum: walkRecordNumberOfMonth))))
                 }
             })
         
@@ -109,9 +99,31 @@ extension WalkRecordReactor {
         ])
     }
     
-    func createCalendarSection(days: [String]) -> [WalkRecordSectionModel] {
-        let calendarItems = days.map { day -> WalkRecordItem in
-            return .calendar(day)
+    func getPrevMonthMutation() -> Observable<Mutation> {
+        setPrevMonth()
+        
+        let days = [Int](repeating: 0, count: totalDays) // TODO: - 서버에서 받는 값으로 수정
+        
+        return Observable.concat([
+            .just(.setWalkRecordSection(createCalendarSection(model: getDays(walkRecordNum: days)))),
+            .just(.setCalendarMonthTitle(updateMonthTitle()))
+        ])
+    }
+    
+    func getNextMonthMutation() -> Observable<Mutation> {
+        setNextMonth()
+        
+        let days = [Int](repeating: 0, count: totalDays) // TODO: - 서버에서 받는 값으로 수정
+        
+        return Observable.concat([
+            .just(.setWalkRecordSection(createCalendarSection(model: getDays(walkRecordNum: days)))),
+            .just(.setCalendarMonthTitle(updateMonthTitle()))
+        ])
+    }
+    
+    func createCalendarSection(model: [WalkRecordModel]) -> [WalkRecordSectionModel] {
+        let calendarItems = model.map { item -> WalkRecordItem in
+            return .calendar(item.day)
         }
         var recordItems:[WalkRecordItem] = []
         recordItems.append(.walkSummary(.init()))
@@ -124,15 +136,16 @@ extension WalkRecordReactor {
         return [calendarSection, recordSection]
     }
     
-    func getDays() -> [String] {
-        var days: [String] = []
+    func getDays(walkRecordNum: [Int]) -> [WalkRecordModel] {
+        var days: [WalkRecordModel] = []
         
         for day in 0..<totalDays {
             if day < startDay {
-                days.append(String())
+                days.append(WalkRecordModel(day: String(), footprintNumber: 0))
                 continue
             }
-            days.append("\(day - startDay + 1)")
+            
+            days.append(WalkRecordModel(day: "\(day - startDay + 1)", footprintNumber: walkRecordNum[day]))
         }
         
         print("🚨 - getDays 함수 안")
@@ -165,6 +178,8 @@ extension WalkRecordReactor {
         self.monthDays = calendar.range(of: .day, in: .month, for: calendarDate)!.count
     }
     
+    /// 날짜별로 발자국 여부를 나타내주기 위한 함수
+    /// 발자국이 없는 날은 0, 있는 날은 1로
     func getWalkRecordOfMonth(date: [WalkRecordResponseDTO]) -> [Int] {
         var walkRecordDate: [WalkRecordResponseDTO] = date
         var days = [Int](repeating: 0, count: monthDays)
