@@ -1,45 +1,53 @@
 //
-//  GoalReactor.swift
-//  Footprint-iOSTests
+//  GoalEditNextMonthReactor.swift
+//  Footprint-iOS
 //
-//  Created by 김영인 on 2022/08/30.
-//  Copyright © 2022 Footprint-iOS. All rights reserved.
+//  Created by 김영인 on 2023/01/08.
+//  Copyright © 2023 Footprint-iOS. All rights reserved.
 //
 
 import ReactorKit
 
-class GoalReactor: Reactor {
+class GoalEditNextMonthReactor: Reactor {
     enum Action {
+        case refresh
         case tapDayButton(Int)
-        case tapDoneButton(GoalInfoDTO)
+        case tapSaveButton(GoalInfoDTO)
     }
     
     enum Mutation {
+        case setGoalInfo(GoalModel)
+        case setDayButtons([Bool])
         case updateDayButton(Int)
         case updateWalk(String)
         case updateGoalWalk(String)
     }
     
     struct State {
+        var goalInfo: GoalModel
         var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
         var walk: String?
         var goalWalk: String?
-        var isEnabledDoneButton: [Bool] = [false, false, false]
     }
     
     var initialState: State
     var service: InfoServiceProtocol
 
-    init(service: InfoServiceProtocol) {
-        self.initialState = State()
+    init(service: InfoServiceProtocol, goalInfo: GoalModel) {
+        self.initialState = State(goalInfo: goalInfo)
         self.service = service
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
+        case .refresh:
+            return .concat(
+                .just(.setGoalInfo(initialState.goalInfo)),
+                setDayButtons(days: initialState.goalInfo.dayIdx)
+            )
         case .tapDayButton(let day):
             return .just(.updateDayButton(day))
-        case .tapDoneButton(let info):
+        case .tapSaveButton(let info):
             return updateInfoMutation(info)
         }
     }
@@ -63,25 +71,37 @@ class GoalReactor: Reactor {
         var newState = state
         
         switch mutation {
+        case let .setGoalInfo(goalInfo):
+            newState.goalInfo = goalInfo
+        case let .setDayButtons(dayButtons):
+            newState.isSelectedButtons = dayButtons
         case .updateDayButton(let day):
             newState.isSelectedButtons[day] = !newState.isSelectedButtons[day]
-            newState.isEnabledDoneButton[0] = newState.isSelectedButtons.filter { $0 }.count > 0
         case .updateWalk(let walk):
             newState.walk = walk
-            newState.isEnabledDoneButton[1] = true
         case .updateGoalWalk(let goalWalk):
             newState.goalWalk = goalWalk
-            newState.isEnabledDoneButton[2] = true
         }
-        
         return newState
     }
 }
 
-extension GoalReactor {
+extension GoalEditNextMonthReactor {
+    func setDayButtons(days: [Int]) -> Observable<Mutation> {
+        var dayButtons: [Bool] = [false, false, false, false, false, false, false]
+        
+        for (index, _) in dayButtons.enumerated() {
+            if days.contains(index) {
+                dayButtons[index] = true
+            }
+        }
+        
+        return .just(.setDayButtons(dayButtons))
+    }
+    
     func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
         service.updateGoalInfo(goalInfo: goalInfo)
-        service.createInfo()
+        service.editGoalInfo()
         
         return .empty()
     }

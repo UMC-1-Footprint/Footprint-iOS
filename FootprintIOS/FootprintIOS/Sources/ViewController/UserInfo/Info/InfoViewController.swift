@@ -341,8 +341,7 @@ class InfoViewController: NavigationBarViewController, View {
         bottomButton.rx.tap
             .withUnretained(self)
             .bind { owner, _ in
-                let vc = GoalViewController(reactor: reactor.reactorForGoal())
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.willPushGoalScreen()
             }
             .disposed(by: disposeBag)
         
@@ -381,7 +380,7 @@ class InfoViewController: NavigationBarViewController, View {
         }
     }
     
-    private func goToGoalScreen() {
+    private func willPushGoalScreen() {
         let controller = self.pushGoalScreen()
         self.navigationController?.pushViewController(controller, animated: true)
     }

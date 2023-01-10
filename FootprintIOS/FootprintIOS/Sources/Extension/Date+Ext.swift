@@ -44,4 +44,17 @@ extension Date {
         monthList.append("이번달")
         return monthList
     }
+    
+    func calculateDate(type: Calendar.Component, value: Int) -> Date {
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: type, value: value, to: self) ?? Date()
+        return date
+    }
+    
+    func toString(dateFormat: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = dateFormat
+        let string = dateFormatter.string(from: self)
+        return string
+    }
 }

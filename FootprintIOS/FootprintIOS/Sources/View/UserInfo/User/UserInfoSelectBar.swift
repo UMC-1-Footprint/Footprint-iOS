@@ -46,7 +46,7 @@ class UserInfoSelectBar: BaseView {
         $0.font = .systemFont(ofSize: 14)
     }
     
-    private let selectButton = UIButton().then {
+    let selectButton = UIButton().then {
         $0.setImage(FootprintIOSAsset.Images.downButtonIcon.image, for: .normal)
     }
     
@@ -93,7 +93,6 @@ class UserInfoSelectBar: BaseView {
         }
     }
 }
-
 
 extension UserInfoSelectBar {
     func update(text: String) {
