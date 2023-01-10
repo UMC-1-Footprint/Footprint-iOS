@@ -17,8 +17,8 @@ class CalendarViewController: NavigationBarViewController, View {
     
     // MARK: - Properties
     
-    var pushInfoScreen: () -> InfoViewController
-    var pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController
+    private let pushInfoScreen: () -> InfoViewController
+    private let pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController
     
     // MARK: - UI Components
     

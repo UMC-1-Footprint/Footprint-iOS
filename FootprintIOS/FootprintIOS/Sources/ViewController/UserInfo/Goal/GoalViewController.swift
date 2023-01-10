@@ -131,7 +131,7 @@ class GoalViewController: BaseViewController, View {
     }
     
     func bind(reactor: Reactor) {
-        for day in 0..<7 {
+        for day in 0..<goalView.dayButtons.count {
             goalView.dayButtons[day].rx.tap
                 .map { .tapDayButton(day) }
                 .bind(to: reactor.action)
@@ -175,7 +175,7 @@ class GoalViewController: BaseViewController, View {
             .map(\.isSelectedButtons)
             .withUnretained(self)
             .bind { owner, isSelectedDays in
-                for day in 0..<7 {
+                for day in 0..<owner.goalView.dayButtons.count {
                     isSelectedDays[day] ? owner.goalView.updateDayButtonIsSelected(day: day) : owner.goalView.updateDayButtonIsUnSelected(day: day)
                 }
             }

@@ -90,7 +90,7 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        for day in 0..<7 {
+        for day in 0..<goalView.dayButtons.count {
             goalView.dayButtons[day].rx.tap
                 .map { .tapDayButton(day) }
                 .bind(to: reactor.action)
@@ -144,7 +144,7 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
             .map(\.isSelectedButtons)
             .withUnretained(self)
             .bind { owner, isSelectedDays in
-                for day in 0..<7 {
+                for day in 0..<owner.goalView.dayButtons.count {
                     isSelectedDays[day] ? owner.goalView.updateDayButtonIsSelected(day: day) : owner.goalView.updateDayButtonIsUnSelected(day: day)
                 }
             }

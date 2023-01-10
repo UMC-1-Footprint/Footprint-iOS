@@ -36,10 +36,11 @@ extension CompositionRoot {
     static func makeTabBarScreen() -> TabBarViewController {
         
         let walkService: WalkServiceType = WalkService()
+        let infoService: InfoServiceProtocol = InfoService()
         
         let tabBarViewController = TabBarViewController()
         let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
-        let calendarViewController = makeCalendarScreen()
+        let calendarViewController = makeCalendarScreen(infoService: infoService)
         let recommendViewController = makeRecommendScreen()
         let myPageViewController = makeMyPageScreen()
         
@@ -83,9 +84,7 @@ extension CompositionRoot {
         return controller
     }
     
-    static func makeCalendarScreen() -> CalendarViewController {
-        let infoService: InfoServiceProtocol = InfoService()
-        
+    static func makeCalendarScreen(infoService: InfoServiceProtocol) -> CalendarViewController {
         let pushGoalScreen: () -> GoalViewController = {
             let reactor = GoalReactor.init(service: infoService)
             let controller = GoalViewController(reactor: reactor)
@@ -101,10 +100,8 @@ extension CompositionRoot {
             return controller
         }
         
-        let editInfoService: InfoServiceProtocol = InfoService()
-        
         let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController = { (goalInfo) in
-            let reactor = GoalEditNextMonthReactor.init(service: editInfoService, goalInfo: goalInfo)
+            let reactor = GoalEditNextMonthReactor.init(service: infoService, goalInfo: goalInfo)
             let controller = GoalEditNextMonthViewController(reactor: reactor)
             
             return controller

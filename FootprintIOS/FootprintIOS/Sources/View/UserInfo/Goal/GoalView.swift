@@ -92,15 +92,15 @@ class GoalView: BaseView {
     // MARK: - Update Methods
     
     func updateDayButtonIsSelected(day: Int) {
-        dayButtons[day].isSelected = true
-        dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
-        dayButtons[day].backgroundColor = FootprintIOSAsset.Colors.blueM.color
+        dayButtons[safe: day]?.isSelected = true
+        dayButtons[safe: day]?.layer.borderColor = FootprintIOSAsset.Colors.blueM.color.cgColor
+        dayButtons[safe: day]?.backgroundColor = FootprintIOSAsset.Colors.blueM.color
     }
     
     func updateDayButtonIsUnSelected(day: Int) {
-        dayButtons[day].isSelected = false
-        dayButtons[day].layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
-        dayButtons[day].backgroundColor = .white
+        dayButtons[safe: day]?.isSelected = false
+        dayButtons[safe: day]?.layer.borderColor = FootprintIOSAsset.Colors.white3.color.cgColor
+        dayButtons[safe: day]?.backgroundColor = .white
     }
     
     func updateDayButtons(days: [Int]) {

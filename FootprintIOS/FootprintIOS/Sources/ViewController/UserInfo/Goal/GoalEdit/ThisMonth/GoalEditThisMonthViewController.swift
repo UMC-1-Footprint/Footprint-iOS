@@ -17,7 +17,7 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
     
     // MARK: - Properties
     
-    private var pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController
+    private let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController
     
     // MARK: - UI Components
     
