@@ -14,7 +14,7 @@ struct GoalInfoDTO {
     
     func toDomain() -> GoalModel {
         GoalModel(dayIdx: dayIdx,
-                  walkGoalTime: GoalTexts.goalWalkTexts[walkGoalTime],
-                  walkTimeSlot: GoalTexts.walkTexts[walkTimeSlot])
+                  walkGoalTime: InfoTexts.goalWalkTexts[walkGoalTime],
+                  walkTimeSlot: InfoTexts.walkTexts[walkTimeSlot])
     }
 }
