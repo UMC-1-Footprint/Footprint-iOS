@@ -100,8 +100,6 @@ extension GoalEditNextMonthReactor {
     }
     
     func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
-        service.updateGoalInfo(goalInfo: goalInfo)
-        service.editGoalInfo()
         
         return .empty()
     }

@@ -16,7 +16,7 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
     
     // MARK: - Properties
     
-    private let texts = GoalTexts.goalWalkTexts
+    private let texts = InfoTexts.goalWalkTexts
     
     // MARK: - UI Components
     

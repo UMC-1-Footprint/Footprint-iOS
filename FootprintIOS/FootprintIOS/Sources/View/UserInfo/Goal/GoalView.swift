@@ -110,4 +110,27 @@ class GoalView: BaseView {
             }
         }
     }
+    
+    // MARK: - Methods
+    
+    func getWalkIndex(type: UserInfoSelectBarType) -> Int {
+        switch type {
+        case .goalTime:
+            for (index, walkType) in InfoTexts.goalWalkTexts.enumerated() {
+                if walkType == goalWalkSelectView.selectLabel.text {
+                    return index
+                }
+            }
+        case .time:
+            for (index, walkType) in InfoTexts.walkTexts.enumerated() {
+                if walkType == walkSelectView.selectLabel.text {
+                    return index
+                }
+            }
+        default:
+            break
+        }
+        
+        return 0
+    }
 }
