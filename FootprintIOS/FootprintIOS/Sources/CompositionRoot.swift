@@ -85,8 +85,8 @@ extension CompositionRoot {
     }
     
     static func makeCalendarScreen(infoService: InfoServiceProtocol) -> CalendarViewController {
-        let pushGoalScreen: () -> GoalViewController = {
-            let reactor = GoalReactor.init(service: infoService)
+        let pushGoalScreen: (UserInfoRequestModel) -> GoalViewController = { (userInfo) in
+            let reactor = GoalReactor.init(service: infoService, userInfo: userInfo)
             let controller = GoalViewController(reactor: reactor)
             
             return controller

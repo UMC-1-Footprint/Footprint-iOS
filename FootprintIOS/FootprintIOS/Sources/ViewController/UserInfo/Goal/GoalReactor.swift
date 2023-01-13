@@ -29,10 +29,12 @@ class GoalReactor: Reactor {
     
     var initialState: State
     var service: InfoServiceProtocol
+    var userInfo: UserInfoRequestModel
 
-    init(service: InfoServiceProtocol) {
+    init(service: InfoServiceProtocol, userInfo: UserInfoRequestModel) {
         self.initialState = State()
         self.service = service
+        self.userInfo = userInfo
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -80,8 +82,7 @@ class GoalReactor: Reactor {
 
 extension GoalReactor {
     func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
-        service.updateGoalInfo(goalInfo: goalInfo)
-        service.createInfo()
+        service.requestInfo(userInfo: userInfo, goalInfo: goalInfo)
         
         return .empty()
     }
