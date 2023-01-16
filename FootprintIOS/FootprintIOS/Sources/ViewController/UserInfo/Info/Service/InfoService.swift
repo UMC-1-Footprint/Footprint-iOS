@@ -18,22 +18,27 @@ protocol InfoServiceProtocol {
     var event: PublishSubject<InfoEvent> { get }
     
     func createInfo()
+    func editGoalInfo()
     func updateBirth(to birth: String) -> Observable<String>
     func updateWalk(to walk: String) -> Observable<String>
     func updateGoalWalk(to goalWalk: String) -> Observable<String>
     func updateUserInfo(userInfo: InfoModel)
-    func updateGoalInfo(goalInfo: GoalModel)
+    func updateGoalInfo(goalInfo: GoalInfoDTO)
 }
 
 class InfoService: InfoServiceProtocol {
     let event = PublishSubject<InfoEvent>()
     
     private var userInfo: InfoModel?
-    private var goalInfo: GoalModel?
+    private var goalInfo: GoalInfoDTO?
     
     func createInfo() {
         // 서버 통신
         print(self.userInfo)
+        print(self.goalInfo)
+    }
+    
+    func editGoalInfo() {
         print(self.goalInfo)
     }
     
@@ -56,7 +61,7 @@ class InfoService: InfoServiceProtocol {
         self.userInfo = userInfo
     }
     
-    func updateGoalInfo(goalInfo: GoalModel) {
+    func updateGoalInfo(goalInfo: GoalInfoDTO) {
         self.goalInfo = goalInfo
     }
 }

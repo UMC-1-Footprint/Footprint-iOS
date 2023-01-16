@@ -10,5 +10,5 @@ import Foundation
 
 struct GoalModel {
     let dayIdx: [Int]
-    let walkGoalTime, walkTimeSlot: Int
+    let walkGoalTime, walkTimeSlot: String
 }

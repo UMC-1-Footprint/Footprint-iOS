@@ -17,7 +17,7 @@ final class WalkBottomSheetViewController: BottomSheetViewController,View {
     
     // MARK: - Properties
     
-    private let texts = ["이른 오전 (5-8)", "늦은 오전 (9-12)", "이른 오후 (13-16)", "늦은 오후 (17-20)", "밤 (21-0)", "새벽 (1-4)", "매번 다름"]
+    private let texts = GoalTexts.walkTexts
     
     // MARK: - UI Components
     

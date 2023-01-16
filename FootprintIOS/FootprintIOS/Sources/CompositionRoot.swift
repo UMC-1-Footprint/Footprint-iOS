@@ -37,10 +37,11 @@ extension CompositionRoot {
         
         let walkService: WalkServiceType = WalkService()
         let walkRecordService: WalkRecordServiceType = WalkRecordService()
+        let infoService: InfoServiceProtocol = InfoService()
         
         let tabBarViewController = TabBarViewController()
         let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
-        let calendarViewController = makeCalendarScreen()
+        let calendarViewController = makeCalendarScreen(infoService: infoService)
         let recommendViewController = makeRecommendScreen()
         let myPageViewController = makeMyPageScreen(walkRecordService: walkRecordService)
         
@@ -84,25 +85,39 @@ extension CompositionRoot {
         return controller
     }
     
-    static func makeCalendarScreen() -> CalendarViewController {
+    static func makeCalendarScreen(infoService: InfoServiceProtocol) -> CalendarViewController {
         let pushGoalScreen: () -> GoalViewController = {
-            let reactor = GoalReactor.init(service: InfoService())
+            let reactor = GoalReactor.init(service: infoService)
             let controller = GoalViewController(reactor: reactor)
             
             return controller
         }
     
         let pushInfoScreen: () -> InfoViewController = {
-            let reactor = InfoReactor.init(service: InfoService())
+            let reactor = InfoReactor.init(service: infoService)
             let controller = InfoViewController(reactor: reactor,
                                                 pushGoalScreen: pushGoalScreen)
             
             return controller
         }
         
+        let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController = { (goalInfo) in
+            let reactor = GoalEditNextMonthReactor.init(service: infoService, goalInfo: goalInfo)
+            let controller = GoalEditNextMonthViewController(reactor: reactor)
+            
+            return controller
+        }
+        
+        let pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController = {
+            let reactor = GoalEditThisMonthReactor.init()
+            let controller = GoalEditThisMonthViewController(reactor: reactor, pushGoalEditNextMonthScreen: pushGoalEditNextMonthScreen)
+            
+            return controller
+        }
+        
         let reactor = CalendarReactor(state: .init())
         let controller = CalendarViewController(reactor: reactor,
-                                                pushInfoScreen: pushInfoScreen)
+                                                pushInfoScreen: pushInfoScreen, pushGoalEditThisMonthScreen: pushGoalEditThisMonthScreen)
         
         controller.title = "캘린더"
         controller.tabBarItem.image = nil

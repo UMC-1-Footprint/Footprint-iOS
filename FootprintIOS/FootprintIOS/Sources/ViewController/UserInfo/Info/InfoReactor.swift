@@ -71,8 +71,4 @@ extension InfoReactor {
     func reactorForBirth() -> BirthBottomSheetReactor {
         return BirthBottomSheetReactor(service: service)
     }
-    
-    func reactorForGoal() -> GoalReactor {
-        return GoalReactor(service: service)
-    }
 }
