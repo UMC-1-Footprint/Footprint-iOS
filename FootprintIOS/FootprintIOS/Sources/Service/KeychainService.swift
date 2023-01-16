@@ -12,10 +12,12 @@ import RxSwift
 enum KeychainEvent {
     case getAccessToken(token: String)
     case getRefreshToken(token: String)
+    case getJWTId(id: String)
     
     case updateTokens
     case updateAccessToken
     case updateRefreshToken
+    case updateJWTId
     
     case deleteTokens
     case deleteAccessToken
@@ -28,6 +30,7 @@ protocol KeychainServiceType {
     func updateTokens(accessToken: String, refreshToken: String)
     func updateAccessToken(token: String)
     func updateRefreshToken(token: String)
+    func updateJWTId(id: String)
     
     func deleteTokens()
     func deleteAccessToken()
@@ -35,6 +38,7 @@ protocol KeychainServiceType {
 }
 
 class KeychainService: LocalService, KeychainServiceType {
+    
     unowned let keyChain: KeychainProviderType = Provider.shared.Keychain
     
     var event = PublishSubject<KeychainEvent>()
@@ -55,6 +59,12 @@ class KeychainService: LocalService, KeychainServiceType {
         keyChain.updateRefreshToken(token)
         
         event.onNext(.updateRefreshToken)
+    }
+    
+    func updateJWTId(id: String) {
+        keyChain.updateJWTId(id: id)
+        
+        event.onNext(.updateJWTId)
     }
     
     func deleteTokens() {
