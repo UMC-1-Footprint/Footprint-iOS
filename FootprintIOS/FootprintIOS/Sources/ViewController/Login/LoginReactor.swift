@@ -102,10 +102,17 @@ extension LoginReactor {
                                   let userName = user?.properties?["nickname"]
                                 else { return observable.onNext(.doKakaoLogin(false)) }
                        
-                            print(userName)
                             self?.keychainService.updateTokens(accessToken: token.accessToken, refreshToken: token.refreshToken)
                             
                             self?.loginService.login(userId: String(userId), userName: userName, userEmail: userEmail, providerType: .kakao)
+                            
+                            self?.loginService.event
+                                .subscribe(onNext: { event in
+                                    switch event {
+                                    case let .login(data):
+                                        self?.keychainService.updateJWTId(id: data.jwtID)
+                                    }
+                                })
                             
                             observable.onNext(.doKakaoLogin(true))
                         }

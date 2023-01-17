@@ -11,10 +11,12 @@ import SwiftKeychainWrapper
 protocol KeychainProviderType: AnyObject {
     func getAccessToken() -> String
     func getRefreshToken() -> String
+    func getJWTId() -> String
     
     func updateTokens(accessToken: String, refreshToken: String)
     func updateAccessToken(_ token: String)
     func updateRefreshToken(_ token: String)
+    func updateJWTId(id: String)
     
     func deleteTokens()
     func deleteAccessToken()
@@ -22,10 +24,12 @@ protocol KeychainProviderType: AnyObject {
 }
 
 class KeychainProvider: BaseProvider, KeychainProviderType {
+    
     let keychain = KeychainWrapper.standard
     
     let accessTokenKey = "accessToken"
     let refreshTokenKey = "refreshToken"
+    let jwtId = "jwtId"
     
     func getAccessToken() -> String {
         return keychain.string(forKey: accessTokenKey) ?? ""
@@ -33,6 +37,10 @@ class KeychainProvider: BaseProvider, KeychainProviderType {
     
     func getRefreshToken() -> String {
         return keychain.string(forKey: refreshTokenKey) ?? ""
+    }
+    
+    func getJWTId() -> String {
+        return keychain.string(forKey: jwtId) ?? ""
     }
     
     func updateTokens(accessToken: String, refreshToken: String) {
@@ -46,6 +54,10 @@ class KeychainProvider: BaseProvider, KeychainProviderType {
     
     func updateRefreshToken(_ token: String) {
         keychain.set(token, forKey: refreshTokenKey)
+    }
+    
+    func updateJWTId(id: String) {
+        keychain.set(id, forKey: jwtId)
     }
     
     func deleteTokens() {

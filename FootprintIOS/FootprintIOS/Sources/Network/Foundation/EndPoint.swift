@@ -20,7 +20,7 @@ protocol EndPoint {
 extension EndPoint {
     var headers: [String: String] {
         var headers: [String: String] = [:]
-        headers["X-ACCESS-TOKEN"] = Provider.shared.Keychain.getAccessToken()
+        headers["X-ACCESS-TOKEN"] = Provider.shared.Keychain.getJWTId()
         headers["Content-Type"] = "application/json"
         return headers
     }
