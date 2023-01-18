@@ -10,6 +10,10 @@ import UIKit
 
 class GoalView: BaseView {
     
+    // MARK: - Properties
+    
+    var walkTimes: [Int] = [15, 30, 60, 90, 0]
+    
     // MARK: - UI Components
     
     lazy var dayButtons: [UIButton] = []
@@ -118,7 +122,7 @@ class GoalView: BaseView {
         case .goalTime:
             for (index, walkType) in InfoTexts.goalWalkTexts.enumerated() {
                 if walkType == goalWalkSelectView.selectLabel.text {
-                    return index
+                    return walkTimes[safe: index] ?? 0
                 }
             }
         case .time:
