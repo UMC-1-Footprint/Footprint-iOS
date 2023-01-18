@@ -9,6 +9,7 @@
 import UIKit
 import NMapsMap
 import ReactorKit
+import CoreLocation
 
 class FootprintMapViewController: NavigationBarViewController, View {
     // MARK: - Constants
@@ -23,7 +24,7 @@ class FootprintMapViewController: NavigationBarViewController, View {
     
     // MARK: - UI Components
     
-    let mapView: NMFNaverMapView = .init()
+    let naverMapView: NMFNaverMapView = .init()
     let topView: UIView = .init()
     let timeLabel: UILabel = .init()
     let distanceTagView: TagView = .init(type: .gray, title: "거리")
@@ -79,8 +80,8 @@ class FootprintMapViewController: NavigationBarViewController, View {
     override func setupProperty() {
         super.setupProperty()
         
-        mapView.showLocationButton = true
-        mapView.positionMode = .direction
+        naverMapView.showLocationButton = true
+        naverMapView.positionMode = .direction
         
         topView.backgroundColor = .white
         
@@ -119,7 +120,7 @@ class FootprintMapViewController: NavigationBarViewController, View {
     override func setupHierarchy() {
         super.setupHierarchy()
         
-        contentView.addSubviews([mapView, topView, stopButton, stopTagView, footprintButton, footprintTagView, saveButton, saveTagView])
+        contentView.addSubviews([naverMapView, topView, stopButton, stopTagView, footprintButton, footprintTagView, saveButton, saveTagView])
         topView.addSubviews([timeLabel, distanceTagView, distanceLabel, divider1, calorieTagView, calorieLabel, divider2, paceTagView, paceLabel, toggleButton, progressView])
         progressView.addSubviews([progressBarView])
     }
@@ -127,7 +128,7 @@ class FootprintMapViewController: NavigationBarViewController, View {
     override func setupLayout() {
         super.setupLayout()
         
-        mapView.snp.makeConstraints {
+        naverMapView.snp.makeConstraints {
             $0.top.leading.trailing.bottom.equalToSuperview()
         }
         
@@ -238,8 +239,27 @@ class FootprintMapViewController: NavigationBarViewController, View {
         footprintButton.rx.tap
             .bind { [weak self] _ in
                 self?.willPresentFootprintWriteScreen()
+                reactor.action.onNext(.mark)
             }
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.locations.last)
+            .bind { [weak self] location in
+                let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: location.latitude, lng: location.longitude))
+                cameraUpdate.animation = .easeIn
+                self?.naverMapView.mapView.moveCamera(cameraUpdate)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.markers.last)
+            .bind { [weak self] location in
+                let marker = NMFMarker()
+                marker.position = NMGLatLng(lat: location.latitude, lng: location.longitude)
+                marker.iconImage = NMFOverlayImage(image: FootprintIOSAsset.Images.iconFootprint.image)
+                marker.mapView = self?.naverMapView.mapView
+            }
     }
 }
 
@@ -252,7 +272,7 @@ extension FootprintMapViewController {
 
 extension FootprintMapViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-         print("[Error] \(error.localizedDescription)")
+         print("error: \(error.localizedDescription)")
     }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
@@ -262,12 +282,8 @@ extension FootprintMapViewController: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("[Debug] \(locations)")
+        guard let location = locations.last?.coordinate else { return }
         
-        print("[D] \(locations.last?.coordinate.latitude)")
-        
-        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: 37.5666102, lng: 126.9783881))
-        cameraUpdate.animation = .easeIn
-        mapView.mapView.moveCamera(cameraUpdate)
+        reactor?.action.onNext(.move(location))
     }
 }
