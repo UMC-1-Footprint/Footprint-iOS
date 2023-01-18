@@ -17,11 +17,13 @@ class FootprintMapViewController: NavigationBarViewController, View {
     
     // MARK: - Properties
     
-    var pushFootprintWriteScreen: () -> FootprintWriteViewController
+    private let pushFootprintWriteScreen: () -> FootprintWriteViewController
+    
+    lazy var locationManager = CLLocationManager()
     
     // MARK: - UI Components
     
-    let mapView: NMFMapView = .init()
+    let mapView: NMFNaverMapView = .init()
     let topView: UIView = .init()
     let timeLabel: UILabel = .init()
     let distanceTagView: TagView = .init(type: .gray, title: "거리")
@@ -56,6 +58,16 @@ class FootprintMapViewController: NavigationBarViewController, View {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - View Lifecylce
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+    }
+    
     // MARK: - Setup Methods
     
     override func setupNavigationBar() {
@@ -66,6 +78,9 @@ class FootprintMapViewController: NavigationBarViewController, View {
     
     override func setupProperty() {
         super.setupProperty()
+        
+        mapView.showLocationButton = true
+        mapView.positionMode = .direction
         
         topView.backgroundColor = .white
         
@@ -222,13 +237,37 @@ class FootprintMapViewController: NavigationBarViewController, View {
     func bind(reactor: Reactor) {
         footprintButton.rx.tap
             .bind { [weak self] _ in
-                self?.goToFootprintWriteScreen()
+                self?.willPresentFootprintWriteScreen()
             }
             .disposed(by: disposeBag)
     }
-    
-    private func goToFootprintWriteScreen() {
+}
+
+extension FootprintMapViewController {
+    private func willPresentFootprintWriteScreen() {
         let controller = self.pushFootprintWriteScreen()
         self.present(controller, animated: true)
+    }
+}
+
+extension FootprintMapViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+         print("[Error] \(error.localizedDescription)")
+    }
+
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            locationManager.requestLocation()
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print("[Debug] \(locations)")
+        
+        print("[D] \(locations.last?.coordinate.latitude)")
+        
+        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: 37.5666102, lng: 126.9783881))
+        cameraUpdate.animation = .easeIn
+        mapView.mapView.moveCamera(cameraUpdate)
     }
 }

@@ -157,7 +157,7 @@ extension CompositionRoot {
         
         var pushWalkRecordScreen: () -> WalkRecordViewController
         pushWalkRecordScreen = {
-            let reactor = WalkRecordReactor(walkRecordService: walkRecordService)
+            let reactor = WalkRecordReactor(service: walkRecordService)
             let controller = WalkRecordViewController(reactor: reactor)
             return controller
         }
