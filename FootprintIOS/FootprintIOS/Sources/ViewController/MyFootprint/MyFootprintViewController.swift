@@ -11,8 +11,21 @@ import UIKit
 import SnapKit
 import Then
 import RxSwift
+import ReactorKit
 
-class MyFootprintViewController: BaseViewController {
+class MyFootprintViewController: BaseViewController, View {
+    typealias Reactor = MyFootprintReactor
+    
+    init(reactor: Reactor) {
+        super.init(nibName: nil, bundle: nil)
+        
+        self.reactor = reactor
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 // MARK: - UI Components
     enum TabItem: CaseIterable {
         case dayAchievement
@@ -109,6 +122,14 @@ class MyFootprintViewController: BaseViewController {
         tabSelected(selectedTabItem)
         tabBind()
         setTabPager()
+    }
+    
+// MARK: - bind
+    func bind(reactor: MyFootprintReactor) {
+        rx.viewWillAppear
+            .map { _ in .refresh }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
 // MARK: - setupProperty

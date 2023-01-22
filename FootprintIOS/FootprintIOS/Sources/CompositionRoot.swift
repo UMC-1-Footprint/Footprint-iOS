@@ -43,7 +43,9 @@ extension CompositionRoot {
         let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
         let calendarViewController = makeCalendarScreen(infoService: infoService)
         let recommendViewController = makeRecommendScreen()
-        let myPageViewController = makeMyPageScreen(walkRecordService: walkRecordService)
+        
+        let myFootprintInfosService: MyFootprintInfosServiceType = MyFootprintInfosService()
+        let myPageViewController = makeMyPageScreen(walkRecordService: walkRecordService, myFootprintInfoService: myFootprintInfosService)
         
         tabBarViewController.viewControllers = [
             footprintRootViewController.navigationWrap(),
@@ -147,17 +149,17 @@ extension CompositionRoot {
         return controller
     }
     
-    static func makeMyPageScreen(walkRecordService: WalkRecordServiceType) -> MyPageViewController {
+    static func makeMyPageScreen(walkRecordService: WalkRecordServiceType, myFootprintInfoService: MyFootprintInfosServiceType) -> MyPageViewController {
         var pushMyFootprintScreen: () -> MyFootprintViewController
         pushMyFootprintScreen = {
-            let controller = MyFootprintViewController()
-            
+            let reactor: MyFootprintReactor = .init(service: myFootprintInfoService)
+            let controller = MyFootprintViewController(reactor: reactor)
             return controller
         }
         
         var pushWalkRecordScreen: () -> WalkRecordViewController
         pushWalkRecordScreen = {
-            let reactor = WalkRecordReactor(walkRecordService: walkRecordService)
+            let reactor = WalkRecordReactor(service: walkRecordService)
             let controller = WalkRecordViewController(reactor: reactor)
             return controller
         }
