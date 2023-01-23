@@ -239,7 +239,6 @@ class FootprintMapViewController: NavigationBarViewController, View {
         footprintButton.rx.tap
             .bind { [weak self] _ in
                 self?.willPresentFootprintWriteScreen()
-                reactor.action.onNext(.mark)
             }
             .disposed(by: disposeBag)
         
@@ -260,6 +259,7 @@ class FootprintMapViewController: NavigationBarViewController, View {
                 marker.iconImage = NMFOverlayImage(image: FootprintIOSAsset.Images.iconFootprint.image)
                 marker.mapView = self?.naverMapView.mapView
             }
+            .disposed(by: disposeBag)
     }
 }
 

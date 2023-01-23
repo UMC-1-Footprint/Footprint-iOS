@@ -12,7 +12,6 @@ import CoreLocation
 class FootprintMapReactor: Reactor {
     enum Action {
         case move(CLLocationCoordinate2D)
-        case mark
     }
     
     enum Mutation {
@@ -26,9 +25,11 @@ class FootprintMapReactor: Reactor {
     }
     
     var initialState: State
+    let footprintService: FootprintServiceType
     
-    init(state: State) {
+    init(state: State, footprintService: FootprintServiceType) {
         self.initialState = state
+        self.footprintService = footprintService
     }
 }
 
@@ -37,14 +38,22 @@ extension FootprintMapReactor {
         switch action {
         case let .move(location):
             return .just(.appendLocation(location))
-            
-        case let .mark:
-            if let location = currentState.locations.last {
-                return .just(.appendMarker(location))
-            } else {
-                return .empty()
+        }
+    }
+    
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let event = footprintService.event.flatMap { [weak self] (event) -> Observable<Mutation> in
+            switch event {
+            case .saveFootprint:
+                if let location = self?.currentState.locations.last {
+                    return .just(.appendMarker(location))
+                } else {
+                    return .empty()
+                }
             }
         }
+        
+        return Observable.merge(event, mutation)
     }
     
     func reduce(state: State, mutation: Mutation) -> State {

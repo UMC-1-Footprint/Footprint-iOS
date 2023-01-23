@@ -38,9 +38,11 @@ extension CompositionRoot {
         let walkService: WalkServiceType = WalkService()
         let walkRecordService: WalkRecordServiceType = WalkRecordService()
         let infoService: InfoServiceProtocol = InfoService()
+        let footprintService: FootprintServiceType = FootprintService()
         
         let tabBarViewController = TabBarViewController()
-        let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
+        let footprintRootViewController = makeFootprintRootScreen(walkService: walkService,
+                                                                  footprintService: footprintService)
         let calendarViewController = makeCalendarScreen(infoService: infoService)
         let recommendViewController = makeRecommendScreen()
         let myPageViewController = makeMyPageScreen(walkRecordService: walkRecordService)
@@ -55,15 +57,17 @@ extension CompositionRoot {
         return tabBarViewController
     }
     
-    static func makeFootprintRootScreen(walkService: WalkServiceType) -> FootprintRootViewController {
+    static func makeFootprintRootScreen(walkService: WalkServiceType, footprintService: FootprintServiceType) -> FootprintRootViewController {
         let pushFootprintWriteScreen: () -> FootprintWriteViewController = {
-            let reactor = FootprintWriteReactor(state: .init())
+            let reactor = FootprintWriteReactor(state: .init(),
+                                                footprintService: footprintService)
             let controller = FootprintWriteViewController(reactor: reactor)
             return controller
         }
         
         let pushFootprintMapScreen: () -> FootprintMapViewController = {
-            let reactor = FootprintMapReactor(state: .init())
+            let reactor = FootprintMapReactor(state: .init(),
+                                              footprintService: footprintService)
             let controller = FootprintMapViewController(reactor: reactor,
                                                         pushFootprintWriteScreen: pushFootprintWriteScreen)
             return controller
@@ -74,7 +78,8 @@ extension CompositionRoot {
             return .init(reactor: reactor)
         }
 
-        let reactor = FootprintRootReactor(state: .init())
+        let reactor = FootprintRootReactor(state: .init(),
+                                           footprintService: footprintService)
         let controller = FootprintRootViewController(reactor: reactor,
                                                      pushFootprintMapScreen: pushFootprintMapScreen,
                                                      pushRecordSearchScreen: pushRecordSearchScreen)

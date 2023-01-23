@@ -217,17 +217,20 @@ class FootprintWriteViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         addPictureView.addPictureButton.rx.tap
-            .withUnretained(self)
-            .bind { this, _ in
-                this.goToPickerScreen()
+            .bind { [weak self] _ in
+                self?.willPresentPickerScreen()
             }
             .disposed(by: disposeBag)
         
         accessoryView.addPictureButton.rx.tap
-            .withUnretained(self)
-            .bind { this, _ in
-                this.goToPickerScreen()
+            .bind { [weak self] _ in
+                self?.willPresentPickerScreen()
             }
+            .disposed(by: disposeBag)
+        
+        saveButton.rx.tap
+            .map { .save }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         collectionView.rx.setDelegate(self).disposed(by: disposeBag)
@@ -266,7 +269,7 @@ class FootprintWriteViewController: NavigationBarViewController, View {
 }
 
 extension FootprintWriteViewController {
-    private func goToPickerScreen() {
+    private func willPresentPickerScreen() {
         var configure = PHPickerConfiguration()
         configure.selectionLimit = 10
         configure.filter = .images

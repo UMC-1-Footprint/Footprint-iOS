@@ -14,6 +14,7 @@ class FootprintWriteReactor: Reactor {
     enum Action {
         case text(String)
         case uploadImage([UIImage])
+        case save
     }
     
     enum Mutation {
@@ -29,9 +30,11 @@ class FootprintWriteReactor: Reactor {
     }
     
     var initialState: State
+    let footprintService: FootprintServiceType
     
-    init(state: State) {
+    init(state: State, footprintService: FootprintServiceType) {
         self.initialState = state
+        self.footprintService = footprintService
     }
 }
 
@@ -46,6 +49,10 @@ extension FootprintWriteReactor {
                 .just(.setImages(images)),
                 .just(.setSections(makeSections(from: images)))
             ])
+            
+        case .save:
+            footprintService.saveFootprint()
+            return .empty()
         }
     }
     

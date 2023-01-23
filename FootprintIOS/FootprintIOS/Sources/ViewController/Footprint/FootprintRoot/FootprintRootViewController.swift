@@ -137,6 +137,7 @@ class FootprintRootViewController: NavigationBarViewController, View {
     
     private func goToFootprintMapScreen() {
         let controller = self.pushFootprintMapScreen()
+        controller.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
