@@ -12,7 +12,7 @@ class GoalEditNextMonthReactor: Reactor {
     enum Action {
         case refresh
         case tapDayButton(Int)
-        case tapSaveButton(GoalInfoDTO)
+        case tapSaveButton(GoalRequestDTO)
     }
     
     enum Mutation {
@@ -21,40 +21,51 @@ class GoalEditNextMonthReactor: Reactor {
         case updateDayButton(Int)
         case updateWalk(String)
         case updateGoalWalk(String)
+        case saveGoal(Bool?)
     }
     
     struct State {
-        var goalInfo: GoalModel
+        var goalInfo: GoalModel?
         var isSelectedButtons: [Bool] = [false, false, false, false, false, false, false]
         var walk: String?
         var goalWalk: String?
+        var save: Bool?
     }
     
     var initialState: State
     var service: InfoServiceProtocol
-
-    init(service: InfoServiceProtocol, goalInfo: GoalModel) {
-        self.initialState = State(goalInfo: goalInfo)
+    
+    init(service: InfoServiceProtocol) {
+        self.initialState = State()
         self.service = service
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .refresh:
-            return .concat(
-                .just(.setGoalInfo(initialState.goalInfo)),
-                setDayButtons(days: initialState.goalInfo.dayIdx)
-            )
+            service.getNextMonthGoal()
+            return .empty()
         case .tapDayButton(let day):
             return .just(.updateDayButton(day))
         case .tapSaveButton(let info):
-            return updateInfoMutation(info)
+            service.patchNextMonthGoal(goalInfo: info)
+            return .empty()
         }
     }
     
     func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
         let event = service.event.flatMap { event -> Observable<Mutation> in
             switch event {
+            case let .getNextMonthGoal(goalInfo):
+                return .concat(
+                    .just(.setGoalInfo(goalInfo.toDomain())),
+                    self.setDayButtons(days: goalInfo.dayIdx)
+                )
+            case let .patchNextMonthGoal(isSuccess):
+                return .concat(
+                    .just(.saveGoal(isSuccess)),
+                    .just(.saveGoal(nil))
+                )
             case .updateWalk(content: let walk):
                 return .just(.updateWalk(walk))
             case .updateGoalWalk(content: let goalWalk):
@@ -81,6 +92,8 @@ class GoalEditNextMonthReactor: Reactor {
             newState.walk = walk
         case .updateGoalWalk(let goalWalk):
             newState.goalWalk = goalWalk
+        case let .saveGoal(isSuccess):
+            newState.save = isSuccess
         }
         return newState
     }
@@ -88,20 +101,15 @@ class GoalEditNextMonthReactor: Reactor {
 
 extension GoalEditNextMonthReactor {
     func setDayButtons(days: [Int]) -> Observable<Mutation> {
-        var dayButtons: [Bool] = [false, false, false, false, false, false, false]
+        var dayButtons: [Bool] = [false, false, false, false, false, false, false, false]
         
         for (index, _) in dayButtons.enumerated() {
             if days.contains(index) {
-                dayButtons[index] = true
+                dayButtons[index - 1] = true
             }
         }
         
         return .just(.setDayButtons(dayButtons))
-    }
-    
-    func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
-        
-        return .empty()
     }
     
     func reactorForWalk() -> WalkBottomSheetReactor {

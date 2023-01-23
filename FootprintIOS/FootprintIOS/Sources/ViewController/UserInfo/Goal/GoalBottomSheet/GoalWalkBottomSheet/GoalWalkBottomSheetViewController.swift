@@ -99,7 +99,7 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
                 .when(.recognized)
                 .withUnretained(self)
                 .map { owner, _ -> String in
-                    return owner.texts[goalWalk]
+                    return owner.texts[goalWalk] ?? "0"
                 }
                 .map { .tapGoalWalkTime($0) }
                 .bind(to: reactor.action)

@@ -11,7 +11,7 @@ import ReactorKit
 class GoalReactor: Reactor {
     enum Action {
         case tapDayButton(Int)
-        case tapDoneButton(GoalInfoDTO)
+        case tapDoneButton(GoalRequestDTO)
     }
     
     enum Mutation {
@@ -81,8 +81,8 @@ class GoalReactor: Reactor {
 }
 
 extension GoalReactor {
-    func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
-        service.requestInfo(userInfo: userInfo, goalInfo: goalInfo)
+    func updateInfoMutation(_ goalInfo: GoalRequestDTO) -> Observable<Mutation> {
+        service.postUserInfo(userInfo: userInfo, goalInfo: goalInfo)
         
         return .empty()
     }

@@ -101,15 +101,15 @@ extension CompositionRoot {
             return controller
         }
         
-        let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController = { (goalInfo) in
-            let reactor = GoalEditNextMonthReactor.init(service: infoService, goalInfo: goalInfo)
+        let pushGoalEditNextMonthScreen: () -> GoalEditNextMonthViewController = {
+            let reactor = GoalEditNextMonthReactor.init(service: infoService)
             let controller = GoalEditNextMonthViewController(reactor: reactor)
             
             return controller
         }
         
         let pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController = {
-            let reactor = GoalEditThisMonthReactor.init()
+            let reactor = GoalEditThisMonthReactor.init(service: infoService)
             let controller = GoalEditThisMonthViewController(reactor: reactor, pushGoalEditNextMonthScreen: pushGoalEditNextMonthScreen)
             
             return controller
@@ -157,7 +157,7 @@ extension CompositionRoot {
         
         var pushWalkRecordScreen: () -> WalkRecordViewController
         pushWalkRecordScreen = {
-            let reactor = WalkRecordReactor(walkRecordService: walkRecordService)
+            let reactor = WalkRecordReactor(service: walkRecordService)
             let controller = WalkRecordViewController(reactor: reactor)
             return controller
         }

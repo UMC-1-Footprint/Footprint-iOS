@@ -110,7 +110,7 @@ class GoalView: BaseView {
     func updateDayButtons(days: [Int]) {
         for (index, _) in dayButtons.enumerated() {
             if days.contains(index) {
-                updateDayButtonIsSelected(day: index)
+                updateDayButtonIsSelected(day: index - 1)
             }
         }
     }
@@ -128,7 +128,7 @@ class GoalView: BaseView {
         case .time:
             for (index, walkType) in InfoTexts.walkTexts.enumerated() {
                 if walkType == walkSelectView.selectLabel.text {
-                    return index
+                    return index + 1
                 }
             }
         default:
