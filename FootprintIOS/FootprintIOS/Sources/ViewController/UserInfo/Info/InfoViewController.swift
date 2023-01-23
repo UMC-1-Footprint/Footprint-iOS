@@ -329,7 +329,9 @@ class InfoViewController: NavigationBarViewController, View {
                 let gender = GenderType(rawValue: idx)?.genderType
                 var birth = owner.birthSelectView.selectLabel.text
                 if birth == InfoTexts.birthTitleText {
-                    birth = ""
+                    birth = nil
+                } else {
+                    birth = birth?.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "[^0-9]", with: "-", options: .regularExpression)
                 }
                 let userInfo = UserInfoRequestModel(
                     nickname: owner.nicknameTextField.text ?? "",
