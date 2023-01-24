@@ -33,9 +33,9 @@ class GoalEditNextMonthReactor: Reactor {
     }
     
     var initialState: State
-    var service: InfoServiceProtocol
+    var service: InfoServiceType
     
-    init(service: InfoServiceProtocol) {
+    init(service: InfoServiceType) {
         self.initialState = State()
         self.service = service
     }
@@ -54,7 +54,9 @@ class GoalEditNextMonthReactor: Reactor {
     }
     
     func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
-        let event = service.event.flatMap { event -> Observable<Mutation> in
+        let event = service.event.flatMap { [weak self] event -> Observable<Mutation> in
+            guard let `self` = self else { return .empty() }
+            
             switch event {
             case let .getNextMonthGoal(goalInfo):
                 return .concat(
@@ -66,9 +68,9 @@ class GoalEditNextMonthReactor: Reactor {
                     .just(.saveGoal(isSuccess)),
                     .just(.saveGoal(nil))
                 )
-            case .updateWalk(content: let walk):
+            case let .updateWalk(content: walk):
                 return .just(.updateWalk(walk))
-            case .updateGoalWalk(content: let goalWalk):
+            case let .updateGoalWalk(content: goalWalk):
                 return .just(.updateGoalWalk(goalWalk))
             default:
                 return .never()

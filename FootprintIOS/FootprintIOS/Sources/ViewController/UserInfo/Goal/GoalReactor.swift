@@ -28,10 +28,10 @@ class GoalReactor: Reactor {
     }
     
     var initialState: State
-    var service: InfoServiceProtocol
+    var service: InfoServiceType
     var userInfo: UserInfoRequestModel
 
-    init(service: InfoServiceProtocol, userInfo: UserInfoRequestModel) {
+    init(service: InfoServiceType, userInfo: UserInfoRequestModel) {
         self.initialState = State()
         self.service = service
         self.userInfo = userInfo

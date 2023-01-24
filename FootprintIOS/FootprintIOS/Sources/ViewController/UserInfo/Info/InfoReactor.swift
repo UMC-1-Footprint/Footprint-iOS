@@ -22,9 +22,9 @@ class InfoReactor: Reactor {
     }
     
     var initialState: State
-    var service: InfoServiceProtocol
+    var service: InfoServiceType
     
-    init(service: InfoServiceProtocol) {
+    init(service: InfoServiceType) {
         self.initialState = State()
         self.service = service
     }

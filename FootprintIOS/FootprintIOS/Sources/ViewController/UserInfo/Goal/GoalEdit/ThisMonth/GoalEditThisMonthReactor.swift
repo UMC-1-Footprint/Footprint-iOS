@@ -22,9 +22,9 @@ class GoalEditThisMonthReactor: Reactor {
     }
     
     var initialState: State
-    let service: InfoServiceProtocol
+    let service: InfoServiceType
     
-    init(service: InfoServiceProtocol) {
+    init(service: InfoServiceType) {
         self.initialState = State()
         self.service = service
     }

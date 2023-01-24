@@ -37,7 +37,7 @@ extension CompositionRoot {
         
         let walkService: WalkServiceType = WalkService()
         let walkRecordService: WalkRecordServiceType = WalkRecordService()
-        let infoService: InfoServiceProtocol = InfoService()
+        let infoService: InfoServiceType = InfoService()
         
         let tabBarViewController = TabBarViewController()
         let footprintRootViewController = makeFootprintRootScreen(walkService: walkService)
@@ -85,7 +85,7 @@ extension CompositionRoot {
         return controller
     }
     
-    static func makeCalendarScreen(infoService: InfoServiceProtocol) -> CalendarViewController {
+    static func makeCalendarScreen(infoService: InfoServiceType) -> CalendarViewController {
         let pushGoalScreen: (UserInfoRequestModel) -> GoalViewController = { (userInfo) in
             let reactor = GoalReactor.init(service: infoService, userInfo: userInfo)
             let controller = GoalViewController(reactor: reactor)

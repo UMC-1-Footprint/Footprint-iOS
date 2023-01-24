@@ -18,7 +18,7 @@ enum InfoEvent {
     case patchNextMonthGoal(Bool)
 }
 
-protocol InfoServiceProtocol {
+protocol InfoServiceType {
     var event: PublishSubject<InfoEvent> { get }
     
     func postUserInfo(userInfo: UserInfoRequestModel, goalInfo: GoalRequestDTO)
@@ -30,7 +30,7 @@ protocol InfoServiceProtocol {
     func updateGoalWalk(to goalWalk: String) -> Observable<String>
 }
 
-class InfoService: NetworkService, InfoServiceProtocol {
+class InfoService: NetworkService, InfoServiceType {
     let event = PublishSubject<InfoEvent>()
     
     func postUserInfo(userInfo: UserInfoRequestModel, goalInfo: GoalRequestDTO) {
