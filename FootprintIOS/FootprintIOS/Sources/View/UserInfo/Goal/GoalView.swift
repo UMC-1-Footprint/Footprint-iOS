@@ -10,6 +10,10 @@ import UIKit
 
 class GoalView: BaseView {
     
+    // MARK: - Properties
+    
+    var walkTimes: [Int] = [15, 30, 60, 90, 0]
+    
     // MARK: - UI Components
     
     lazy var dayButtons: [UIButton] = []
@@ -106,8 +110,31 @@ class GoalView: BaseView {
     func updateDayButtons(days: [Int]) {
         for (index, _) in dayButtons.enumerated() {
             if days.contains(index) {
-                updateDayButtonIsSelected(day: index)
+                updateDayButtonIsSelected(day: index - 1)
             }
         }
+    }
+    
+    // MARK: - Methods
+    
+    func getWalkIndex(type: UserInfoSelectBarType) -> Int {
+        switch type {
+        case .goalTime:
+            for (index, walkType) in InfoTexts.goalWalkTexts.enumerated() {
+                if walkType == goalWalkSelectView.selectLabel.text {
+                    return walkTimes[safe: index] ?? 0
+                }
+            }
+        case .time:
+            for (index, walkType) in InfoTexts.walkTexts.enumerated() {
+                if walkType == walkSelectView.selectLabel.text {
+                    return index + 1
+                }
+            }
+        default:
+            break
+        }
+        
+        return 0
     }
 }

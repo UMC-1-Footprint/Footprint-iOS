@@ -22,19 +22,32 @@ class GoalEditThisMonthReactor: Reactor {
     }
     
     var initialState: State
+    let service: InfoServiceType
     
-    init() {
+    init(service: InfoServiceType) {
         self.initialState = State()
+        self.service = service
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .refresh:
-            return .just(.setGoalInfo(
-                GoalInfoDTO(dayIdx: [2, 3],
-                            walkGoalTime: 1,
-                            walkTimeSlot: 1).toDomain()))
+            service.getThisMonthGoal()
+            return .empty()
         }
+    }
+
+    func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
+        let event = service.event.flatMap { event -> Observable<Mutation> in
+            switch event {
+            case let .getThisMonthGoal(goalInfo):
+                return .just(.setGoalInfo(goalInfo.toDomain()))
+            default:
+                return .never()
+            }
+        }
+        
+        return Observable.merge(mutation, event)
     }
     
     func reduce(state: State, mutation: Mutation) -> State {

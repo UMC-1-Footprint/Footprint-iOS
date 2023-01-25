@@ -10,7 +10,7 @@ import ReactorKit
 
 class InfoReactor: Reactor {
     enum Action {
-        case tapDoneButton(InfoModel)
+        
     }
     
     enum Mutation {
@@ -22,18 +22,11 @@ class InfoReactor: Reactor {
     }
     
     var initialState: State
-    var service: InfoServiceProtocol
+    var service: InfoServiceType
     
-    init(service: InfoServiceProtocol) {
+    init(service: InfoServiceType) {
         self.initialState = State()
         self.service = service
-    }
-    
-    func mutate(action: Action) -> Observable<Mutation> {
-        switch action {
-        case .tapDoneButton(let userInfo):
-            return updateUserInfoMutation(userInfo)
-        }
     }
     
     func transform(mutation: Observable<Mutation>) -> Observable<Mutation> {
@@ -62,12 +55,6 @@ class InfoReactor: Reactor {
 }
 
 extension InfoReactor {
-    func updateUserInfoMutation(_ userInfo: InfoModel) -> Observable<Mutation> {
-        service.updateUserInfo(userInfo: userInfo)
-        
-        return .empty()
-    }
-    
     func reactorForBirth() -> BirthBottomSheetReactor {
         return BirthBottomSheetReactor(service: service)
     }

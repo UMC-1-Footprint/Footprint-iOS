@@ -99,10 +99,10 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
         
         navigationBar.rightButton.rx.tap
             .withUnretained(self)
-            .map { owner, _ -> GoalInfoDTO in
-                let info = GoalInfoDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
-                                       walkGoalTime: 0,
-                                       walkTimeSlot: 0)
+            .map { owner, _ -> GoalRequestDTO in
+                let info = GoalRequestDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                                          walkGoalTime: owner.goalView.getWalkIndex(type: .goalTime),
+                                          walkTimeSlot: owner.goalView.getWalkIndex(type: .time))
                 
                 return info
             }
@@ -131,8 +131,9 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map(\.goalInfo)
+            .compactMap(\.goalInfo)
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .bind { owner, goalInfo in
                 owner.goalView.updateDayButtons(days: goalInfo.dayIdx)
                 owner.goalView.walkSelectView.update(text: goalInfo.walkTimeSlot)
@@ -143,6 +144,7 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
         reactor.state
             .map(\.isSelectedButtons)
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .bind { owner, isSelectedDays in
                 for day in 0..<owner.goalView.dayButtons.count {
                     isSelectedDays[day] ? owner.goalView.updateDayButtonIsSelected(day: day) : owner.goalView.updateDayButtonIsUnSelected(day: day)
@@ -153,6 +155,7 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
         reactor.state
             .compactMap(\.goalWalk)
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .bind { owner, goalWalk in
                 owner.goalView.goalWalkSelectView.update(text: goalWalk)
             }
@@ -161,8 +164,22 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
         reactor.state
             .compactMap(\.walk)
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .bind { owner, walk in
                 owner.goalView.walkSelectView.update(text: walk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap(\.save)
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .bind { owner, isSuccess in
+                if isSuccess {
+                    owner.makeAlert(type: .changeGoal)
+                } else {
+                    owner.makeAlert(type: .noGoal)
+                }
             }
             .disposed(by: disposeBag)
     }

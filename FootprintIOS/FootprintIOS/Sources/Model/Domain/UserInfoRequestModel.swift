@@ -1,5 +1,5 @@
 //
-//  InfoModel.swift
+//  UserInfoRequestModel.swift
 //  Footprint-iOS
 //
 //  Created by 김영인 on 2022/11/21.
@@ -8,7 +8,8 @@
 
 import Foundation
 
-struct InfoModel {
-    var nickname,sex,birth: String
-    let height,weight: Int
+struct UserInfoRequestModel {
+    let nickname,sex: String
+    let birth: String?
+    let height,weight: String?
 }

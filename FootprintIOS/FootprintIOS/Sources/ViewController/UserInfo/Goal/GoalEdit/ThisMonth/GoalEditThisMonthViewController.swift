@@ -17,7 +17,7 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
     
     // MARK: - Properties
     
-    private let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController
+    private let pushGoalEditNextMonthScreen: () -> GoalEditNextMonthViewController
     
     // MARK: - UI Components
     
@@ -47,7 +47,7 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
     
     // MARK: - Initiailzer
     
-    init(reactor: Reactor, pushGoalEditNextMonthScreen: @escaping (GoalModel) -> GoalEditNextMonthViewController) {
+    init(reactor: Reactor, pushGoalEditNextMonthScreen: @escaping () -> GoalEditNextMonthViewController) {
         self.pushGoalEditNextMonthScreen = pushGoalEditNextMonthScreen
         
         super.init(nibName: nil, bundle: nil)
@@ -117,14 +117,14 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
         goalEditNextMonthButton.rx.tap
             .withUnretained(self)
             .bind { owner, _ in
-                guard let goalInfo = reactor.currentState.goalInfo else { return }
-                owner.willPushGoalEditNextMonthScreen(goalInfo: goalInfo)
+                owner.willPushGoalEditNextMonthScreen()
             }
             .disposed(by: disposeBag)
         
         reactor.state
             .compactMap(\.goalInfo)
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .bind { owner, goalInfo in
                 owner.goalView.updateDayButtons(days: goalInfo.dayIdx)
                 owner.goalView.walkSelectView.update(text: goalInfo.walkTimeSlot)
@@ -138,8 +138,8 @@ final class GoalEditThisMonthViewController: NavigationBarViewController, View {
 }
 
 extension GoalEditThisMonthViewController {
-    private func willPushGoalEditNextMonthScreen(goalInfo: GoalModel) {
-        let controller = self.pushGoalEditNextMonthScreen(goalInfo)
+    private func willPushGoalEditNextMonthScreen() {
+        let controller = self.pushGoalEditNextMonthScreen()
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }

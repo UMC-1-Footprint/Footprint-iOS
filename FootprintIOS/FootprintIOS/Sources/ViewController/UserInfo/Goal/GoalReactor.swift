@@ -11,7 +11,7 @@ import ReactorKit
 class GoalReactor: Reactor {
     enum Action {
         case tapDayButton(Int)
-        case tapDoneButton(GoalInfoDTO)
+        case tapDoneButton(GoalRequestDTO)
     }
     
     enum Mutation {
@@ -28,11 +28,13 @@ class GoalReactor: Reactor {
     }
     
     var initialState: State
-    var service: InfoServiceProtocol
+    var service: InfoServiceType
+    var userInfo: UserInfoRequestModel
 
-    init(service: InfoServiceProtocol) {
+    init(service: InfoServiceType, userInfo: UserInfoRequestModel) {
         self.initialState = State()
         self.service = service
+        self.userInfo = userInfo
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -79,9 +81,8 @@ class GoalReactor: Reactor {
 }
 
 extension GoalReactor {
-    func updateInfoMutation(_ goalInfo: GoalInfoDTO) -> Observable<Mutation> {
-        service.updateGoalInfo(goalInfo: goalInfo)
-        service.createInfo()
+    func updateInfoMutation(_ goalInfo: GoalRequestDTO) -> Observable<Mutation> {
+        service.postUserInfo(userInfo: userInfo, goalInfo: goalInfo)
         
         return .empty()
     }
