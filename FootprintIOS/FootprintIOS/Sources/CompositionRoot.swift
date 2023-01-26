@@ -37,7 +37,7 @@ extension CompositionRoot {
         
         let walkService: WalkServiceType = WalkService()
         let walkRecordService: WalkRecordServiceType = WalkRecordService()
-        let infoService: InfoServiceProtocol = InfoService()
+        let infoService: InfoServiceType = InfoService()
         let footprintService: FootprintServiceType = FootprintService()
         
         let tabBarViewController = TabBarViewController()
@@ -90,9 +90,9 @@ extension CompositionRoot {
         return controller
     }
     
-    static func makeCalendarScreen(infoService: InfoServiceProtocol) -> CalendarViewController {
-        let pushGoalScreen: () -> GoalViewController = {
-            let reactor = GoalReactor.init(service: infoService)
+    static func makeCalendarScreen(infoService: InfoServiceType) -> CalendarViewController {
+        let pushGoalScreen: (UserInfoRequestModel) -> GoalViewController = { (userInfo) in
+            let reactor = GoalReactor.init(service: infoService, userInfo: userInfo)
             let controller = GoalViewController(reactor: reactor)
             
             return controller
@@ -106,15 +106,15 @@ extension CompositionRoot {
             return controller
         }
         
-        let pushGoalEditNextMonthScreen: (GoalModel) -> GoalEditNextMonthViewController = { (goalInfo) in
-            let reactor = GoalEditNextMonthReactor.init(service: infoService, goalInfo: goalInfo)
+        let pushGoalEditNextMonthScreen: () -> GoalEditNextMonthViewController = {
+            let reactor = GoalEditNextMonthReactor.init(service: infoService)
             let controller = GoalEditNextMonthViewController(reactor: reactor)
             
             return controller
         }
         
         let pushGoalEditThisMonthScreen: () -> GoalEditThisMonthViewController = {
-            let reactor = GoalEditThisMonthReactor.init()
+            let reactor = GoalEditThisMonthReactor.init(service: infoService)
             let controller = GoalEditThisMonthViewController(reactor: reactor, pushGoalEditNextMonthScreen: pushGoalEditNextMonthScreen)
             
             return controller

@@ -36,7 +36,7 @@ class InfoViewController: NavigationBarViewController, View {
 
     // MARK: - Properties
     
-    var pushGoalScreen: () -> GoalViewController
+    private let pushGoalScreen: (UserInfoRequestModel) -> GoalViewController
     
     // MARK: - UI Components
     
@@ -137,7 +137,7 @@ class InfoViewController: NavigationBarViewController, View {
     // MARK: - Initializer
     
     init(reactor: Reactor,
-         pushGoalScreen: @escaping () -> GoalViewController) {
+         pushGoalScreen: @escaping (UserInfoRequestModel) -> GoalViewController) {
         self.pushGoalScreen = pushGoalScreen
         
         super.init(nibName: nil, bundle: nil)
@@ -324,24 +324,24 @@ class InfoViewController: NavigationBarViewController, View {
         
         bottomButton.rx.tap
             .withUnretained(self)
-            .map { owner, _ -> InfoModel in
+            .bind { owner, _ in
                 let idx = owner.genderSegmentControl.selectedSegmentIndex
                 let gender = GenderType(rawValue: idx)?.genderType
-                let info = InfoModel(nickname: owner.nicknameTextField.text ?? "",
-                                     sex: gender ?? "none",
-                                     birth: owner.birthSelectView.selectLabel.text ?? "",
-                                     height: Int(owner.heightTextField.text ?? "0") ?? 0,
-                                     weight: Int(owner.weightTextField.text ?? "0") ?? 0)
-                return info
-            }
-            .map { .tapDoneButton($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        bottomButton.rx.tap
-            .withUnretained(self)
-            .bind { owner, _ in
-                owner.willPushGoalScreen()
+                var birth = owner.birthSelectView.selectLabel.text
+                if birth == InfoTexts.birthTitleText {
+                    birth = nil
+                } else {
+                    birth = birth?.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "[^0-9]", with: "-", options: .regularExpression)
+                }
+                let userInfo = UserInfoRequestModel(
+                    nickname: owner.nicknameTextField.text ?? "",
+                    sex: gender ?? "none",
+                    birth: birth,
+                    height: owner.heightTextField.text,
+                    weight: owner.weightTextField.text
+                    )
+                
+                owner.willPushToGoalScreen(userInfo: userInfo)
             }
             .disposed(by: disposeBag)
         
@@ -380,8 +380,8 @@ class InfoViewController: NavigationBarViewController, View {
         }
     }
     
-    private func willPushGoalScreen() {
-        let controller = self.pushGoalScreen()
+    private func willPushToGoalScreen(userInfo: UserInfoRequestModel) {
+        let controller = self.pushGoalScreen(userInfo)
         self.navigationController?.pushViewController(controller, animated: true)
     }
 }

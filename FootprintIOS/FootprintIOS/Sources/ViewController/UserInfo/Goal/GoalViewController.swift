@@ -12,8 +12,6 @@ import ReactorKit
 
 class GoalViewController: BaseViewController, View {
     
-    // MARK: - Properties
-    
     typealias Reactor = GoalReactor
     
     // MARK: - UI Components
@@ -140,10 +138,10 @@ class GoalViewController: BaseViewController, View {
         
         bottomButton.rx.tap
             .withUnretained(self)
-            .map { owner, _ -> GoalInfoDTO in
-                let info = GoalInfoDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
-                                       walkGoalTime: 0,
-                                       walkTimeSlot: 0)
+            .map { owner, _ -> GoalRequestDTO in
+                let info = GoalRequestDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                                       walkGoalTime: owner.goalView.getWalkIndex(type: .goalTime),
+                                       walkTimeSlot: owner.goalView.getWalkIndex(type: .time))
                 
                 return info
             }

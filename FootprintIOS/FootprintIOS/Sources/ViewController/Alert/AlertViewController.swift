@@ -212,7 +212,7 @@ extension UIViewController {
     func makeAlert(type: AlertType, alertAction: (() -> Void)? = nil) {
         let alertVC = AlertViewController(type: type, reator: .init())
         alertVC.modalTransitionStyle = .crossDissolve
-        alertVC.modalPresentationStyle = .fullScreen
+        alertVC.modalPresentationStyle = .overCurrentContext
         alertVC.alertAction = alertAction
         self.present(alertVC, animated: true)
     }
