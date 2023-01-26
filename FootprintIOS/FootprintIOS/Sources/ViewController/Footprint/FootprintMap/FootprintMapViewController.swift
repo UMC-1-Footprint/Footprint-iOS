@@ -20,7 +20,7 @@ class FootprintMapViewController: NavigationBarViewController, View {
     
     private let pushFootprintWriteScreen: () -> FootprintWriteViewController
     
-    lazy var locationManager = CLLocationManager()
+    let locationManager: CLLocationManager = .init()
     
     // MARK: - UI Components
     
