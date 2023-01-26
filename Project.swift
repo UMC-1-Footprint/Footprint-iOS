@@ -42,6 +42,9 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "사용자의 위치를 받습니다.",
+        "NSLocationWhenInUseUsageDescription": "사용자의 위치를 받습니다.",
+        "NSLocationUsageDescription": "사용자의 위치를 받습니다.",
         "UIUserInterfaceStyle": "Light",
         "API_BASE_URL": "$(ROOT_URL)",
         "KAKAO_APP_KEY": "$(KAKAO_APP_KEY)",

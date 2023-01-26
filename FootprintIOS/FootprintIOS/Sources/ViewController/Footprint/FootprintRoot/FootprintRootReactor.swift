@@ -22,7 +22,10 @@ class FootprintRootReactor: Reactor {
     
     var initialState: State
     
-    init(state: State) {
+    let footprintService: FootprintServiceType
+    
+    init(state: State, footprintService: FootprintServiceType) {
         self.initialState = state
+        self.footprintService = footprintService
     }
 }
