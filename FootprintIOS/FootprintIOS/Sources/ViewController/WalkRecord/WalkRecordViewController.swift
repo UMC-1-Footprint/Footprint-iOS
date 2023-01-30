@@ -53,8 +53,20 @@ class WalkRecordViewController: BaseViewController, View {
             
             return header
         case .walkSummary:
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self), for: indexPath) as? WalkRecordSummaryHeader else { return .init() }
-            
+            guard let reactor = reactor,
+                  let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self), for: indexPath) as? WalkRecordSummaryHeader else { return .init() }
+
+            reactor.state
+                .map(\.headerDateTitle)
+                .bind(to: header.dateLabel.rx.text)
+                .disposed(by: header.disposeBag)
+
+            reactor.state
+                .map(\.detailCount)
+                .map { count in "총 \(count)회" }
+                .bind(to: header.summaryLabel.rx.text)
+                .disposed(by: header.disposeBag)
+
             return header
         }
     }
@@ -151,11 +163,17 @@ class WalkRecordViewController: BaseViewController, View {
         
         collectionView.rx.itemSelected
             .filter { $0[0] == 0 }
-            .bind { this in
-                print("🔥 아이템 어떻게 출력되는지")
-                print(reactor.currentState.monthTitle)
-                print(this)
+            .map { this in
+                let month: String = reactor.calendarDate.month < 10 ? "0\(String(reactor.calendarDate.month))" : String(reactor.calendarDate.month)
+                let cellPointToDay: Int = this[1] + 1
+                let date: String = cellPointToDay < 10 ? "0\(String(cellPointToDay))" : String(cellPointToDay)
+                let selectedDate: String = "\(reactor.calendarDate.year)-\(month)-\(String(date))"
+                
+                return selectedDate
             }
+            .map { date in .updateDetail(date) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
         collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }

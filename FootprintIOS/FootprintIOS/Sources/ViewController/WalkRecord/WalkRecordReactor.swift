@@ -20,21 +20,23 @@ class WalkRecordReactor: Reactor {
         case refresh
         case prevMonth
         case nextMonth
-//        case detail(String)
+        case updateDetail(String)
     }
     
     enum Mutation {
         case setWalkRecordSection([WalkRecordSectionModel])
         case setCalendarMonthTitle(String)
+        case setHeaderDateTitle(String)
         case setUpdateStatus(Bool)
-//        case setCalendarSection([WalkRecordResponseDTO])
-//        case setDetailSection([WalkRecordDetailResponseDTO])
+        case updateDetailCount(String)
     }
     
     struct State {
         var walkRecordSection: [WalkRecordSectionModel] = []
         var monthTitle: String = .init()
         var isUpdated: Bool = false
+        var headerDateTitle: String = .init()
+        var detailCount: String = .init()
     }
     
     let initialState: State
@@ -62,6 +64,8 @@ class WalkRecordReactor: Reactor {
             return getPrevMonthMutation()
         case .nextMonth:
             return getNextMonthMutation()
+        case let .updateDetail(date):
+            return updateDeatilMutation(date: date)
         }
     }
     
@@ -75,6 +79,10 @@ class WalkRecordReactor: Reactor {
             newState.monthTitle = month
         case let .setUpdateStatus(status):
             newState.isUpdated = status
+        case let .setHeaderDateTitle(date):
+            newState.headerDateTitle = date
+        case let .updateDetailCount(count):
+            newState.detailCount = count
         }
         return newState
     }
@@ -88,7 +96,10 @@ class WalkRecordReactor: Reactor {
                     return .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays())))
                 case let .getDetail(data):
                     self.footprintDetail = data
-                    return .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays())))
+                    return Observable.concat([
+                        .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays()))),
+                        .just(.updateDetailCount(String(data.count)))
+                    ])
                 }
             })
         
@@ -100,43 +111,52 @@ class WalkRecordReactor: Reactor {
 extension WalkRecordReactor {
     func refreshMutation() -> Observable<Mutation> {
         service.getNumber(year: calendarDate.year, month: calendarDate.month)
-        service.getDetail(date: "2023-01-04")
+        service.getDetail(date: Date().toString(dateFormat: "yyyy-MM-dd"))
 
         return Observable.concat([
-            .just(.setCalendarMonthTitle(updateMonthTitle()))
+            .just(.setCalendarMonthTitle(updateMonthTitle(dateFormat: "yyyy년 MM월"))),
+            .just(.setHeaderDateTitle(Date().toString(dateFormat: "yyyy년 MM월 dd일")))
         ])
     }
     
     func getPrevMonthMutation() -> Observable<Mutation> {
         setPrevMonth()
-        
-        let days = [Int](repeating: 0, count: totalDays) // TODO: - 서버에서 받는 값으로 수정
+        service.getNumber(year: calendarDate.year, month: calendarDate.month)
         
         return Observable.concat([
             .just(.setWalkRecordSection(createCalendarSection(model: getDays()))),
-            .just(.setCalendarMonthTitle(updateMonthTitle()))
+            .just(.setCalendarMonthTitle(updateMonthTitle(dateFormat: "yyyy년 MM월")))
         ])
     }
     
     func getNextMonthMutation() -> Observable<Mutation> {
         setNextMonth()
-        
-        let days = [Int](repeating: 0, count: totalDays) // TODO: - 서버에서 받는 값으로 수정
+        service.getNumber(year: calendarDate.year, month: calendarDate.month)
         
         return Observable.concat([
             .just(.setWalkRecordSection(createCalendarSection(model: getDays()))),
-            .just(.setCalendarMonthTitle(updateMonthTitle()))
+            .just(.setCalendarMonthTitle(updateMonthTitle(dateFormat: "yyyy년 MM월")))
         ])
     }
     
+    func updateDeatilMutation(date: String) -> Observable<Mutation> {
+        service.getDetail(date: date)
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.timeZone = NSTimeZone(name: "ko_KR") as TimeZone? 
+        guard let date: Date = dateFormatter.date(from: date) else { return .empty() }
+        
+        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+        let dateToString = dateFormatter.string(from: date)
+        
+        return .just(.setHeaderDateTitle(dateToString))
+    }
+    
     func createCalendarSection(model: [WalkRecordModel]) -> [WalkRecordSectionModel] {
-        // reactor 내부 변수에 저장해두고 이걸 사용하는 방식으로 착안 ??
         let calendarItems = model.map { item -> WalkRecordItem in
             return .calendar(item)
         }
-        
-        //detail 여기서 사용해야함
-//        var recordItems:[WalkRecordItem] = []
         
         let recordItems = self.footprintDetail.map { item -> WalkRecordItem in
             return .walkSummary(item)
@@ -174,15 +194,15 @@ extension WalkRecordReactor {
         return days
     }
     
-    func updateMonthTitle() -> String {
+    func updateMonthTitle(dateFormat: String) -> String {
         let dateFormatter = DateFormatter()
         
-        dateFormatter.dateFormat = "yyyy년 MM월"
+        dateFormatter.dateFormat = dateFormat
         let dateToString = dateFormatter.string(from: calendarDate)
         return dateToString
     }
     
-    func setPrevMonth(){
+    func setPrevMonth() {
         let calendarDate = calendar.date(byAdding: DateComponents(month: -1), to: calendarDate) ?? Date()
         
         self.calendarDate = calendarDate

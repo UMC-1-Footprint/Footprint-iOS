@@ -15,11 +15,9 @@ import Then
 class WalkRecordSummaryHeader: BaseCollectionReusableView {
     let dateLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .medium)
-        $0.text = "2023년 1월 1일"
     }
     let summaryLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14, weight: .medium)
-        $0.text = "총 3회"
     }
     let topLineView = UIView().then {
         $0.backgroundColor = FootprintIOSAsset.Colors.whiteM.color
