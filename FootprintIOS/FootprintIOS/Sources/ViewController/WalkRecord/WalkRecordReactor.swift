@@ -20,12 +20,15 @@ class WalkRecordReactor: Reactor {
         case refresh
         case prevMonth
         case nextMonth
+//        case detail(String)
     }
     
     enum Mutation {
         case setWalkRecordSection([WalkRecordSectionModel])
         case setCalendarMonthTitle(String)
         case setUpdateStatus(Bool)
+//        case setCalendarSection([WalkRecordResponseDTO])
+//        case setDetailSection([WalkRecordDetailResponseDTO])
     }
     
     struct State {
@@ -41,6 +44,8 @@ class WalkRecordReactor: Reactor {
     lazy var startDay = calendar.component(.weekday, from: calendarDate) - 1
     lazy var monthDays = calendar.range(of: .day, in: .month, for: calendarDate)!.count
     lazy var totalDays = startDay + monthDays
+    var hasFootprintOfMonth:[Int] = []
+    var footprintDetail:[WalkRecordDetailResponseDTO] = []
     
     let service: WalkRecordServiceType
     
@@ -80,20 +85,24 @@ class WalkRecordReactor: Reactor {
             .flatMap({ (event) -> Observable<Mutation> in
                 switch event {
                 case let .getNumber(data):
-                    let walkRecordNumberOfMonth = self.getWalkRecordOfMonth(date: data)
-                    
-                    return .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays(walkRecordNum: walkRecordNumberOfMonth))))
+                    self.hasFootprintOfMonth = self.getWalkRecordOfMonth(date: data)
+                    return .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays())))
+                case let .getDetail(data):
+                    self.footprintDetail = data
+                    return .just(.setWalkRecordSection(self.createCalendarSection(model: self.getDays())))
                 }
             })
         
         return Observable.merge(mutation, eventMutation)
     }
+    
 }
 
 extension WalkRecordReactor {
     func refreshMutation() -> Observable<Mutation> {
         service.getNumber(year: calendarDate.year, month: calendarDate.month)
-        
+        service.getDetail(date: "2023-01-04")
+
         return Observable.concat([
             .just(.setCalendarMonthTitle(updateMonthTitle()))
         ])
@@ -105,7 +114,7 @@ extension WalkRecordReactor {
         let days = [Int](repeating: 0, count: totalDays) // TODO: - 서버에서 받는 값으로 수정
         
         return Observable.concat([
-            .just(.setWalkRecordSection(createCalendarSection(model: getDays(walkRecordNum: days)))),
+            .just(.setWalkRecordSection(createCalendarSection(model: getDays()))),
             .just(.setCalendarMonthTitle(updateMonthTitle()))
         ])
     }
@@ -116,19 +125,23 @@ extension WalkRecordReactor {
         let days = [Int](repeating: 0, count: totalDays) // TODO: - 서버에서 받는 값으로 수정
         
         return Observable.concat([
-            .just(.setWalkRecordSection(createCalendarSection(model: getDays(walkRecordNum: days)))),
+            .just(.setWalkRecordSection(createCalendarSection(model: getDays()))),
             .just(.setCalendarMonthTitle(updateMonthTitle()))
         ])
     }
     
     func createCalendarSection(model: [WalkRecordModel]) -> [WalkRecordSectionModel] {
+        // reactor 내부 변수에 저장해두고 이걸 사용하는 방식으로 착안 ??
         let calendarItems = model.map { item -> WalkRecordItem in
-            return .calendar(item.day)
+            return .calendar(item)
         }
-        var recordItems:[WalkRecordItem] = []
-        recordItems.append(.walkSummary(.init()))
-        recordItems.append(.walkSummary(.init()))
-        recordItems.append(.walkSummary(.init()))
+        
+        //detail 여기서 사용해야함
+//        var recordItems:[WalkRecordItem] = []
+        
+        let recordItems = self.footprintDetail.map { item -> WalkRecordItem in
+            return .walkSummary(item)
+        }
         
         let calendarSection = WalkRecordSectionModel.init(model: .calendar(calendarItems), items: calendarItems)
         let recordSection = WalkRecordSectionModel.init(model: .walkSummary(recordItems), items: recordItems)
@@ -136,8 +149,16 @@ extension WalkRecordReactor {
         return [calendarSection, recordSection]
     }
     
-    func getDays(walkRecordNum: [Int]) -> [WalkRecordModel] {
+    func refreshSection() -> [WalkRecordSectionModel] {
+        let calendarSection = WalkRecordSectionModel(model: .calendar(.init()), items: .init())
+        let recordSection = WalkRecordSectionModel(model: .walkSummary(.init()), items: .init())
+        
+        return [calendarSection, recordSection]
+    }
+    
+    func getDays() -> [WalkRecordModel] {
         var days: [WalkRecordModel] = []
+        let walkRecordNum:[Int] = self.hasFootprintOfMonth
         
         for day in 0..<totalDays {
             if day < startDay {

@@ -10,7 +10,7 @@ import Foundation
 
 enum WalkRecordEndPoint {
     case getNumber(year: Int, month: Int)
-    case getDetail(userIdx: String, date: String)
+    case getDetail(date: String)
 }
 
 extension WalkRecordEndPoint: EndPoint {
@@ -26,15 +26,9 @@ extension WalkRecordEndPoint: EndPoint {
             
             guard let url = urlComponents?.url else { return .init() }
             return url.absoluteString
-        case let .getDetail(userIdx, date):
-            var urlComponents = URLComponents(string: Provider.shared.Enviroment.url + "/users/\(userIdx)?")
             
-            urlComponents?.queryItems = [
-                URLQueryItem(name: "date", value: String(date))
-            ]
-            
-            guard let url = urlComponents?.url else { return .init() }
-            return url.absoluteString
+        case let .getDetail(date):
+            return Provider.shared.Enviroment.url + "/users/\(date)"
         }
     }
     
