@@ -45,7 +45,8 @@ class WalkRecordCollectionViewCell: BaseCollectionViewCell {
         }
     }
     
-    func setData(day: String) {
-        dateLabel.text = day
+    func configure(model: WalkRecordModel) {
+        dateLabel.text = model.day
+        footprintImage.isHidden = model.footprintNumber > 0 ? false : true
     }
 }

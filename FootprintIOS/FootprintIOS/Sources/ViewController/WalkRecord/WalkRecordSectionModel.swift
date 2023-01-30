@@ -18,8 +18,9 @@ enum WalkRecordSection {
 }
 
 enum WalkRecordItem {
-    case calendar(String)
-    case walkSummary(RecordCollectionViewCellReactor)
+//    case calendar(String)
+    case calendar(WalkRecordModel)
+    case walkSummary(WalkRecordDetailResponseDTO)
 //    case emptyWalkSummary
 }
 

@@ -20,14 +20,14 @@ class WalkRecordViewController: BaseViewController, View {
     
     private lazy var dataSource = WalkRecordDataSource { [weak self] _, collectionView, indexPath, item -> UICollectionViewCell in
         switch item {
-        case let .calendar(day):
+        case let .calendar(model):
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self), for: indexPath) as? WalkRecordCollectionViewCell else { return .init() }
-            cell.setData(day: day)
+            cell.configure(model: model)
             
             return cell
         case let .walkSummary(reactor):
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: RecordCollectionViewCell.self), for: indexPath) as? RecordCollectionViewCell else { return .init() }
-            cell.reactor = reactor
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: WalkRecordSummaryCell.self), for: indexPath) as? WalkRecordSummaryCell else { return .init() }
+//            cell.reactor = reactor
             return cell
         }
     } configureSupplementaryView: { [self] (dataSource, collectionView, kind, indexPath) -> UICollectionReusableView in
@@ -76,9 +76,11 @@ class WalkRecordViewController: BaseViewController, View {
     }
     lazy var collectionView: UICollectionView = .init(frame: .zero, collectionViewLayout: collectionViewFlowLayout)
     
-    init(reactor: Reactor) {
+    var service: WalkRecordServiceType
+    
+    init(reactor: Reactor, service: WalkRecordServiceType) {
+        self.service = service
         super.init(nibName: nil, bundle: nil)
-        
         self.reactor = reactor
     }
     
@@ -133,7 +135,8 @@ class WalkRecordViewController: BaseViewController, View {
         collectionView.register(WalkRecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self))
         collectionView.register(WalkRecordCalendarHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordCalendarHeader.self))
         collectionView.register(WalkRecordSummaryHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self))
-        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
+//        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
+        collectionView.register(WalkRecordSummaryCell.self, forCellWithReuseIdentifier: String(describing: WalkRecordSummaryCell.self))
     }
     
     func bind(reactor: WalkRecordReactor) {
@@ -150,7 +153,9 @@ class WalkRecordViewController: BaseViewController, View {
         collectionView.rx.itemSelected
             .filter { $0[0] == 0 }
             .bind { this in
-                print("cell 클릭됨")
+                print("🔥 아이템 어떻게 출력되는지")
+                print(reactor.currentState.monthTitle)
+                print(this)
             }
         
         collectionView.rx.setDelegate(self).disposed(by: disposeBag)
