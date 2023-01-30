@@ -10,6 +10,7 @@ import Foundation
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 class WalkRecordSummaryCell: BaseCollectionViewCell {
     // MARK: - UI Components
@@ -30,21 +31,15 @@ class WalkRecordSummaryCell: BaseCollectionViewCell {
         cornerRound(radius: 12)
         setShadow(radius: 16, offset: .init(width: 0, height: 2), opacity: 0.05)
         
-        imageView.backgroundColor = .green
-        
         timeImageView.image = FootprintIOSAsset.Images.iconTime.image
         
         titleLabel.font = .systemFont(ofSize: 16)
         titleLabel.textColor = .black
-        titleLabel.text = "산책 기록 테스트" // 수정바람
         
         timeLabel.font = .systemFont(ofSize: 10)
         timeLabel.textColor = FootprintIOSAsset.Colors.blackL.color
-        timeLabel.text = "13:40 ~ 14:01" // 수정바람
         
         deleteButton.setImage(FootprintIOSAsset.Images.iconTrash.image, for: .normal)
-        
-        hashTagStackView.update(texts: ["테스트1", "테스트2"])
     }
     
     override func setupHierarchy() {
@@ -88,5 +83,14 @@ class WalkRecordSummaryCell: BaseCollectionViewCell {
             $0.leading.equalTo(imageView.snp.trailing).offset(10)
             $0.bottom.equalTo(imageView.snp.bottom)
         }
+    }
+    
+    func configure(model: WalkRecordDetailResponseDTO) {
+        let tags: [String] = model.hashtag.map { return $0 }
+        
+        titleLabel.text = "\(model.userDateWalk.walkIdx)번째 산책"
+        timeLabel.text = "\(model.userDateWalk.startTime) ~ \(model.userDateWalk.endTime)"
+        imageView.kf.setImage(with: URL(string: model.userDateWalk.pathImageURL))
+        hashTagStackView.update(texts: tags)
     }
 }

@@ -70,7 +70,6 @@ class WalkRecordReactor: Reactor {
         
         switch mutation {
         case let .setWalkRecordSection(section):
-            print("🔥 setWalkRecord")
             newState.walkRecordSection = section
         case let .setCalendarMonthTitle(month):
             newState.monthTitle = month

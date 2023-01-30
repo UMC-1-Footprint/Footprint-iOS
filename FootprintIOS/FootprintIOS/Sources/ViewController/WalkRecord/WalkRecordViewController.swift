@@ -25,9 +25,9 @@ class WalkRecordViewController: BaseViewController, View {
             cell.configure(model: model)
             
             return cell
-        case let .walkSummary(reactor):
+        case let .walkSummary(model):
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: WalkRecordSummaryCell.self), for: indexPath) as? WalkRecordSummaryCell else { return .init() }
-//            cell.reactor = reactor
+            cell.configure(model: model)
             return cell
         }
     } configureSupplementaryView: { [self] (dataSource, collectionView, kind, indexPath) -> UICollectionReusableView in
@@ -135,7 +135,6 @@ class WalkRecordViewController: BaseViewController, View {
         collectionView.register(WalkRecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: WalkRecordCollectionViewCell.self))
         collectionView.register(WalkRecordCalendarHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordCalendarHeader.self))
         collectionView.register(WalkRecordSummaryHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: String(describing: WalkRecordSummaryHeader.self))
-//        collectionView.register(RecordCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: RecordCollectionViewCell.self))
         collectionView.register(WalkRecordSummaryCell.self, forCellWithReuseIdentifier: String(describing: WalkRecordSummaryCell.self))
     }
     
