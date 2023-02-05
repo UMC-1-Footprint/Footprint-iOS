@@ -12,6 +12,7 @@ enum InfoEvent {
     case updateBirth(content: String)
     case updateWalk(content: String)
     case updateGoalWalk(content: String)
+    case showGoalWalkAlertView
     
     case getThisMonthGoal(GoalResponseDTO)
     case getNextMonthGoal(GoalResponseDTO)
@@ -28,6 +29,7 @@ protocol InfoServiceType {
     func updateBirth(to birth: String) -> Observable<String>
     func updateWalk(to walk: String) -> Observable<String>
     func updateGoalWalk(to goalWalk: String) -> Observable<String>
+    func showGoalWalkAlertView() -> Observable<Void>
 }
 
 class InfoService: NetworkService, InfoServiceType {
@@ -106,6 +108,11 @@ class InfoService: NetworkService, InfoServiceType {
     func updateWalk(to walk: String) -> Observable<String> {
         event.onNext(.updateWalk(content: walk))
         return .just(walk)
+    }
+    
+    func showGoalWalkAlertView() -> Observable<Void> {
+        event.onNext(.showGoalWalkAlertView)
+        return .just(Void())
     }
     
     func updateGoalWalk(to goalWalk: String) -> Observable<String> {

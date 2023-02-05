@@ -94,17 +94,28 @@ final class GoalWalkBottomSheetViewController: BottomSheetViewController, View {
     func bind(reactor: GoalWalkBottomSheetReactor) {
         setGoalWalkLabels()
         
-        for goalWalk in 0..<5 {
+        for goalWalk in texts.indices {
             goalWalkLabels[goalWalk].rx.tapGesture()
                 .when(.recognized)
                 .withUnretained(self)
                 .map { owner, _ -> String in
-                    return owner.texts[goalWalk] ?? "0"
+                    return owner.texts[goalWalk]
                 }
                 .map { .tapGoalWalkTime($0) }
                 .bind(to: reactor.action)
                 .disposed(by: disposeBag)
         }
+        
+        reactor.state
+            .map(\.showGoalWalkTimeAlertView)
+            .filter { $0 }
+            .withUnretained(self)
+            .bind { owner, _ in
+                owner.dismiss(animated: true) {
+                    reactor.service.showGoalWalkAlertView()
+                }
+            }
+            .disposed(by: disposeBag)
         
         reactor.state
             .map(\.dismiss)

@@ -149,16 +149,6 @@ class GoalViewController: BaseViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        goalView.walkSelectView.rx.tapGesture()
-            .when(.recognized)
-            .withUnretained(self)
-            .bind { owner, _ in
-                let reactor = reactor.reactorForWalk()
-                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
-                owner.present(walkBottomSheet, animated: true)
-            }
-            .disposed(by: disposeBag)
-        
         goalView.goalWalkSelectView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
@@ -166,6 +156,16 @@ class GoalViewController: BaseViewController, View {
                 let reactor = reactor.reactorForGoalWalk()
                 let goalWalkBottomSheet = GoalWalkBottomSheetViewController(reactor: reactor)
                 owner.present(goalWalkBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        goalView.walkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = reactor.reactorForWalk()
+                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
+                owner.present(walkBottomSheet, animated: true)
             }
             .disposed(by: disposeBag)
         
@@ -180,6 +180,14 @@ class GoalViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
+            .compactMap(\.walk)
+            .withUnretained(self)
+            .bind { owner, walk in
+                owner.goalView.walkSelectView.update(text: walk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .compactMap(\.goalWalk)
             .withUnretained(self)
             .bind { owner, goalWalk in
@@ -188,10 +196,21 @@ class GoalViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap(\.walk)
+            .map(\.isPresentGoalWalkSelectView)
+            .filter { $0 }
             .withUnretained(self)
-            .bind { owner, walk in
-                owner.goalView.walkSelectView.update(text: walk)
+            .flatMap { owner, _ in
+                let selectGoalWalkTime: PublishSubject<String> = .init()
+                
+                owner.makeAlert(type: .custom(value: .selectGoalWalkTime), customViewType: .selectGoalWalkTime, alertAction: {
+                    
+                })
+                
+                return selectGoalWalkTime
+            }
+            .withUnretained(self)
+            .bind { (owner, goalWalkTime) in
+                print("!! alert !!")
             }
             .disposed(by: disposeBag)
         
