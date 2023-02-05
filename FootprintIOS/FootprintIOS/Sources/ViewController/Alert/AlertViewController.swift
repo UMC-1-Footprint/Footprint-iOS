@@ -22,7 +22,11 @@ enum AlertType {
     case withdrawal
     case deleteAll(Int)
     case badge(String)
-    case custom
+    case custom(value: Custom)
+    
+    enum Custom {
+        case selectGoalWalkTime
+    }
     
     var title: String {
         switch self {
@@ -46,7 +50,7 @@ enum AlertType {
             return "\(i)번째 산책'을 삭제하시겠어요?"
         case let .badge(badgeName):
             return "\(badgeName)\n뱃지를 획득했어요!"
-        case .custom:
+        case .custom(value: .selectGoalWalkTime):
             return "목표산책시간 직접설정"
         }
     }
@@ -89,6 +93,7 @@ class AlertViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     private let type: AlertType
+    private let customViewType: AlertType.Custom?
     typealias Reactor = AlertReactor
     var alertAction: (() -> Void)?
     
@@ -97,16 +102,17 @@ class AlertViewController: NavigationBarViewController, View {
     private lazy var oneButtonAlertView = OneButtonAlertView.init(type: self.type)
     private lazy var twoButtonAlertView = TwoButtonAlertView.init(type: self.type)
     private lazy var badgeAlertView = BadgeAlertView.init(type: self.type)
-    private lazy var customAlertView = CustomAlertView.init(type: self.type)
+    private lazy var customAlertView = CustomAlertView.init(type: self.type, customViewType: self.customViewType)
     
     // MARK: - Initializer
     
-    init(type: AlertType, reator: Reactor) {
+    init(type: AlertType, customViewType: AlertType.Custom? = nil, reactor: Reactor) {
         self.type = type
+        self.customViewType = customViewType
         
         super.init(nibName: nil, bundle: nil)
         
-        self.reactor = reator
+        self.reactor = reactor
     }
     
     @available(*, unavailable)
@@ -209,8 +215,8 @@ class AlertViewController: NavigationBarViewController, View {
 }
 
 extension UIViewController {
-    func makeAlert(type: AlertType, alertAction: (() -> Void)? = nil) {
-        let alertVC = AlertViewController(type: type, reator: .init())
+    func makeAlert(type: AlertType, customViewType: AlertType.Custom? = nil, alertAction: (() -> Void)? = nil) {
+        let alertVC = AlertViewController(type: type, customViewType: customViewType, reactor: .init())
         alertVC.modalTransitionStyle = .crossDissolve
         alertVC.modalPresentationStyle = .overCurrentContext
         alertVC.alertAction = alertAction

@@ -13,6 +13,7 @@ class CustomAlertView: BaseView {
     // MARK: - Properties
     
     let type: AlertType
+    let customViewType: AlertType.Custom?
 
     // MARK: - UI Components
     
@@ -26,10 +27,7 @@ class CustomAlertView: BaseView {
         $0.textColor = FootprintIOSAsset.Colors.blackM.color
     }
     
-    // FIXME: 나중에 재사용 가능성이 있다면 customView도 enum으로 관리
-    private let customView = UIView().then {
-        $0.backgroundColor = .systemYellow
-    }
+    private lazy var customView = UIView.init()
     
     private let lineView = UIView().then {
         $0.backgroundColor = FootprintIOSAsset.Colors.white3.color
@@ -55,8 +53,9 @@ class CustomAlertView: BaseView {
     
     // MARK: - Initializer
     
-    init(type: AlertType) {
+    init(type: AlertType, customViewType: AlertType.Custom?) {
         self.type = type
+        self.customViewType = customViewType
         
         super.init(frame: .zero)
     }
@@ -73,6 +72,13 @@ class CustomAlertView: BaseView {
         
         titleLabel.text = type.title
         rightButton.setTitle(type.buttonTitle, for: .normal)
+        
+        switch customViewType {
+        case .selectGoalWalkTime:
+            customView = SelectGoalWalkTimeView.init()
+        case .none:
+            return
+        }
     }
 
     override func setupHierarchy() {
