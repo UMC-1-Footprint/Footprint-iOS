@@ -9,6 +9,7 @@
 import UIKit
 
 import RxSwift
+import RxRelay
 
 class SelectGoalWalkTimeView: BaseView {
     
@@ -22,8 +23,8 @@ class SelectGoalWalkTimeView: BaseView {
     private var hours: [String] = []
     private var minutes: [String] = []
     
-    var selectedHour = BehaviorSubject<String>(value: "0시간")
-    var selectedMinute = BehaviorSubject<String>(value: "0분")
+    var selectedHour = BehaviorRelay<String>(value: "0시간")
+    var selectedMinute = BehaviorRelay<String>(value: "10분")
     
     // MARK: - UI Components
     
@@ -53,8 +54,14 @@ class SelectGoalWalkTimeView: BaseView {
         }
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        pickerView.selectRow(1, inComponent: 1, animated: true)
+    }
+    
     private func setupPickerView() {
-        for hour in Array(0...23) {
+        for hour in Array(0...4) {
             hours.append("\(hour)시간")
         }
         
@@ -82,30 +89,28 @@ extension SelectGoalWalkTimeView: UIPickerViewDataSource {
 }
 
 extension SelectGoalWalkTimeView: UIPickerViewDelegate {
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        switch component {
-        case Time.hour.rawValue:
-            return hours[row]
-        case Time.minute.rawValue:
-            return minutes[row]
-        default:
-            return ""
-        }
-    }
-    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        
         switch component {
         case Time.hour.rawValue:
-            selectedHour.onNext(hours[row])
+            selectedHour.accept(hours[row])
         case Time.minute.rawValue:
-            selectedMinute.onNext(minutes[row])
+            selectedMinute.accept(minutes[row])
         default:
             break
+        }
+        
+        if selectedHour.value == hours[0] {
+            pickerView.selectRow(1, inComponent: 1, animated: true)
         }
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return 40
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        return 90
     }
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {

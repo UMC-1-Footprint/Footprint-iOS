@@ -10,10 +10,6 @@ import UIKit
 
 class GoalView: BaseView {
     
-    // MARK: - Properties
-    
-    var walkTimes: [Int] = [15, 30, 60, 90, 0]
-    
     // MARK: - UI Components
     
     lazy var dayButtons: [UIButton] = []
@@ -120,11 +116,25 @@ class GoalView: BaseView {
     func getWalkIndex(type: UserInfoSelectBarType) -> Int {
         switch type {
         case .goalTime:
-            for (index, walkType) in InfoTexts.goalWalkTexts.enumerated() {
-                if walkType == goalWalkSelectView.selectLabel.text {
-                    return walkTimes[safe: index] ?? 0
-                }
+            let time = goalWalkSelectView.selectLabel.text ?? ""
+            var goalTime: Int
+            
+            if !time.contains("시간") {
+                goalTime = time.split(separator: "분").map { Int($0) ?? 0 }.first ?? 0
+            } else if !time.contains("분") {
+                goalTime = (time.split(separator: "시간").map { Int($0) ?? 0 }.first ?? 0) * 60
+            } else {
+                let hourMinute = time.split(separator: " ")
+                let hour = (hourMinute[0].split(separator: "시간").map { Int($0) ?? 0 }.first ?? 0) * 60
+                let minute = hourMinute[1].split(separator: "분").map { Int($0) ?? 0 }.first ?? 0
+                goalTime = hour + minute
             }
+            
+            if time == "0분" {
+                goalTime = 10
+            }
+            
+            return goalTime
         case .time:
             for (index, walkType) in InfoTexts.walkTexts.enumerated() {
                 if walkType == walkSelectView.selectLabel.text {
