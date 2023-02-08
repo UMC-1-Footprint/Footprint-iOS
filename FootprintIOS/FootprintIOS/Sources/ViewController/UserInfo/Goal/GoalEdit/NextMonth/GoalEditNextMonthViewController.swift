@@ -110,16 +110,6 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        goalView.walkSelectView.rx.tapGesture()
-            .when(.recognized)
-            .withUnretained(self)
-            .bind { owner, _ in
-                let reactor = reactor.reactorForWalk()
-                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
-                owner.present(walkBottomSheet, animated: true)
-            }
-            .disposed(by: disposeBag)
-        
         goalView.goalWalkSelectView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
@@ -127,6 +117,16 @@ final class GoalEditNextMonthViewController: NavigationBarViewController, View {
                 let reactor = reactor.reactorForGoalWalk()
                 let goalWalkBottomSheet = GoalWalkBottomSheetViewController(reactor: reactor)
                 owner.present(goalWalkBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        goalView.walkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = reactor.reactorForWalk()
+                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
+                owner.present(walkBottomSheet, animated: true)
             }
             .disposed(by: disposeBag)
         

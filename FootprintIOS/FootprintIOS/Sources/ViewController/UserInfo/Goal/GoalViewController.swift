@@ -139,9 +139,11 @@ class GoalViewController: BaseViewController, View {
         bottomButton.rx.tap
             .withUnretained(self)
             .map { owner, _ -> GoalRequestDTO in
-                let info = GoalRequestDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
-                                       walkGoalTime: owner.goalView.getWalkIndex(type: .goalTime),
-                                       walkTimeSlot: owner.goalView.getWalkIndex(type: .time))
+                let info = GoalRequestDTO(
+                    dayIdx: reactor.currentState.isSelectedButtons
+                        .enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                    walkGoalTime: owner.goalView.getWalkIndex(type: .goalTime),
+                    walkTimeSlot: owner.goalView.getWalkIndex(type: .time))
                 
                 return info
             }
@@ -202,15 +204,17 @@ class GoalViewController: BaseViewController, View {
             .flatMap { owner, _ in
                 let selectGoalWalkTime: PublishSubject<String> = .init()
                 
-                owner.makeAlert(type: .custom(value: .selectGoalWalkTime), customViewType: .selectGoalWalkTime, alertAction: {
-                    
+                owner.makeAlert(type: .custom(value: .selectGoalWalkTime),
+                                customViewType: .selectGoalWalkTime,
+                                selectTimeAction: { time in
+                    selectGoalWalkTime.onNext(time)
                 })
                 
                 return selectGoalWalkTime
             }
             .withUnretained(self)
             .bind { (owner, goalWalkTime) in
-                print("!! alert !!")
+                owner.goalView.goalWalkSelectView.update(text: goalWalkTime)
             }
             .disposed(by: disposeBag)
         

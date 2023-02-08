@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RxSwift
+
 class SelectGoalWalkTimeView: BaseView {
     
     enum Time: Int {
@@ -19,6 +21,9 @@ class SelectGoalWalkTimeView: BaseView {
     
     private var hours: [String] = []
     private var minutes: [String] = []
+    
+    var selectedHour = BehaviorSubject<String>(value: "0시간")
+    var selectedMinute = BehaviorSubject<String>(value: "0분")
     
     // MARK: - UI Components
     
@@ -91,9 +96,9 @@ extension SelectGoalWalkTimeView: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch component {
         case Time.hour.rawValue:
-            print(hours[row])
+            selectedHour.onNext(hours[row])
         case Time.minute.rawValue:
-            print(minutes[row])
+            selectedMinute.onNext(minutes[row])
         default:
             break
         }
