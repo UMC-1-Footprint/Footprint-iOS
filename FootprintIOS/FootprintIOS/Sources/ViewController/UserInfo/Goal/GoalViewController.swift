@@ -139,24 +139,16 @@ class GoalViewController: BaseViewController, View {
         bottomButton.rx.tap
             .withUnretained(self)
             .map { owner, _ -> GoalRequestDTO in
-                let info = GoalRequestDTO(dayIdx: reactor.currentState.isSelectedButtons.enumerated().filter { $0.1 }.map { $0.0 + 1 },
-                                       walkGoalTime: owner.goalView.getWalkIndex(type: .goalTime),
-                                       walkTimeSlot: owner.goalView.getWalkIndex(type: .time))
+                let info = GoalRequestDTO(
+                    dayIdx: reactor.currentState.isSelectedButtons
+                        .enumerated().filter { $0.1 }.map { $0.0 + 1 },
+                    walkGoalTime: owner.goalView.getWalkIndex(type: .goalTime),
+                    walkTimeSlot: owner.goalView.getWalkIndex(type: .time))
                 
                 return info
             }
             .map { .tapDoneButton($0) }
             .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        goalView.walkSelectView.rx.tapGesture()
-            .when(.recognized)
-            .withUnretained(self)
-            .bind { owner, _ in
-                let reactor = reactor.reactorForWalk()
-                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
-                owner.present(walkBottomSheet, animated: true)
-            }
             .disposed(by: disposeBag)
         
         goalView.goalWalkSelectView.rx.tapGesture()
@@ -166,6 +158,16 @@ class GoalViewController: BaseViewController, View {
                 let reactor = reactor.reactorForGoalWalk()
                 let goalWalkBottomSheet = GoalWalkBottomSheetViewController(reactor: reactor)
                 owner.present(goalWalkBottomSheet, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        goalView.walkSelectView.rx.tapGesture()
+            .when(.recognized)
+            .withUnretained(self)
+            .bind { owner, _ in
+                let reactor = reactor.reactorForWalk()
+                let walkBottomSheet = WalkBottomSheetViewController(reactor: reactor)
+                owner.present(walkBottomSheet, animated: true)
             }
             .disposed(by: disposeBag)
         
@@ -180,6 +182,14 @@ class GoalViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
+            .compactMap(\.walk)
+            .withUnretained(self)
+            .bind { owner, walk in
+                owner.goalView.walkSelectView.update(text: walk)
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.state
             .compactMap(\.goalWalk)
             .withUnretained(self)
             .bind { owner, goalWalk in
@@ -188,10 +198,23 @@ class GoalViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .compactMap(\.walk)
+            .map(\.isPresentGoalWalkSelectView)
+            .filter { $0 }
             .withUnretained(self)
-            .bind { owner, walk in
-                owner.goalView.walkSelectView.update(text: walk)
+            .flatMap { owner, _ in
+                let selectGoalWalkTime: PublishSubject<String> = .init()
+                
+                owner.makeAlert(type: .custom(value: .selectGoalWalkTime),
+                                customViewType: .selectGoalWalkTime,
+                                selectTimeAction: { time in
+                    selectGoalWalkTime.onNext(time)
+                })
+                
+                return selectGoalWalkTime
+            }
+            .withUnretained(self)
+            .bind { (owner, goalWalkTime) in
+                owner.goalView.goalWalkSelectView.update(text: goalWalkTime)
             }
             .disposed(by: disposeBag)
         

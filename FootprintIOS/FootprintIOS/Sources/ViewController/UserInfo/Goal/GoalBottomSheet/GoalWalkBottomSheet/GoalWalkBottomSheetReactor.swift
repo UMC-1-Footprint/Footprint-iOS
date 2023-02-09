@@ -15,12 +15,14 @@ class GoalWalkBottomSheetReactor: Reactor {
     
     enum Mutation {
         case updateGoalWalkInfo(String)
+        case selectGoalWalkTime
         case dismiss
     }
     
     struct State {
         var goalWalk: String?
         var goalWalkNum: Int?
+        var showGoalWalkTimeAlertView: Bool = false
         var dismiss: Bool = true
     }
     
@@ -34,8 +36,8 @@ class GoalWalkBottomSheetReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .tapGoalWalkTime(let goalWalk):
-            return service.updateGoalWalk(to: goalWalk).map { _ in .dismiss }
+        case .tapGoalWalkTime(let goalWalkTime):
+            return goalWalkTimeMutation(goalWalkTime)
         }
     }
     
@@ -45,10 +47,23 @@ class GoalWalkBottomSheetReactor: Reactor {
         switch mutation {
         case .updateGoalWalkInfo(let goalWalk):
             newState.goalWalk = goalWalk
+        case .selectGoalWalkTime:
+            newState.showGoalWalkTimeAlertView = true
         case .dismiss:
             newState.dismiss = true
+            newState.showGoalWalkTimeAlertView = false
         }
         
         return newState
+    }
+}
+
+extension GoalWalkBottomSheetReactor {
+    private func goalWalkTimeMutation(_ goalWalkTime: String) -> Observable<Mutation> {
+        if goalWalkTime == "직접 설정" {
+            return .just(.selectGoalWalkTime)
+        } else {
+            return service.updateGoalWalk(to: goalWalkTime).map { _ in .dismiss }
+        }
     }
 }

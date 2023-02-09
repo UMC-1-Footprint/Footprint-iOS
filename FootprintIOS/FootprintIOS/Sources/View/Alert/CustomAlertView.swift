@@ -13,6 +13,7 @@ class CustomAlertView: BaseView {
     // MARK: - Properties
     
     let type: AlertType
+    let customViewType: AlertType.Custom?
 
     // MARK: - UI Components
     
@@ -26,10 +27,7 @@ class CustomAlertView: BaseView {
         $0.textColor = FootprintIOSAsset.Colors.blackM.color
     }
     
-    // FIXME: 나중에 재사용 가능성이 있다면 customView도 enum으로 관리
-    private let customView = UIView().then {
-        $0.backgroundColor = .systemYellow
-    }
+    lazy var selectGoalWalkTimeView = SelectGoalWalkTimeView.init()
     
     private let lineView = UIView().then {
         $0.backgroundColor = FootprintIOSAsset.Colors.white3.color
@@ -55,8 +53,9 @@ class CustomAlertView: BaseView {
     
     // MARK: - Initializer
     
-    init(type: AlertType) {
+    init(type: AlertType, customViewType: AlertType.Custom?) {
         self.type = type
+        self.customViewType = customViewType
         
         super.init(frame: .zero)
     }
@@ -79,15 +78,19 @@ class CustomAlertView: BaseView {
         super.setupHierarchy()
         
         addSubview(backgroundView)
-        backgroundView.addSubviews([titleLabel, customView, lineView, buttonStackView])
+        backgroundView.addSubviews([titleLabel, lineView, buttonStackView])
+        
+        if customViewType == .selectGoalWalkTime {
+            backgroundView.addSubview(selectGoalWalkTimeView)
+        }
     }
     
     override func setupLayout() {
         super.setupLayout()
         
         backgroundView.snp.makeConstraints {
-            $0.width.equalTo(326)
-            $0.height.equalTo(259)
+            $0.width.equalTo(327)
+            $0.height.equalTo(230)
             $0.center.equalToSuperview()
         }
         
@@ -96,10 +99,12 @@ class CustomAlertView: BaseView {
             $0.centerX.equalTo(backgroundView)
         }
         
-        customView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
-            $0.leading.trailing.equalTo(backgroundView)
-            $0.height.equalTo(150)
+        if customViewType == .selectGoalWalkTime {
+            selectGoalWalkTimeView.snp.makeConstraints {
+                $0.top.equalTo(titleLabel.snp.bottom).offset(10)
+                $0.leading.trailing.equalTo(backgroundView)
+                $0.height.equalTo(130)
+            }
         }
         
         buttonStackView.snp.makeConstraints {

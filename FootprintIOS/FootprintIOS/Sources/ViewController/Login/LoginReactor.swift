@@ -73,8 +73,23 @@ extension LoginReactor {
                         if let error = error {
                             print(error)
                         } else {
-                            guard let userEmail = user?.kakaoAccount?.email else { return observable.onNext(.doKakaoLogin(false)) }
+                            guard let userEmail = user?.kakaoAccount?.email,
+                                  let userId = user?.id,
+                                  let userName = user?.properties?["nickname"]
+                                else { return observable.onNext(.doKakaoLogin(false)) }
+                            
                             self?.keychainService.updateTokens(accessToken: token.accessToken, refreshToken: token.refreshToken)
+                            
+                            self?.loginService.login(userId: String(userId), userName: userName, userEmail: userEmail, providerType: .kakao)
+                            
+                            self?.loginService.event
+                                .subscribe(onNext: { event in
+                                    switch event {
+                                    case let .login(data):
+                                        self?.keychainService.updateJWTId(id: data.jwtID)
+                                    }
+                                })
+                            
                             observable.onNext(.doKakaoLogin(true))
                         }
                     }

@@ -9,6 +9,7 @@
 import UIKit
 
 import ReactorKit
+import RxSwift
 import Then
 
 enum AlertType {
@@ -22,7 +23,11 @@ enum AlertType {
     case withdrawal
     case deleteAll(Int)
     case badge(String)
-    case custom
+    case custom(value: Custom)
+    
+    enum Custom {
+        case selectGoalWalkTime
+    }
     
     var title: String {
         switch self {
@@ -46,7 +51,7 @@ enum AlertType {
             return "\(i)번째 산책'을 삭제하시겠어요?"
         case let .badge(badgeName):
             return "\(badgeName)\n뱃지를 획득했어요!"
-        case .custom:
+        case .custom(value: .selectGoalWalkTime):
             return "목표산책시간 직접설정"
         }
     }
@@ -89,24 +94,29 @@ class AlertViewController: NavigationBarViewController, View {
     // MARK: - Properties
     
     private let type: AlertType
+    private let customViewType: AlertType.Custom?
     typealias Reactor = AlertReactor
     var alertAction: (() -> Void)?
+    var selectTimeAction: ((String) -> Void)?
+    
+    private lazy var selectedTime: String = ""
     
     // MARK: - UI Components
     
     private lazy var oneButtonAlertView = OneButtonAlertView.init(type: self.type)
     private lazy var twoButtonAlertView = TwoButtonAlertView.init(type: self.type)
     private lazy var badgeAlertView = BadgeAlertView.init(type: self.type)
-    private lazy var customAlertView = CustomAlertView.init(type: self.type)
+    private lazy var customAlertView = CustomAlertView.init(type: self.type, customViewType: self.customViewType)
     
     // MARK: - Initializer
     
-    init(type: AlertType, reator: Reactor) {
+    init(type: AlertType, customViewType: AlertType.Custom? = nil, reactor: Reactor) {
         self.type = type
+        self.customViewType = customViewType
         
         super.init(nibName: nil, bundle: nil)
         
-        self.reactor = reator
+        self.reactor = reactor
     }
     
     @available(*, unavailable)
@@ -190,15 +200,38 @@ class AlertViewController: NavigationBarViewController, View {
             })
             .disposed(by: disposeBag)
         
+        if customViewType == .selectGoalWalkTime {
+            Observable.combineLatest(
+                customAlertView.selectGoalWalkTimeView.selectedHour,
+                customAlertView.selectGoalWalkTimeView.selectedMinute
+            ).bind { [weak self] (hour, minute) in
+                if hour == "4시간" {
+                    self?.selectedTime = "4시간"
+                    return
+                }
+                
+                let time = hour.contains("0") ? "\(minute)" :
+                (minute == "0분") ? "\(hour)" : "\(hour) \(minute)"
+                
+                self?.selectedTime = time
+                if time == "0분" {
+                    self?.selectedTime = "10분"
+                }
+            }
+            .disposed(by: disposeBag)
+        }
+        
         customAlertView.rightButton.rx.tap
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { owner, _ in
-                owner.alertAction?()
+                if owner.customViewType == .selectGoalWalkTime {
+                    owner.selectTimeAction?(owner.selectedTime)
+                }
                 owner.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
-        
+    
         reactor.state
             .map(\.isDismiss)
             .bind { [weak self] _ in
@@ -209,11 +242,15 @@ class AlertViewController: NavigationBarViewController, View {
 }
 
 extension UIViewController {
-    func makeAlert(type: AlertType, alertAction: (() -> Void)? = nil) {
-        let alertVC = AlertViewController(type: type, reator: .init())
+    func makeAlert(type: AlertType,
+                   customViewType: AlertType.Custom? = nil,
+                   alertAction: (() -> Void)? = nil,
+                   selectTimeAction: ((String) -> Void)? = nil) {
+        let alertVC = AlertViewController(type: type, customViewType: customViewType, reactor: .init())
         alertVC.modalTransitionStyle = .crossDissolve
         alertVC.modalPresentationStyle = .overCurrentContext
         alertVC.alertAction = alertAction
+        alertVC.selectTimeAction = selectTimeAction
         self.present(alertVC, animated: true)
     }
 }
