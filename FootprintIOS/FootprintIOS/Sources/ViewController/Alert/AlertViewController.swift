@@ -208,6 +208,7 @@ class AlertViewController: NavigationBarViewController, View {
                 let time = hour.contains("0") ? "\(minute)" :
                 (minute == "0분") ? "\(hour)" : "\(hour) \(minute)"
                 
+                self?.selectedTime = time
                 if time == "0분" {
                     self?.selectedTime = "10분"
                 }
