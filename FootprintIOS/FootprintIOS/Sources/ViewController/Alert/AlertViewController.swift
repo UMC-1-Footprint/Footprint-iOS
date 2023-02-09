@@ -205,6 +205,11 @@ class AlertViewController: NavigationBarViewController, View {
                 customAlertView.selectGoalWalkTimeView.selectedHour,
                 customAlertView.selectGoalWalkTimeView.selectedMinute
             ).bind { [weak self] (hour, minute) in
+                if hour == "4시간" {
+                    self?.selectedTime = "4시간"
+                    return
+                }
+                
                 let time = hour.contains("0") ? "\(minute)" :
                 (minute == "0분") ? "\(hour)" : "\(hour) \(minute)"
                 

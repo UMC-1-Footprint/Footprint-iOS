@@ -103,6 +103,9 @@ extension SelectGoalWalkTimeView: UIPickerViewDelegate {
         if selectedHour.value == hours[0] {
             pickerView.selectRow(1, inComponent: 1, animated: true)
         }
+        if selectedHour.value == hours[4] {
+            pickerView.selectRow(0, inComponent: 1, animated: true)
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
